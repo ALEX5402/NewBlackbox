@@ -15,7 +15,7 @@
 
 > *"The only people who have anything to fear from free software are those whose products are worth even less."*
 >
-> <p align="right">——David Emery</p>
+> <p align="right"></p>
 
 ---
 
