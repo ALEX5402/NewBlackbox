@@ -21,7 +21,7 @@ android {
                 enable true
                 reset()
                 //noinspection ChromeOsAbiSupport
-                include 'armeabi-v7a', "arm64-v8a" , "x86"
+                include 'armeabi-v7a', "arm64-v8a"
                 universalApk false
             }
         }
