@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/language-java-brightgreen.svg" alt="Java"/>
   <img src="https://img.shields.io/badge/language-kotlin-blue.svg" alt="Kotlin"/>
   <img src="https://img.shields.io/badge/android-5.0%2B-green.svg" alt="Android 5.0+"/>
-  <img src="https://img.shields.io/badge/architecture-arm64--v8a%20%7C%20armeabi--v7a%20%7C%20x86-orange.svg" alt="Architecture"/>
+  <img src="https://img.shields.io/badge/architecture-arm64--v8a%20%7C%20armeabi--v7a%20%7C%20-pink.svg" alt="Architecture"/>
   <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"/>
 </p>
 
