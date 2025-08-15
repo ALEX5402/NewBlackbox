@@ -1,0 +1,88 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+}
+
+android {
+
+    namespace 'top.niunaijun.blackboxa'
+    compileSdk 35
+    ndkVersion = "29.0.13846066"
+    defaultConfig {
+        applicationId "top.niunaijun.blackboxa"
+        minSdk 24
+        targetSdk 34
+        versionCode 2
+        versionName "2.0-r1beta"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        splits {
+            abi {
+                enable true
+                reset()
+                //noinspection ChromeOsAbiSupport
+                include 'armeabi-v7a', "arm64-v8a" , "x86"
+                universalApk false
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+    // download the latest .aar file  fromm https://t.me/blackbox_apks and paste that to libs directory and sync projecr
+
+//     implementation project(':Bcore')
+
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.constraintlayout
+    implementation libs.core.ktx
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+
+    implementation "androidx.preference:preference-ktx:1.1.1"
+    //viewModel liveData  lifecycle
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+
+    //列表
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.gitee.cbfg5210:RVAdapter:0.3.7'
+
+    //searchView
+    implementation 'com.github.Othershe:CornerLabelView:1.0.0'
+    //dialog
+    implementation 'com.github.nukc.stateview:kotlin:2.2.0'
+    //加载dialog
+    implementation 'com.github.Ferfalk:SimpleSearchView:0.2.0'
+    implementation 'com.tbuonomo:dotsindicator:4.2'
+    // osmdroid
+    implementation 'org.osmdroid:osmdroid-android:6.1.11'
+    //viewPager2 指示点
+    implementation 'com.afollestad.material-dialogs:core:3.3.0'
+    implementation 'com.afollestad.material-dialogs:input:3.3.0'
+
+
+
+}
