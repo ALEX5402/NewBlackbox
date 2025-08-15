@@ -1,5 +1,8 @@
 pluginManagement {
     repositories {
+        flatDir {
+            dirs "libs"
+        }
         maven { url "https://www.jitpack.io" }
         maven { url 'https://maven.aliyun.com/repository/releases' }
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -20,6 +23,9 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        flatDir {
+            dirs "libs"
+        }
         maven { url "https://www.jitpack.io" }
         maven { url 'https://maven.aliyun.com/repository/releases' }
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -34,4 +40,4 @@ dependencyResolutionManagement {
 rootProject.name = "vspace-fully-fixed"
 
 include ':app'
-include ':Bcore'
+//include ':Bcore'
