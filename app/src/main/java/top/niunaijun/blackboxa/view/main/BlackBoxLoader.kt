@@ -8,6 +8,7 @@ import top.niunaijun.blackbox.app.BActivityThread
 import top.niunaijun.blackbox.app.configuration.AppLifecycleCallback
 import top.niunaijun.blackbox.app.configuration.ClientConfiguration
 import top.niunaijun.blackboxa.app.App
+import top.niunaijun.blackboxa.app.rocker.RockerManager
 import top.niunaijun.blackboxa.biz.cache.AppSharedPreferenceDelegate
 import java.io.File
 
@@ -141,7 +142,7 @@ class BlackBoxLoader {
                 ) {
                     try {
                         Log.d(TAG, "afterApplicationOnCreate: pkg $packageName, processName $processName")
-                        // RockerManager.init(application,userId)
+                        RockerManager.init(application,userId)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error in afterApplicationOnCreate: ${e.message}")
                     }
@@ -214,6 +215,17 @@ class BlackBoxLoader {
     fun doOnCreate(context: Context) {
         try {
             BlackBoxCore.get().doCreate()
+            
+            // Register callback to refresh app list when services become available
+            try {
+                BlackBoxCore.get().addServiceAvailableCallback {
+                    Log.d(TAG, "Services became available, triggering app list refresh")
+                    // This will be called when services are ready
+                    // The UI components can listen for this and refresh their data
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error registering service available callback: ${e.message}")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error in doOnCreate: ${e.message}")
         }

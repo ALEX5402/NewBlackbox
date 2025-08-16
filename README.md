@@ -391,172 +391,31 @@ dependencies {
 3. Build the Bcore module
 4. Include the generated AAR in your project
 
-### ⚙️ Integration Steps
+### ⚙️ Documentation & Resources
 
-#### Step 1: Initialize BlackBox in Your Application
-```java
-public class MyApplication extends Application {
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        try {
-            BlackBoxCore.get().doAttachBaseContext(base, new ClientConfiguration() {
-                @Override
-                public String getHostPackageName() {
-                    return base.getPackageName();
-                }
-            });
-        } catch (Exception e) {
-            // Enhanced error handling
-            Log.e("BlackBox", "Failed to attach base context", e);
-        }
-    }
+#### 📚 Complete User Guide
+- **[Docs.md](Docs.md)** - Comprehensive user guide covering all features, installation, app management, WebView support, Google services, background jobs, troubleshooting, and advanced features
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        try {
-        BlackBoxCore.get().doCreate();
-        } catch (Exception e) {
-            // Enhanced error handling
-            Log.e("BlackBox", "Failed to create BlackBox core", e);
-        }
-    }
-}
-```
+#### 📋 Release Information
+- **[RELEASE_NOTES.md](RELEASE_NOTES.md)** - Detailed release notes for version 2.4.0 with all new features, improvements, and bug fixes
 
-#### Step 2: Install Virtual Applications
-```java
-// Method 1: Install from existing package (if already installed on device)
-try {
-    boolean success = BlackBoxCore.get().installPackageAsUser("com.example.app", userId);
-    if (success) {
-        Log.d("BlackBox", "Package installed successfully");
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to install package", e);
-}
+#### 🔧 Quick Start & Integration
+- **Installation Methods**: Pre-built AAR or source code compilation
+- **API Reference**: Complete developer interface documentation
+- **Troubleshooting**: Common issues and solutions
+- **Performance Metrics**: Benchmarks and compatibility statistics
 
-// Method 2: Install from APK file
-try {
-    File apkFile = new File("/sdcard/Download/app.apk");
-    boolean success = BlackBoxCore.get().installPackageAsUser(apkFile, userId);
-    if (success) {
-        Log.d("BlackBox", "APK installed successfully");
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to install APK", e);
-}
-```
+#### 📖 Documentation Sections
+- **App Management**: Install, remove, and manage virtual applications
+- **WebView & Browser Support**: Complete WebView compatibility and browser apps
+- **Google Services Integration**: GMS, account management, and authentication
+- **Background Job Management**: WorkManager and JobScheduler support
+- **Advanced Features**: UID spoofing, process management, and security
+- **Troubleshooting**: Debug mode, log analysis, and problem resolution
+- **API Reference**: Complete class and method documentation
+- **FAQ**: Common questions and detailed answers
 
-#### Step 3: Launch Virtual Applications
-```java
-try {
-    Intent intent = BlackBoxCore.get().launchApk("com.example.app", userId);
-    if (intent != null) {
-        startActivity(intent);
-        Log.d("BlackBox", "App launched successfully");
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to launch app", e);
-}
-
-### 🎯 App Cloning Demo
-<p align="center">
-  <img src="assets/multiw.gif" width="50%" alt="Multi-window app cloning demo"/>
-</p>
-
-## 📚 Comprehensive API Reference
-
-### 🔍 Application Management APIs
-
-#### Get Installed Virtual Applications
-```java
-// Get installed applications with specific flags
-try {
-    List<ApplicationInfo> apps = BlackBoxCore.get().getInstalledApplications(
-        PackageManager.GET_META_DATA, userId);
-    for (ApplicationInfo app : apps) {
-        Log.d("BlackBox", "Installed app: " + app.packageName);
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to get installed applications", e);
-}
-
-// Get installed packages with detailed information
-try {
-    List<PackageInfo> packages = BlackBoxCore.get().getInstalledPackages(
-        PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES, userId);
-    for (PackageInfo pkg : packages) {
-        Log.d("BlackBox", "Package: " + pkg.packageName + 
-              ", Version: " + pkg.versionName);
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to get installed packages", e);
-}
-```
-
-#### User Management
-```java
-// Get all virtual users
-try {
-    List<BUserInfo> users = BlackBoxCore.get().getUsers();
-    for (BUserInfo user : users) {
-        Log.d("BlackBox", "User ID: " + user.id + ", Name: " + user.name);
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to get users", e);
-}
-
-// Create new virtual user
-try {
-    BUserInfo newUser = BlackBoxCore.get().createUser("User2", 0);
-    if (newUser != null) {
-        Log.d("BlackBox", "Created user with ID: " + newUser.id);
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to create user", e);
-}
-```
-
-### 🎛️ Advanced Features
-
-#### Fake Location Support
-```java
-// Enable fake location for a specific app
-try {
-    boolean success = BlackBoxCore.get().setFakeLocation(
-        "com.example.app", userId, latitude, longitude);
-    if (success) {
-        Log.d("BlackBox", "Fake location set successfully");
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to set fake location", e);
-}
-```
-
-#### Package Operations
-```java
-// Uninstall virtual application
-try {
-    boolean success = BlackBoxCore.get().uninstallPackageAsUser(
-        "com.example.app", userId);
-    if (success) {
-        Log.d("BlackBox", "Package uninstalled successfully");
-    }
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to uninstall package", e);
-}
-
-// Check if package is installed
-try {
-    boolean isInstalled = BlackBoxCore.get().isPackageInstalled(
-        "com.example.app", userId);
-    Log.d("BlackBox", "Package installed: " + isInstalled);
-} catch (Exception e) {
-    Log.e("BlackBox", "Failed to check package installation", e);
-}
-```
+> 💡 **Pro Tip**: Start with [Docs.md](Docs.md) for comprehensive usage instructions, then refer to [RELEASE_NOTES.md](RELEASE_NOTES.md) for detailed feature information.
 
 ### 🛡️ Xposed Framework Integration
 

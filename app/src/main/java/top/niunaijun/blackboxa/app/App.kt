@@ -9,8 +9,8 @@ import top.niunaijun.blackbox.BlackBoxCore
 /**
  *
  * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 21:21
+ * @Author: alex5402
+ * @CreateDate: Saturday, August 16, 2025
  */
 class App : Application() {
 
@@ -30,7 +30,6 @@ class App : Application() {
         try {
             super.attachBaseContext(base)
 
-            // Initialize BlackBoxCore with error handling
             try {
                 BlackBoxCore.get().closeCodeInit()
             } catch (e: Exception) {
@@ -44,7 +43,7 @@ class App : Application() {
             }
 
             mContext = base!!
-            
+
             try {
                 AppManager.doAttachBaseContext(base)
             } catch (e: Exception) {
@@ -52,13 +51,16 @@ class App : Application() {
             }
 
             try {
+
                 BlackBoxCore.get().onAfterMainApplicationAttach(this, base)
+
             } catch (e: Exception) {
+
                 Log.e("App", "Error in onAfterMainApplicationAttach: ${e.message}")
+
             }
         } catch (e: Exception) {
             Log.e("App", "Critical error in attachBaseContext: ${e.message}")
-            // Ensure we still set the context even if other initialization fails
             if (base != null) {
                 mContext = base
             }

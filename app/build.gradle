@@ -13,7 +13,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode 3
-        versionName "3.0.1r2"
+        versionName "3.0.7r3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         splits {
@@ -80,6 +80,7 @@ dependencies {
     //viewPager2 指示点
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
+
 
 
 

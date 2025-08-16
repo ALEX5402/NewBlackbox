@@ -7,8 +7,8 @@ import android.os.Bundle
 /**
  *
  * @Description:
- * @Author: kotlinMiku
- * @CreateDate: 2022/3/19 20:08
+ * @Author: alex5402
+ * @CreateDate: Saturday, August 16, 2025
  */
 interface BaseActivityLifecycleCallback : Application.ActivityLifecycleCallbacks {
 

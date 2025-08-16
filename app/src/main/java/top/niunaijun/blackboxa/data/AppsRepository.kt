@@ -68,6 +68,12 @@ class AppsRepository {
 
                         if (!AbiUtils.isSupport(file)) continue
 
+                        // Filter out BlackBox apps to prevent cloning
+                        if (BlackBoxCore.get().isBlackBoxApp(installedApplication.packageName)) {
+                            Log.d(TAG, "Filtering out BlackBox app: ${installedApplication.packageName}")
+                            continue
+                        }
+
                         val isXpModule = BlackBoxCore.get().isXposedModule(file)
 
                         val info = AppInfo(
@@ -213,6 +219,15 @@ class AppsRepository {
             }
 
             Log.d(TAG, "getVmInstallList: processed ${appInfoList.size} apps")
+            
+            // If no virtual apps found, show empty list (correct behavior for new users)
+            // Do NOT load regular installed apps as fallback - this causes the bug
+            if (appInfoList.isEmpty()) {
+                Log.d(TAG, "getVmInstallList: No virtual apps found for userId=$userId, showing empty list (correct for new users)")
+            } else {
+                Log.d(TAG, "getVmInstallList: Showing ${appInfoList.size} virtual apps for userId=$userId")
+            }
+            
             appsLiveData.postValue(appInfoList)
         } catch (e: Exception) {
             Log.e(TAG, "Error in getVmInstallList: ${e.message}")
@@ -236,6 +251,30 @@ class AppsRepository {
 
     fun installApk(source: String, userId: Int, resultLiveData: MutableLiveData<String>) {
         try {
+            // Check if this is an attempt to install BlackBox app
+            if (source.contains("blackbox") || source.contains("niunaijun") || 
+                source.contains("vspace") || source.contains("virtual")) {
+                // Additional check for the actual BlackBox app
+                try {
+                    val blackBoxCore = BlackBoxCore.get()
+                    val hostPackageName = BlackBoxCore.getHostPkg()
+                    
+                    // If it's a file path, try to check the package name
+                    if (!URLUtil.isValidUrl(source)) {
+                        val file = File(source)
+                        if (file.exists()) {
+                            val packageInfo = BlackBoxCore.getPackageManager().getPackageArchiveInfo(source, 0)
+                            if (packageInfo != null && packageInfo.packageName == hostPackageName) {
+                                resultLiveData.postValue("Cannot install BlackBox app from within BlackBox. This would create infinite recursion and is not allowed for security reasons.")
+                                return
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Could not verify if this is BlackBox app: ${e.message}")
+                }
+            }
+            
             val blackBoxCore = BlackBoxCore.get()
             val installResult = if (URLUtil.isValidUrl(source)) {
                 val uri = Uri.parse(source)

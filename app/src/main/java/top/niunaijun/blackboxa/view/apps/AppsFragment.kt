@@ -128,7 +128,19 @@ class AppsFragment : Fragment() {
     override fun onStart() {
         try {
             super.onStart()
-            viewModel.getInstalledApps(userID)
+            
+            // Register callback to refresh app list when services become available
+            try {
+                BlackBoxCore.get().addServiceAvailableCallback {
+                    Log.d(TAG, "Services became available, refreshing app list")
+                    // Refresh the app list when services are ready
+                    viewModel.getInstalledAppsWithRetry(userID)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error registering service available callback: ${e.message}")
+            }
+            
+            viewModel.getInstalledAppsWithRetry(userID)
         } catch (e: Exception) {
             Log.e(TAG, "Error in onStart: ${e.message}")
         }
