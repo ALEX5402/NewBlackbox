@@ -44,15 +44,11 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
-
 }
-
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-    // download the latest .aar file  fromm https://t.me/blackbox_apks and paste that to libs directory and sync projecr
-
-//     implementation project(':Bcore')
+    implementation project(':Bcore')
 
     implementation libs.appcompat
     implementation libs.material
