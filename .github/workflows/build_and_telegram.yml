@@ -21,6 +21,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -37,76 +40,17 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
-      - name: Find APK paths
-        id: apk_paths
-        run: |
-          DEBUG_APK=$(find ./app/build/outputs/apk/debug -name "*.apk" | head -n 1)
-          RELEASE_APK=$(find ./app/build/outputs/apk/release -name "*.apk" | head -n 1)
-          echo "debug_apk_path=$DEBUG_APK" >> $GITHUB_OUTPUT
-          echo "release_apk_path=$RELEASE_APK" >> $GITHUB_OUTPUT
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Send Debug APK to Telegram and Pin
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          RESPONSE=$(curl -s -F document=@"${{ steps.apk_paths.outputs.debug_apk_path }}" \
-               -F chat_id="$TELEGRAM_CHAT_ID" \
-               -F caption="[DEBUG] $COMMIT_MSG" \
-               https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument)
-          MESSAGE_ID=$(echo $RESPONSE | jq '.result.message_id')
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/pinChatMessage" \
-            -d chat_id="$TELEGRAM_CHAT_ID" \
-            -d message_id="$MESSAGE_ID"
-
-      - name: Send Release APK to Telegram and Pin
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          RESPONSE=$(curl -s -F document=@"${{ steps.apk_paths.outputs.release_apk_path }}" \
-               -F chat_id="$TELEGRAM_CHAT_ID" \
-               -F caption="[RELEASE] $COMMIT_MSG" \
-               https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument)
-          MESSAGE_ID=$(echo $RESPONSE | jq '.result.message_id')
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/pinChatMessage" \
-            -d chat_id="$TELEGRAM_CHAT_ID" \
-            -d message_id="$MESSAGE_ID"
-
       - name: Build Bcore AAR
         run: ./gradlew :Bcore:assembleRelease
+
+      - name: Build Bcore Debug AAR
+        run: ./gradlew :Bcore:assembleDebug
 
       - name: Find Bcore AAR path
         id: aar_path
         run: |
           AAR=$(find ./Bcore/build/outputs/aar -name "*.aar" | head -n 1)
           echo "aar_path=$AAR" >> $GITHUB_OUTPUT
-
-      - name: Send Bcore AAR to Telegram and Pin
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          RESPONSE=$(curl -s -F document=@"${{ steps.aar_path.outputs.aar_path }}" \
-               -F chat_id="$TELEGRAM_CHAT_ID" \
-               -F caption="[Bcore AAR] $COMMIT_MSG" \
-               https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument)
-          MESSAGE_ID=$(echo $RESPONSE | jq '.result.message_id')
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/pinChatMessage" \
-            -d chat_id="$TELEGRAM_CHAT_ID" \
-            -d message_id="$MESSAGE_ID"
-
-      - name: Build Bcore Debug AAR
-        run: ./gradlew :Bcore:assembleDebug
-
-      - name: Build Bcore Release AAR
-        run: ./gradlew :Bcore:assembleRelease
 
       - name: Find Bcore AAR paths
         id: aar_paths
@@ -145,3 +89,46 @@ jobs:
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/pinChatMessage" \
             -d chat_id="$TELEGRAM_CHAT_ID" \
             -d message_id="$MESSAGE_ID"
+
+      - name: Find APK paths
+        id: apk_paths
+        run: |
+          DEBUG_APK=$(find ./app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          RELEASE_APK=$(find ./app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          echo "debug_apk_path=$DEBUG_APK" >> $GITHUB_OUTPUT
+          echo "release_apk_path=$RELEASE_APK" >> $GITHUB_OUTPUT
+          
+      - name: Send ALL Debug APKs to Telegram and Pin
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          for APK in ./app/build/outputs/apk/debug/*.apk; do
+            RESPONSE=$(curl -s -F document=@"$APK" \
+                 -F chat_id="$TELEGRAM_CHAT_ID" \
+                 -F caption="[DEBUG] $(basename $APK) $COMMIT_MSG" \
+                 https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument)
+            MESSAGE_ID=$(echo $RESPONSE | jq '.result.message_id')
+            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/pinChatMessage" \
+              -d chat_id="$TELEGRAM_CHAT_ID" \
+              -d message_id="$MESSAGE_ID"
+          done
+
+      - name: Send ALL Release APKs to Telegram and Pin
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          for APK in ./app/build/outputs/apk/release/*.apk; do
+            RESPONSE=$(curl -s -F document=@"$APK" \
+                 -F chat_id="$TELEGRAM_CHAT_ID" \
+                 -F caption="[RELEASE] $(basename $APK) $COMMIT_MSG" \
+                 https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument)
+            MESSAGE_ID=$(echo $RESPONSE | jq '.result.message_id')
+            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/pinChatMessage" \
+              -d chat_id="$TELEGRAM_CHAT_ID" \
+              -d message_id="$MESSAGE_ID"
+          done
+
