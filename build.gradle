@@ -6,15 +6,18 @@ alias(libs.plugins.android.application) apply false
 }
 
 ext {
-    compileSdkVersion = 34
-//    buildToolsVersionbuildToolsVersion = '28.0.2'
+    compileSdkVersion = 35
     targetSdkVersion = 34
-
-    versionName = '1.0'
+    minSdk = 21
     versionCode = 1
+    versionName = "3.0.7r4"
+
+
+
+
+
 
     xVersion = '1.1.0'
     blackReflection = '1.1.2'
-
     hiddenApiBypass = '4.3'
 }

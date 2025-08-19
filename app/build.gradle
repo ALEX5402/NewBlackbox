@@ -6,23 +6,24 @@ plugins {
 android {
 
     namespace 'top.niunaijun.blackboxa'
-    compileSdk 35
+    compileSdk rootProject.ext.compileSdkVersion
     ndkVersion = "29.0.13846066"
     defaultConfig {
         applicationId "top.niunaijun.blackboxa"
-        minSdk 24
-        targetSdk 34
-        versionCode 3
-        versionName "3.0.7r3"
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
         splits {
             abi {
                 enable true
                 reset()
                 //noinspection ChromeOsAbiSupport
                 include 'armeabi-v7a', "arm64-v8a"
-                universalApk false
+                universalApk true
             }
         }
     }
@@ -30,7 +31,7 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -48,7 +49,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-    implementation project(':Bcore')
+//     implementation project(':Bcore')
+// download the aar from https://t.me/blackbox_apks
 
     implementation libs.appcompat
     implementation libs.material
