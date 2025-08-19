@@ -1,7 +1,7 @@
 # 🚀 Virtual Engine · BlackBox (Enhanced Edition)
 
 <p align="center">
-  <img src="assets/banner.png" alt="BlackBox Banner" width="100%"/>
+  <img src="assets/usage.gif" alt="BlackBox Banner" width="100%"/>
 </p>
 
 <p align="center">
