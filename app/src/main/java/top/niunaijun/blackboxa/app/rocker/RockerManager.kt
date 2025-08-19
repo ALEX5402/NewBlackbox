@@ -51,6 +51,14 @@ import kotlin.math.sin
  * @CreateDate: 2022/3/19 19:37
  * @LastModified: 2024 - Enhanced with better error handling and permissions
  */
+/**
+ * updated by alex5402 on 4/9/21.
+ * * ∧＿∧
+ * (`･ω･∥
+ * 丶　つ０
+ * しーＪ
+ * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ */
 object RockerManager {
 
     private const val TAG = "RockerManager"

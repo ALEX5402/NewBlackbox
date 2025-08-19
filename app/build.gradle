@@ -49,29 +49,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-//     implementation project(':Bcore')
-// download the aar from https://t.me/blackbox_apks
-
-
-    implementation "com.github.CodingGay.BlackReflection:core:$rootProject.ext.blackReflection"
-    annotationProcessor "com.github.CodingGay.BlackReflection:compiler:$rootProject.ext.blackReflection"
-
-    /*   // Configure annotation processors to be incremental
-       annotationProcessor {
-           arguments {
-               // Enable incremental processing
-               arg("incremental", "true")
-               // Set source version compatibility
-               arg("sourceVersion", "17")
-           }
-       }*/
-
-
-
-    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
-
-    implementation 'com.github.tiann:FreeReflection:3.2.2'
-    implementation "com.github.CodingGay.BlackReflection:core:$rootProject.ext.blackReflection"
+    implementation project(':Bcore')
 
     implementation libs.appcompat
     implementation libs.material

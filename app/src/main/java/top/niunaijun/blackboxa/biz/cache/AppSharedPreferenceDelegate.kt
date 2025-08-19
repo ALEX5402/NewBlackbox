@@ -7,11 +7,12 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- *
- * @desc:目前只支持 5种基本数据类型，如果要支持obj，请继承该类并重写他的相关方法 findData/putData
- *
- * @author: mini
- * @created by 2021/5/10
+ * updated by alex5402 on 4/9/21.
+ * * ∧＿∧
+ * (`･ω･∥
+ * 丶　つ０
+ * しーＪ
+ * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
  */
 open class AppSharedPreferenceDelegate<Data>(context: Context, private val default: Data, spName: String? = null) : ReadWriteProperty<Any, Data?> {
 

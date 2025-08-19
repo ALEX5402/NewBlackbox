@@ -31,7 +31,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "vspace-fully-fixed"
+rootProject.name = "NewBlackbox"
 
 include ':app'
-
+include ':Bcore'

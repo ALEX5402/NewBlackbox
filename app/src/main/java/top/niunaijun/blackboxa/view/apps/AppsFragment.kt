@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import cbfg.rvadapter.RVAdapter
 import com.afollestad.materialdialogs.MaterialDialog
 import top.niunaijun.blackbox.BlackBoxCore
@@ -23,6 +24,7 @@ import top.niunaijun.blackboxa.databinding.FragmentAppsBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.ShortcutUtil
 import top.niunaijun.blackboxa.util.inflate
+import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
 import top.niunaijun.blackboxa.view.main.MainActivity
@@ -82,7 +84,59 @@ class AppsFragment : Fragment() {
                 RVAdapter<AppInfo>(requireContext(), AppsAdapter()).bind(viewBinding.recyclerView)
 
             viewBinding.recyclerView.adapter = mAdapter
-            viewBinding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 4)
+            
+            // Enhanced RecyclerView configuration for better performance and crash prevention
+            val layoutManager = GridLayoutManager(requireContext(), 4)
+            layoutManager.isItemPrefetchEnabled = true
+            layoutManager.initialPrefetchItemCount = 8
+            viewBinding.recyclerView.layoutManager = layoutManager
+            
+            // Enable view cache for better scrolling performance
+            viewBinding.recyclerView.setItemViewCacheSize(20)
+            viewBinding.recyclerView.setHasFixedSize(true)
+            
+            // Add scroll listener for crash detection and prevention
+            viewBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    try {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        when (newState) {
+                            RecyclerView.SCROLL_STATE_IDLE -> {
+                                // Scrolling stopped, optimize memory
+                                MemoryManager.optimizeMemoryForRecyclerView()
+                            }
+                            RecyclerView.SCROLL_STATE_DRAGGING -> {
+                                // User is scrolling, ensure smooth performance
+                                // Note: Drawing cache is deprecated, using modern alternatives
+                            }
+                            RecyclerView.SCROLL_STATE_SETTLING -> {
+                                // Scrolling is settling, prepare for idle state
+                                // Note: Drawing cache is deprecated, using modern alternatives
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error in scroll state change: ${e.message}")
+                    }
+                }
+                
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    try {
+                        super.onScrolled(recyclerView, dx, dy)
+                        // Monitor scroll performance
+                        if (Math.abs(dy) > 100) {
+                            // Fast scrolling detected, optimize memory
+                            
+                            // Check memory usage during fast scrolling
+                            if (MemoryManager.isMemoryCritical()) {
+                                Log.w(TAG, "Memory critical during fast scrolling, forcing GC")
+                                MemoryManager.forceGarbageCollectionIfNeeded()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error in scroll: ${e.message}")
+                    }
+                }
+            })
 
             val touchCallBack = AppsTouchCallBack { from, to ->
                 try {
@@ -152,15 +206,34 @@ class AppsFragment : Fragment() {
     private fun interceptTouch() {
         try {
             val point = Point()
-            viewBinding.recyclerView.setOnTouchListener { v, e ->
+            var isScrolling = false
+            var scrollStartTime = 0L
+            
+            viewBinding.recyclerView.setOnTouchListener { _, e ->
                 try {
                     when (e.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            // Reset scroll state
+                            isScrolling = false
+                            scrollStartTime = System.currentTimeMillis()
+                            point.set(0, 0)
+                        }
+                        
                         MotionEvent.ACTION_UP -> {
-                            if (!isMove(point, e)) {
-                                popupMenu?.show()
+                            val scrollDuration = System.currentTimeMillis() - scrollStartTime
+                            
+                            // Only show popup if it wasn't a scroll gesture
+                            if (!isScrolling && !isMove(point, e) && scrollDuration < 500) {
+                                try {
+                                    popupMenu?.show()
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Error showing popup menu: ${e.message}")
+                                }
                             }
+                            
                             popupMenu = null
                             point.set(0, 0)
+                            isScrolling = false
                         }
 
                         MotionEvent.ACTION_MOVE -> {
@@ -168,11 +241,15 @@ class AppsFragment : Fragment() {
                                 point.x = e.rawX.toInt()
                                 point.y = e.rawY.toInt()
                             }
-                            isDownAndUp(point, e)
-
+                            
+                            // Check if this is a scroll gesture
                             if (isMove(point, e)) {
+                                isScrolling = true
                                 popupMenu?.dismiss()
                             }
+                            
+                            // Handle float button visibility
+                            isDownAndUp(point, e)
                         }
                     }
                 } catch (e: Exception) {
@@ -208,25 +285,54 @@ class AppsFragment : Fragment() {
             val yU = y - e.rawY
 
             if (abs(yU) > min) {
-                (requireActivity() as? MainActivity)?.showFloatButton(yU < 0)
+                try {
+                    (requireActivity() as? MainActivity)?.showFloatButton(yU < 0)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error showing/hiding float button: ${e.message}")
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in isDownAndUp: ${e.message}")
         }
     }
 
-    private fun onItemMove(fromPosition:Int, toPosition:Int){
+    private fun onItemMove(fromPosition: Int, toPosition: Int) {
         try {
+            // Validate positions to prevent crashes
+            val items = mAdapter.getItems()
+            if (fromPosition < 0 || toPosition < 0 || 
+                fromPosition >= items.size || toPosition >= items.size) {
+                Log.w(TAG, "Invalid positions for move: from=$fromPosition, to=$toPosition, size=${items.size}")
+                return
+            }
+            
             if (fromPosition < toPosition) {
                 for (i in fromPosition until toPosition) {
-                    Collections.swap(mAdapter.getItems(), i, i + 1)
+                    try {
+                        Collections.swap(items, i, i + 1)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error swapping items at position $i: ${e.message}")
+                        return
+                    }
                 }
             } else {
                 for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(mAdapter.getItems(), i, i - 1)
+                    try {
+                        Collections.swap(items, i, i - 1)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error swapping items at position $i: ${e.message}")
+                        return
+                    }
                 }
             }
-            mAdapter.notifyItemMoved(fromPosition, toPosition)
+            
+            try {
+                mAdapter.notifyItemMoved(fromPosition, toPosition)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error notifying item moved: ${e.message}")
+                // Fallback to full refresh if move notification fails
+                mAdapter.notifyDataSetChanged()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error in onItemMove: ${e.message}")
         }

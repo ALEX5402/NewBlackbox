@@ -1,0 +1,107 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'top.niunaijun.blackbox'
+
+    compileSdk rootProject.ext.compileSdkVersion
+
+
+    aidlPackagedList "android/app/IServiceConnection.aidl"
+    aidlPackagedList "android/accounts/IAccountManagerResponse.aidl"
+    buildFeatures {
+        aidl true
+    }
+    buildFeatures {
+        prefab true
+    }
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdk
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        consumerProguardFiles "consumer-rules.pro"
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'arm64-v8a' , 'armeabi-v7a'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
+        }
+        ndkVersion = "29.0.13846066"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
+    // Enable incremental annotation processing for faster builds
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:-deprecation" << "-Xlint:-unchecked" << "-Xlint:-rawtypes"
+        options.fork = true
+        options.forkOptions.jvmArgs << "-Xmx2048m"
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+    lintOptions {
+
+        checkReleaseBuilds false
+        abortOnError false
+        warningsAsErrors false
+        disable "UnusedResources", 'RestrictedApi'
+        textOutput "stdout"
+        textReport false
+        checkOnly 'NewApi', 'InlinedApi'
+    }
+}
+
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+
+dependencies {
+  implementation 'com.google.android.material:material:1.3.0'
+    implementation "com.github.CodingGay.BlackReflection:core:$rootProject.ext.blackReflection"
+    annotationProcessor "com.github.CodingGay.BlackReflection:compiler:$rootProject.ext.blackReflection"
+    
+ /*   // Configure annotation processors to be incremental
+    annotationProcessor {
+        arguments {
+            // Enable incremental processing
+            arg("incremental", "true")
+            // Set source version compatibility
+            arg("sourceVersion", "17")
+        }
+    }*/
+
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+
+    implementation 'com.github.tiann:FreeReflection:3.2.2'
+    implementation "com.github.CodingGay.BlackReflection:core:$rootProject.ext.blackReflection"
+
+
+    // Pine dependency removed
+}
