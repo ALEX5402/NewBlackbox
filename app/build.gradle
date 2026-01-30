@@ -45,6 +45,12 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            output.outputFileName = "BlackBox_${variant.versionName}_${output.baseName}.apk"
+        }
+    }
 }
 
 dependencies {
