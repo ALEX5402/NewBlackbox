@@ -91,6 +91,7 @@ import top.niunaijun.blackbox.utils.compat.BuildCompat;
 import top.niunaijun.blackbox.fake.service.ISettingsProviderProxy;
 import top.niunaijun.blackbox.fake.service.FeatureFlagUtilsProxy;
 import top.niunaijun.blackbox.fake.service.WorkManagerProxy;
+import top.niunaijun.blackbox.fake.service.IInputMethodManagerProxy;
 
 /**
  * updated by alex5402 on 3/30/21.
@@ -176,6 +177,7 @@ public class HookManager {
             addInjector(new IMediaRouterServiceProxy());
             addInjector(new IPowerManagerProxy());
             addInjector(new IContextHubServiceProxy());
+            addInjector(new IInputMethodManagerProxy());
             addInjector(new IVibratorServiceProxy());
             addInjector(new IPersistentDataBlockServiceProxy());
             addInjector(AppInstrumentation.get());

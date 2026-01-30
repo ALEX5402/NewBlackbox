@@ -28,6 +28,14 @@ public class WebViewProxy extends ClassInvocationStub {
         super();
     }
 
+    /**
+     * getWho() returns null and inject() is empty because this class hooks
+     * instance/static methods on WebView class itself, NOT a system service binder.
+     * 
+     * Unlike binder proxies (e.g., IActivityManagerProxy) that replace services
+     * in ServiceManager.sCache, class proxies use @ProxyMethod inner classes
+     * to intercept specific methods via reflection/instrumentation.
+     */
     @Override
     protected Object getWho() {
         return null; // Not needed for class method hooks

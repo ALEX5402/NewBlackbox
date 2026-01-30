@@ -139,21 +139,87 @@ public class IActivityManagerProxy extends ClassInvocationStub {
     public static class GetContentProvider extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            try {
-                // Try to use the original method first
-                Object result = method.invoke(who, args);
-                if (result != null) {
-                    return result;
+            int authIndex = getAuthIndex();
+            Object auth = args[authIndex];
+            Object content = null;
+
+            if (auth instanceof String) {
+                if (ProxyManifest.isProxy((String) auth)) {
+                    return method.invoke(who, args);
                 }
-                
-                // If original method fails, return null to prevent crashes
-                Slog.w(TAG, "getContentProvider failed, returning null to prevent crash");
-                return null;
-                
-            } catch (Exception e) {
-                Slog.w(TAG, "Error in getContentProvider, returning null: " + e.getMessage());
-                return null;
+
+                if (BuildCompat.isQ()) {
+                    args[1] = BlackBoxCore.getHostPkg();
+                }
+
+                if (auth.equals("settings")
+                        || auth.equals("media")
+                        || auth.equals("telephony")
+                        || ((String) auth).contains("com.google.android.gms")
+                        || ((String) auth).contains("com.android.vending")
+                        || ((String) auth).contains("com.google.android.gsf")
+                        || auth.equals("com.google.android.gms.chimera")
+                        || auth.equals("com.huawei.android.launcher.settings")
+                        || auth.equals("com.hihonor.android.launcher.settings")) {
+                    content = method.invoke(who, args);
+                    ContentProviderDelegate.update(content, (String) auth);
+                    return content;
+                } else {
+                    // Log.d(TAG, "hook getContentProvider: " + auth);
+
+                    ProviderInfo providerInfo = BlackBoxCore.getBPackageManager()
+                            .resolveContentProvider(
+                                    (String) auth, GET_META_DATA, BActivityThread.getUserId());
+                    if (providerInfo == null) {
+                        // Fallback removed to avoid using original Google services
+                        return null;
+                    }
+
+                    // Log.d(TAG, "hook app: " + auth);
+                    IBinder providerBinder = null;
+                    if (BActivityThread.getAppPid() != -1) {
+                        AppConfig appConfig = BlackBoxCore.getBActivityManager()
+                                .initProcess(
+                                        providerInfo.packageName,
+                                        providerInfo.processName,
+                                        BActivityThread.getUserId());
+                        if (appConfig.bPID != BActivityThread.getAppPid()) {
+                            providerBinder = BlackBoxCore.getBActivityManager()
+                                    .acquireContentProviderClient(providerInfo);
+                        }
+                        args[authIndex] = ProxyManifest.getProxyAuthorities(appConfig.bPID);
+                        args[getUserIndex()] = BlackBoxCore.getHostUserId();
+                    }
+                    if (providerBinder == null)
+                        return null;
+
+                    content = method.invoke(who, args);
+                    Reflector.with(content).field("info").set(providerInfo);
+                    Reflector.with(content)
+                            .field("provider")
+                            .set(
+                                    new ContentProviderStub()
+                                            .wrapper(
+                                                    BRContentProviderNative.get().asInterface(providerBinder),
+                                                    providerInfo.packageName));
+                }
+
+                return content;
             }
+            return method.invoke(who, args);
+        }
+
+        protected int getAuthIndex() {
+            // 10.0
+            if (BuildCompat.isQ()) {
+                return 2;
+            } else {
+                return 1;
+            }
+        }
+
+        protected int getUserIndex() {
+            return getAuthIndex() + 1;
         }
     }
 
