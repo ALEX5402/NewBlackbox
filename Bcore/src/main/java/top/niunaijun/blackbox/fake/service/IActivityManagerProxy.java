@@ -183,11 +183,11 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                                         providerInfo.packageName,
                                         providerInfo.processName,
                                         BActivityThread.getUserId());
-                        if (appConfig.bPID != BActivityThread.getAppPid()) {
+                        if (appConfig.bpid != BActivityThread.getAppPid()) {
                             providerBinder = BlackBoxCore.getBActivityManager()
                                     .acquireContentProviderClient(providerInfo);
                         }
-                        args[authIndex] = ProxyManifest.getProxyAuthorities(appConfig.bPID);
+                        args[authIndex] = ProxyManifest.getProxyAuthorities(appConfig.bpid);
                         args[getUserIndex()] = BlackBoxCore.getHostUserId();
                     }
                     if (providerBinder == null)
