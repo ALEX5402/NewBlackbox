@@ -452,20 +452,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AURAL_USER_SELECTED" />
 
-    <!-- Android 16 (API 36) Additional Permissions -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AURAL_USER_SELECTED" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AURAL" />
+    <!-- POST_NOTIFICATIONS and other permissions continue below -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
