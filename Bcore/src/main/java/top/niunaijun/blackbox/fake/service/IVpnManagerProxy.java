@@ -11,7 +11,7 @@ import top.niunaijun.blackbox.fake.hook.ScanClass;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 @ScanClass(VpnCommonProxy.class)
 public class IVpnManagerProxy extends BinderInvocationStub {

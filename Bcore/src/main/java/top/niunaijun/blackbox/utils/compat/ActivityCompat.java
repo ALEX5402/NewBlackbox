@@ -26,7 +26,7 @@ import top.niunaijun.blackbox.utils.DrawableUtils;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ActivityCompat {
 

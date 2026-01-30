@@ -35,7 +35,7 @@ import top.niunaijun.blackbox.core.system.JarManager;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BlackBoxSystem {
     private static BlackBoxSystem sBlackBoxSystem;

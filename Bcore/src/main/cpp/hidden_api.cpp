@@ -11,7 +11,7 @@
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 bool disable_hidden_api(JNIEnv *env) {
     char version_str[PROP_VALUE_MAX];

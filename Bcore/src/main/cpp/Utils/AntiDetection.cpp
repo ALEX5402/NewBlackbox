@@ -17,7 +17,7 @@
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 struct SpoofedProp {
     const char* key;
@@ -36,7 +36,7 @@ static int (*orig_system_property_get)(const char *name, char *value) = nullptr;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 static const char* blocked_files[] = {
     // Root detection files

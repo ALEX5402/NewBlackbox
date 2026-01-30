@@ -7,10 +7,11 @@ alias(libs.plugins.android.application) apply false
 
 ext {
     compileSdkVersion = 35
-    targetSdkVersion = 34
+    targetSdkVersion = 28 // need for support more apps and gg don't change this
+//    targetSdkVersion = 35
     minSdk = 21
     versionCode = 1
-    versionName = "3.0.9-beta2"
+    versionName = "3.0.10-beta2"
     xVersion = '1.1.0'
     hiddenApiBypass = '4.3'
 }

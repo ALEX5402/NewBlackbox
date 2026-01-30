@@ -15,7 +15,7 @@ import top.niunaijun.blackbox.entity.pm.InstalledModule;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BXposedManager extends BlackManager<IBXposedManagerService> {
     private static final BXposedManager sXposedManager = new BXposedManager();

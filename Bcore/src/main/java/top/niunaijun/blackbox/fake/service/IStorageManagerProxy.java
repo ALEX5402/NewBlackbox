@@ -21,7 +21,7 @@ import top.niunaijun.blackbox.utils.compat.BuildCompat;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class IStorageManagerProxy extends BinderInvocationStub {
 

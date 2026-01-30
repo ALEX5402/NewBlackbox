@@ -11,7 +11,7 @@ import java.security.PublicKey;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class VerifierInfo implements Parcelable {
 

@@ -28,7 +28,7 @@ import top.niunaijun.blackbox.utils.TrieTree;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 @SuppressLint("SdCardPath")
 public class IOCore {

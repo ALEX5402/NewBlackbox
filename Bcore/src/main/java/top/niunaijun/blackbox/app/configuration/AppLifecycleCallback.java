@@ -12,7 +12,7 @@ import android.os.Bundle;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class AppLifecycleCallback implements Application.ActivityLifecycleCallbacks {
     public static AppLifecycleCallback EMPTY = new AppLifecycleCallback() {

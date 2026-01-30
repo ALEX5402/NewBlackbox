@@ -15,7 +15,7 @@ import top.niunaijun.blackbox.core.system.ProcessRecord;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ActivityRecord extends Binder {
     public TaskRecord task;

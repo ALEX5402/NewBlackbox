@@ -20,7 +20,7 @@ import top.niunaijun.blackbox.utils.compat.BundleCompat;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ProxyContentProvider extends ContentProvider {
     @Override

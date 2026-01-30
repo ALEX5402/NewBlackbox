@@ -21,7 +21,7 @@ import top.niunaijun.blackbox.utils.Slog;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ProxyActivity extends Activity {
     public static final String TAG = "ProxyActivity";

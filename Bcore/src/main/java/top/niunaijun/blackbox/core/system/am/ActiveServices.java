@@ -34,7 +34,7 @@ import top.niunaijun.blackbox.proxy.record.ProxyServiceRecord;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 @SuppressLint("NewApi")
 public class ActiveServices {

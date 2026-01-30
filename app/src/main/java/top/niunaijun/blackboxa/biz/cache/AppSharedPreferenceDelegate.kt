@@ -8,20 +8,21 @@ import kotlin.reflect.KProperty
 
 /**
  * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * * ∧＿∧ (`･ω･∥ 丶 つ０ しーＪ
  */
-open class AppSharedPreferenceDelegate<Data>(context: Context, private val default: Data, spName: String? = null) : ReadWriteProperty<Any, Data?> {
+open class AppSharedPreferenceDelegate<Data>(
+        context: Context,
+        private val default: Data,
+        spName: String? = null
+) : ReadWriteProperty<Any, Data?> {
 
     private val mSharedPreferences by lazy {
-        val tmpCacheName = if (TextUtils.isEmpty(spName)) {
-            AppSharedPreferenceDelegate::class.java.simpleName
-        } else {
-            spName
-        }
+        val tmpCacheName =
+                if (TextUtils.isEmpty(spName)) {
+                    AppSharedPreferenceDelegate::class.java.simpleName
+                } else {
+                    spName
+                }
         return@lazy context.getSharedPreferences(tmpCacheName, Context.MODE_PRIVATE)
     }
 
@@ -35,14 +36,18 @@ open class AppSharedPreferenceDelegate<Data>(context: Context, private val defau
 
     protected fun findData(key: String, default: Data): Data {
         with(mSharedPreferences) {
-            val result: Any = when (default) {
-                is Int -> getInt(key, default)
-                is Long -> getLong(key, default)
-                is Float -> getFloat(key, default)
-                is String -> getString(key, default)!!
-                is Boolean -> getBoolean(key, default)
-                else -> throw IllegalArgumentException("This type $default can not be saved into sharedPreferences")
-            }
+            val result: Any =
+                    when (default) {
+                        is Int -> getInt(key, default)
+                        is Long -> getLong(key, default)
+                        is Float -> getFloat(key, default)
+                        is String -> getString(key, default)!!
+                        is Boolean -> getBoolean(key, default)
+                        else ->
+                                throw IllegalArgumentException(
+                                        "This type $default can not be saved into sharedPreferences"
+                                )
+                    }
             return result as? Data ?: default
         }
     }
@@ -58,7 +63,10 @@ open class AppSharedPreferenceDelegate<Data>(context: Context, private val defau
                     is Float -> putFloat(key, value)
                     is String -> putString(key, value)
                     is Boolean -> putBoolean(key, value)
-                    else -> throw IllegalArgumentException("This type $default can not be saved into Preferences")
+                    else ->
+                            throw IllegalArgumentException(
+                                    "This type $default can not be saved into Preferences"
+                            )
                 }
             }
         }

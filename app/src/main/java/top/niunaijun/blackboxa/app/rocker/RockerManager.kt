@@ -9,55 +9,56 @@ import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import com.imuxuan.floatingview.FloatingMagnetView
 import com.imuxuan.floatingview.FloatingView
+import kotlin.math.cos
+import kotlin.math.sin
 import top.niunaijun.blackbox.entity.location.BLocation
 import top.niunaijun.blackbox.fake.frameworks.BLocationManager
 import top.niunaijun.blackboxa.app.App
 import top.niunaijun.blackboxa.widget.EnFloatView
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * RockerManager - Advanced GPS Location Spoofing with Floating Joystick Control
- * 
+ *
  * @Description: Provides a floating joystick/rocker control for real-time GPS location manipulation
+ * ```
  *              in virtual apps. Allows users to move their fake GPS location by dragging a joystick.
- * 
- * @Features:
+ *
+ * @Features
+ * ```
+ * :
  * - Floating joystick that appears on screen
  * - Real-time GPS coordinate updates
  * - Precise distance and angle control
  * - App-specific location spoofing
  * - Automatic activity lifecycle management
- * 
+ *
  * @Usage:
  * 1. RockerManager automatically initializes when virtual apps start
  * 2. A floating joystick appears on the left side of the screen
  * 3. Drag the joystick to change GPS location:
+ * ```
  *    - Distance: How far to move (in meters)
  *    - Angle: Direction to move (0-360 degrees)
+ * ```
  * 4. Location updates happen in real-time as you move the joystick
- * 
+ *
  * @Permissions Required:
  * - SYSTEM_ALERT_WINDOW: To show floating view over other apps
  * - ACCESS_FINE_LOCATION: To access GPS location services
  * - ACCESS_COARSE_LOCATION: For approximate location access
- * 
+ *
  * @Requirements:
  * - Fake location must be enabled in BlackBox
  * - User must grant overlay and location permissions
  * - Virtual app must be running
- * 
+ *
  * @Author: kotlinMiku
  * @CreateDate: 2022/3/19 19:37
  * @LastModified: 2024 - Enhanced with better error handling and permissions
  */
 /**
  * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * * ∧＿∧ (`･ω･∥ 丶 つ０ しーＪ
  */
 object RockerManager {
 
@@ -65,8 +66,8 @@ object RockerManager {
     private var isInitialized = false
 
     // Earth radius constants for coordinate calculations
-    private const val Ea = 6378137.0     // Equator radius (meters)
-    private const val Eb = 6356725.0     // Polar radius (meters)
+    private const val Ea = 6378137.0 // Equator radius (meters)
+    private const val Eb = 6356725.0 // Polar radius (meters)
 
     fun init(application: Application?, userId: Int) {
         try {
@@ -93,7 +94,7 @@ object RockerManager {
             }
 
             Log.d(TAG, "Initializing RockerManager for userId: $userId")
-            
+
             val enFloatView = initFloatView()
             if (enFloatView is EnFloatView) {
                 enFloatView.setListener { angle: Float, distance: Float ->
@@ -106,31 +107,47 @@ object RockerManager {
             }
 
             // Register activity lifecycle callbacks for floating view management
-            application.registerActivityLifecycleCallbacks(object : BaseActivityLifecycleCallback {
-                override fun onActivityStarted(activity: Activity) {
-                    super.onActivityStarted(activity)
-                    try {
-                        FloatingView.get().attach(activity)
-                        Log.d(TAG, "Floating view attached to activity: ${activity.javaClass.simpleName}")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error attaching floating view to activity: ${e.message}")
-                    }
-                }
+            application.registerActivityLifecycleCallbacks(
+                    object : BaseActivityLifecycleCallback {
+                        override fun onActivityStarted(activity: Activity) {
+                            super.onActivityStarted(activity)
+                            try {
+                                FloatingView.get().attach(activity)
+                                Log.d(
+                                        TAG,
+                                        "Floating view attached to activity: ${activity.javaClass.simpleName}"
+                                )
+                            } catch (e: Exception) {
+                                Log.e(
+                                        TAG,
+                                        "Error attaching floating view to activity: ${e.message}"
+                                )
+                            }
+                        }
 
-                override fun onActivityStopped(activity: Activity) {
-                    super.onActivityStopped(activity)
-                    try {
-                        FloatingView.get().detach(activity)
-                        Log.d(TAG, "Floating view detached from activity: ${activity.javaClass.simpleName}")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error detaching floating view from activity: ${e.message}")
+                        override fun onActivityStopped(activity: Activity) {
+                            super.onActivityStopped(activity)
+                            try {
+                                FloatingView.get().detach(activity)
+                                Log.d(
+                                        TAG,
+                                        "Floating view detached from activity: ${activity.javaClass.simpleName}"
+                                )
+                            } catch (e: Exception) {
+                                Log.e(
+                                        TAG,
+                                        "Error detaching floating view from activity: ${e.message}"
+                                )
+                            }
+                        }
                     }
-                }
-            })
+            )
 
             isInitialized = true
-            Log.d(TAG, "RockerManager initialized successfully - Floating GPS joystick is now active!")
-            
+            Log.d(
+                    TAG,
+                    "RockerManager initialized successfully - Floating GPS joystick is now active!"
+            )
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing RockerManager: ${e.message}")
             Log.e(TAG, "Stack trace: ", e)
@@ -139,10 +156,11 @@ object RockerManager {
 
     private fun initFloatView(): FloatingMagnetView? {
         return try {
-            val params = FrameLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-            )
+            val params =
+                    FrameLayout.LayoutParams(
+                            RelativeLayout.LayoutParams.WRAP_CONTENT,
+                            RelativeLayout.LayoutParams.WRAP_CONTENT
+                    )
 
             params.gravity = Gravity.START or Gravity.CENTER
             val view = EnFloatView(App.getContext())
@@ -166,7 +184,10 @@ object RockerManager {
                 return
             }
 
-            Log.d(TAG, "Changing location - Distance: ${distance}m, Angle: ${angle}°, Current: ${location.latitude}, ${location.longitude}")
+            Log.d(
+                    TAG,
+                    "Changing location - Distance: ${distance}m, Angle: ${angle}°, Current: ${location.latitude}, ${location.longitude}"
+            )
 
             // Calculate new coordinates based on joystick input
             val dx = distance * sin(angle * Math.PI / 180.0)
@@ -178,41 +199,41 @@ object RockerManager {
 
             val newLng = (dx / ed + location.longitude * Math.PI / 180.0) * 180.0 / Math.PI
             val newLat = (dy / ec + location.latitude * Math.PI / 180.0) * 180.0 / Math.PI
-            
+
             val newLocation = BLocation(newLat, newLng)
 
             // Update the location
             BLocationManager.get().setLocation(userId, packageName, newLocation)
-            
+
             Log.d(TAG, "Location updated - New: ${newLat}, ${newLng}")
-            
         } catch (e: Exception) {
             Log.e(TAG, "Error changing location: ${e.message}")
             Log.e(TAG, "Stack trace: ", e)
         }
     }
 
-    /**
-     * Check if RockerManager is currently initialized and active
-     */
+    /** Check if RockerManager is currently initialized and active */
     fun isActive(): Boolean {
         return isInitialized
     }
 
-    /**
-     * Check if required permissions are granted for RockerManager to work
-     */
+    /** Check if required permissions are granted for RockerManager to work */
     fun checkPermissions(context: Context): Boolean {
         return try {
             // Check if overlay permission is granted (required for floating view)
             val hasOverlayPermission = android.provider.Settings.canDrawOverlays(context)
             if (!hasOverlayPermission) {
-                Log.w(TAG, "Overlay permission not granted - RockerManager cannot show floating view")
+                Log.w(
+                        TAG,
+                        "Overlay permission not granted - RockerManager cannot show floating view"
+                )
                 return false
             }
 
             // Check if location permissions are granted
-            val hasLocationPermission = context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            val hasLocationPermission =
+                    context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                            android.content.pm.PackageManager.PERMISSION_GRANTED
             if (!hasLocationPermission) {
                 Log.w(TAG, "Location permission not granted - RockerManager cannot access location")
                 return false
@@ -226,20 +247,16 @@ object RockerManager {
         }
     }
 
-    /**
-     * Get a list of required permissions for RockerManager
-     */
+    /** Get a list of required permissions for RockerManager */
     fun getRequiredPermissions(): List<String> {
         return listOf(
-            android.Manifest.permission.SYSTEM_ALERT_WINDOW,
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION
+                android.Manifest.permission.SYSTEM_ALERT_WINDOW,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
         )
     }
 
-    /**
-     * Clean up resources (useful for testing or when disabling the feature)
-     */
+    /** Clean up resources (useful for testing or when disabling the feature) */
     fun cleanup() {
         try {
             isInitialized = false

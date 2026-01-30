@@ -13,7 +13,7 @@ import top.niunaijun.blackbox.app.dispatcher.AppJobServiceDispatcher;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ProxyJobService extends JobService {
     public static final String TAG = "StubJobService";

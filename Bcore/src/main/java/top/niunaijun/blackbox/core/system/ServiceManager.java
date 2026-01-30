@@ -22,7 +22,7 @@ import top.niunaijun.blackbox.core.system.user.BUserManagerService;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ServiceManager {
     private static ServiceManager sServiceManager = null;

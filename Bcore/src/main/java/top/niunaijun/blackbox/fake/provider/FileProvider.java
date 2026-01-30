@@ -36,7 +36,7 @@ import static org.xmlpull.v1.XmlPullParser.START_TAG;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class FileProvider extends ContentProvider {
     private static final String[] COLUMNS = {

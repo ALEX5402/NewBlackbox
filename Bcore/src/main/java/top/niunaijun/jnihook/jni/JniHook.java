@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public final class JniHook {
     public static final int NATIVE_OFFSET = 0;

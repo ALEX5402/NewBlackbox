@@ -9,7 +9,7 @@ import top.niunaijun.blackbox.entity.pm.InstallOption;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public interface Executor {
     public static final String TAG = "InstallExecutor";

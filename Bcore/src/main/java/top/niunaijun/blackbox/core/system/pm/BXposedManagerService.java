@@ -28,7 +28,7 @@ import top.niunaijun.blackbox.utils.compat.XposedParserCompat;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BXposedManagerService extends IBXposedManagerService.Stub implements ISystemService, PackageMonitor {
     private static final BXposedManagerService sService = new BXposedManagerService();

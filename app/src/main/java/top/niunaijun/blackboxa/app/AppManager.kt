@@ -7,15 +7,11 @@ import top.niunaijun.blackboxa.view.main.BlackBoxLoader
 
 /**
  * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * * ∧＿∧ (`･ω･∥ 丶 つ０ しーＪ
  */
 object AppManager {
     private const val TAG = "AppManager"
-    
+
     @JvmStatic
     val mBlackBoxLoader by lazy {
         try {

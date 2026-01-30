@@ -28,7 +28,7 @@ import top.niunaijun.blackbox.proxy.ProxyManifest;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BJobManagerService extends IBJobManagerService.Stub implements ISystemService {
     private static final BJobManagerService sService = new BJobManagerService();
