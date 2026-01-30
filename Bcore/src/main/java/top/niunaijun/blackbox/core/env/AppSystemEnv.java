@@ -20,7 +20,7 @@ import top.niunaijun.blackbox.utils.compat.BuildCompat;
 public class AppSystemEnv {
     private static final List<String> sSystemPackages = new ArrayList<>();
     private static final List<String> sSuPackages = new ArrayList<>();
-    private static final List<String> sXposedPackages = new ArrayList<>();
+
     private static final List<String> sPreInstallPackages = new ArrayList<>();
 
     static {
@@ -52,7 +52,7 @@ public class AppSystemEnv {
         sSuPackages.add("com.thirdparty.superuser");
         sSuPackages.add("com.yellowes.su");
 
-        sXposedPackages.add("de.robv.android.xposed.installer");
+
 
         // sPreInstallPackages.add("com.huawei.hwid");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < 29){
@@ -72,8 +72,6 @@ public class AppSystemEnv {
 
     public static boolean isBlackPackage(String packageName) {
         if (BlackBoxCore.get().isHideRoot() && sSuPackages.contains(packageName)) {
-            return true;
-        } else if (BlackBoxCore.get().isHideXposed() && sXposedPackages.contains(packageName)) {
             return true;
         }
         return false;

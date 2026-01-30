@@ -13,7 +13,7 @@ import top.niunaijun.blackbox.core.system.location.BLocationManagerService;
 import top.niunaijun.blackbox.core.system.notification.BNotificationManagerService;
 import top.niunaijun.blackbox.core.system.os.BStorageManagerService;
 import top.niunaijun.blackbox.core.system.pm.BPackageManagerService;
-import top.niunaijun.blackbox.core.system.pm.BXposedManagerService;
+
 import top.niunaijun.blackbox.core.system.user.BUserManagerService;
 
 /**
@@ -31,7 +31,7 @@ public class ServiceManager {
     public static final String PACKAGE_MANAGER = "package_manager";
     public static final String STORAGE_MANAGER = "storage_manager";
     public static final String USER_MANAGER = "user_manager";
-    public static final String XPOSED_MANAGER = "xposed_manager";
+
     public static final String ACCOUNT_MANAGER = "account_manager";
     public static final String LOCATION_MANAGER = "location_manager";
     public static final String NOTIFICATION_MANAGER = "notification_manager";
@@ -59,7 +59,7 @@ public class ServiceManager {
         mCaches.put(PACKAGE_MANAGER, BPackageManagerService.get());
         mCaches.put(STORAGE_MANAGER, BStorageManagerService.get());
         mCaches.put(USER_MANAGER, BUserManagerService.get());
-        mCaches.put(XPOSED_MANAGER, BXposedManagerService.get());
+
         mCaches.put(ACCOUNT_MANAGER, BAccountManagerService.get());
         mCaches.put(LOCATION_MANAGER, BLocationManagerService.get());
         mCaches.put(NOTIFICATION_MANAGER, BNotificationManagerService.get());
@@ -75,7 +75,7 @@ public class ServiceManager {
         BlackBoxCore.get().getService(PACKAGE_MANAGER);
         BlackBoxCore.get().getService(STORAGE_MANAGER);
         BlackBoxCore.get().getService(USER_MANAGER);
-        BlackBoxCore.get().getService(XPOSED_MANAGER);
+
         BlackBoxCore.get().getService(ACCOUNT_MANAGER);
         BlackBoxCore.get().getService(LOCATION_MANAGER);
         BlackBoxCore.get().getService(NOTIFICATION_MANAGER);
