@@ -147,6 +147,26 @@ class BlackBoxLoader {
                         Log.e(TAG, "Error in afterApplicationOnCreate: ${e.message}")
                     }
                 }
+                
+                override fun onStoragePermissionNeeded(packageName: String?, userId: Int): Boolean {
+                    try {
+                        Log.w(TAG, "Storage permission needed for launching: $packageName")
+                        // Broadcast to request storage permission
+                        // The main activity should listen for this and show permission dialog
+                        val intent = android.content.Intent("top.niunaijun.blackboxa.REQUEST_STORAGE_PERMISSION")
+                        intent.putExtra("package_name", packageName)
+                        intent.putExtra("user_id", userId)
+                        intent.setPackage(App.getContext().packageName)
+                        App.getContext().sendBroadcast(intent)
+                        // Return false to NOT block the launch - the app will launch anyway
+                        // but the user will be notified to grant permission
+                        // Change to 'true' if you want to block launch until permission is granted
+                        return false
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error in onStoragePermissionNeeded: ${e.message}")
+                        return false
+                    }
+                }
             })
         } catch (e: Exception) {
             Log.e(TAG, "Error adding lifecycle callback: ${e.message}")

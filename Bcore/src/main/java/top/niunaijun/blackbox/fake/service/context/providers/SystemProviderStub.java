@@ -52,7 +52,25 @@ public class SystemProviderStub extends ClassInvocationStub implements BContentP
         if ("asBinder".equals(method.getName())) {
             return method.invoke(mBase, args);
         }
-        // Don't replace system provider authorities like "settings", "media", etc.
+        
+        String methodName = method.getName();
+        
+        // For call() method, args[0] is the method name (like "GET_global"), NOT a package name
+        // Don't replace it! The method name is essential for Settings provider to work
+        if ("call".equals(methodName)) {
+            // Only fix AttributionSource in call() args, don't replace method name
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    Object arg = args[i];
+                    if (arg != null && arg.getClass().getName().equals(BRAttributionSource.getRealClass().getName())) {
+                        ContextCompat.fixAttributionSourceState(arg, BlackBoxCore.getHostUid());
+                    }
+                }
+            }
+            return method.invoke(mBase, args);
+        }
+        
+        // For other methods like query/insert/update/delete, we may need to fix package names
         if (args != null && args.length > 0) {
             Object arg = args[0];
             if (arg instanceof String) {

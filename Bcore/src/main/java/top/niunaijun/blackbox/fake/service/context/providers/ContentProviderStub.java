@@ -6,10 +6,12 @@ import java.lang.reflect.Method;
 
 import black.android.content.BRAttributionSource;
 import top.niunaijun.blackbox.app.BActivityThread;
+import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.fake.hook.ClassInvocationStub;
 import top.niunaijun.blackbox.utils.compat.ContextCompat;
 import top.niunaijun.blackbox.utils.Slog;
 import android.os.Bundle;
+import top.niunaijun.blackbox.utils.AttributionSourceUtils;
 
 /**
  * updated by alex5402 on 4/8/21.
@@ -52,39 +54,35 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
             return method.invoke(mBase, args);
         }
         
-        // Fix AttributionSource and package name issues
-        if (args != null && args.length > 0) {
-            for (int i = 0; i < args.length; i++) {
-                Object arg = args[i];
-                if (arg instanceof String) {
-                    String strArg = (String) arg;
-                    // Don't replace system provider authorities
-                    if (!isSystemProviderAuthority(strArg)) {
-                        // Replace package name with the correct one
-                        args[i] = mAppPkg;
-                    }
-                } else if (arg != null && arg.getClass().getName().equals(BRAttributionSource.getRealClass().getName())) {
-                    // Fix AttributionSource UID
-                    try {
-                        ContextCompat.fixAttributionSourceState(arg, BActivityThread.getBUid());
-                    } catch (Exception e) {
-                        // If fixing AttributionSource fails, try to create a new one or skip
-                        Slog.w(TAG, "Failed to fix AttributionSource, continuing with original");
-                    }
-                } else if (arg != null && arg.getClass().getName().contains("AttributionSource")) {
-                    // Handle any AttributionSource-like objects that might cause UID issues
-                    try {
-                        // Try to fix UID using reflection
-                        fixAttributionSourceUid(arg);
-                    } catch (Exception e) {
-                        Slog.w(TAG, "Failed to fix AttributionSource-like object: " + e.getMessage());
+        // Get method name first to determine handling logic
+        String methodName = method.getName();
+        
+        // For call() method, String args are method names like "GET_global", NOT package names
+        // Don't replace them! Only fix AttributionSource
+        if ("call".equals(methodName)) {
+            // Fix AttributionSource in args (treats Bundle recursively)
+            AttributionSourceUtils.fixAttributionSourceInArgs(args);
+        } else {
+            // For other methods like query/insert/update/delete, fix both package names and AttributionSource
+            if (args != null && args.length > 0) {
+                for (int i = 0; i < args.length; i++) {
+                    Object arg = args[i];
+                    if (arg instanceof String) {
+                        String strArg = (String) arg;
+                        // Don't replace system provider authorities
+                        if (!isSystemProviderAuthority(strArg)) {
+                            // Replace package name with the correct one
+                            args[i] = mAppPkg;
+                        }
                     }
                 }
+                // Also fix AttributionSources in any arg position
+                AttributionSourceUtils.fixAttributionSourceInArgs(args);
             }
         }
         
         // Pre-validate the call to prevent system-level SecurityException
-        String methodName = method.getName();
+        methodName = method.getName();
         if (methodName.equals("query") || methodName.equals("insert") || 
             methodName.equals("update") || methodName.equals("delete") || 
             methodName.equals("bulkInsert") || methodName.equals("call")) {
@@ -142,7 +140,7 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
             case "bulkInsert":
                 return 0; // Return 0 rows inserted
             case "call":
-                return null; // Return null for call method
+                return new Bundle(); // Return empty Bundle instead of null to prevent NPE
             case "getType":
                 return null; // Return null MIME type
             case "openFile":
@@ -225,21 +223,21 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
             try {
                 java.lang.reflect.Field uidField = attributionSourceClass.getDeclaredField("mUid");
                 uidField.setAccessible(true);
-                uidField.set(attributionSource, BActivityThread.getBUid());
+                uidField.set(attributionSource, BlackBoxCore.getHostUid());
                 Slog.d(TAG, "Fixed AttributionSource UID via field access");
             } catch (NoSuchFieldException e) {
                 // Try alternative field names
                 try {
                     java.lang.reflect.Field uidField = attributionSourceClass.getDeclaredField("uid");
                     uidField.setAccessible(true);
-                    uidField.set(attributionSource, BActivityThread.getBUid());
+                    uidField.set(attributionSource, BlackBoxCore.getHostUid());
                     Slog.d(TAG, "Fixed AttributionSource UID via alternative field");
                 } catch (NoSuchFieldException e2) {
                     // Try using setter method
                     try {
                         java.lang.reflect.Method setUidMethod = attributionSourceClass.getDeclaredMethod("setUid", int.class);
                         setUidMethod.setAccessible(true);
-                        setUidMethod.invoke(attributionSource, BActivityThread.getBUid());
+                        setUidMethod.invoke(attributionSource, BlackBoxCore.getHostUid());
                         Slog.d(TAG, "Fixed AttributionSource UID via setter method");
                     } catch (Exception e3) {
                         Slog.w(TAG, "Could not fix AttributionSource UID: " + e3.getMessage());

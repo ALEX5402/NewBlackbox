@@ -78,7 +78,9 @@ public class ContextCompat {
 
             if (BuildCompat.isS()) {
                 try {
-                    fixAttributionSourceState(BRContextImpl.get(context).getAttributionSource(), BlackBoxCore.getBUid());
+                    // Use getHostUid() instead of getBUid() - AttributionSource UID must match
+                    // the calling process's actual UID (host UID), not the virtual UID
+                    fixAttributionSourceState(BRContextImpl.get(context).getAttributionSource(), BlackBoxCore.getHostUid());
                 } catch (Exception e) {
                     Slog.w(TAG, "Failed to fix attribution source state: " + e.getMessage());
                 }

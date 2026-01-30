@@ -22,6 +22,20 @@ public class AppLifecycleCallback implements Application.ActivityLifecycleCallba
     public void beforeMainLaunchApk(String packageName, int userid) {
 
     }
+    
+    /**
+     * Called when storage permission is needed before launching an app.
+     * Override this in your host app to show permission request UI.
+     * 
+     * @param packageName The package being launched
+     * @param userId The user ID
+     * @return true if the host app will handle the permission request (launch will be cancelled),
+     *         false to continue launching anyway
+     */
+    public boolean onStoragePermissionNeeded(String packageName, int userId) {
+        // Default: don't block the launch, just warn
+        return false;
+    }
 
     public void beforeMainApplicationAttach(Application app, Context context) {
 

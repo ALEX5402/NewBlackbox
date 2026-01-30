@@ -50,17 +50,36 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        String methodName = method.getName();
+        
+        // For all check, note, and start operations, return MODE_ALLOWED directly
+        // without calling the system to avoid UID mismatch errors
+        if (methodName.startsWith("check") || 
+            methodName.startsWith("note") || 
+            methodName.startsWith("start")) {
+            Slog.d(TAG, "AppOps invoke: Bypassing system for " + methodName + ", allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
+        }
+        
+        // For finish operations, just return null without calling system
+        if (methodName.startsWith("finish")) {
+            Slog.d(TAG, "AppOps invoke: Bypassing system for " + methodName);
+            return null;
+        }
+        
+        // For other operations, try to call system with error handling
         try {
             MethodParameterUtils.replaceFirstAppPkg(args);
             MethodParameterUtils.replaceLastUid(args);
             return super.invoke(proxy, method, args);
         } catch (SecurityException e) {
             // Handle SecurityException for UID/package mismatches
-            Slog.w(TAG, "AppOps invoke: SecurityException caught, allowing operation", e);
+            Slog.w(TAG, "AppOps invoke: SecurityException caught for " + methodName + ", allowing operation", e);
             return AppOpsManager.MODE_ALLOWED;
         } catch (Exception e) {
-            Slog.e(TAG, "AppOps invoke: Error in method " + method.getName(), e);
-            return super.invoke(proxy, method, args);
+            Slog.e(TAG, "AppOps invoke: Error in method " + methodName, e);
+            // Return MODE_ALLOWED as fallback to prevent crashes
+            return AppOpsManager.MODE_ALLOWED;
         }
     }
 
@@ -90,19 +109,21 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            MethodParameterUtils.replaceLastUid(args);
-            try {
-                // args: (int op, int uid, String packageName)
-                int op = (int) args[0];
-                // On API >= 29, translate to public op name and allow media/storage reads
-                String publicName = getOpPublicName(op);
-                if (publicName != null && isMediaStorageOrAudioOp(publicName)) {
-                    Slog.d(TAG, "AppOps CheckOperation: Allowing operation: " + publicName);
-                    return AppOpsManager.MODE_ALLOWED;
-                }
-            } catch (Throwable ignored) {
-            }
-            return method.invoke(who, args);
+            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            // The system's checkOperation causes SecurityException when package/uid don't match
+            Slog.d(TAG, "AppOps CheckOperation: Bypassing system check, allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
+        }
+    }
+
+    // Hook for checkOperationForDevice - this is called on Android 12+ and shown in stack trace
+    @ProxyMethod("checkOperationForDevice")
+    public static class CheckOperationForDevice extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            Slog.d(TAG, "AppOps CheckOperationForDevice: Bypassing system check, allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
         }
     }
 
@@ -110,17 +131,9 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class NoteOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // args: (int op, int uid, String packageName)
-            try {
-                int op = (int) args[0];
-                String publicName = getOpPublicName(op);
-                if (publicName != null && isMediaStorageOrAudioOp(publicName)) {
-                    Slog.d(TAG, "AppOps NoteOperation: Allowing operation: " + publicName);
-                    return AppOpsManager.MODE_ALLOWED;
-                }
-            } catch (Throwable ignored) {
-            }
-            return method.invoke(who, args);
+            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            Slog.d(TAG, "AppOps NoteOperation: Bypassing system check, allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
         }
     }
 
@@ -128,16 +141,9 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckOpNoThrow extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // args: (String op, int uid, String packageName)
-            try {
-                String opStr = (String) args[0];
-                if (opStr != null && isMediaStorageOrAudioOp(opStr)) {
-                    Slog.d(TAG, "AppOps CheckOpNoThrow: Allowing operation: " + opStr);
-                    return AppOpsManager.MODE_ALLOWED;
-                }
-            } catch (Throwable ignored) {
-            }
-            return method.invoke(who, args);
+            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            Slog.d(TAG, "AppOps CheckOpNoThrow: Bypassing system check, allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
         }
     }
 
@@ -146,16 +152,9 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class StartOp extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            try {
-                int op = (int) args[0];
-                String name = getOpPublicName(op);
-                if (name != null && isMediaStorageOrAudioOp(name)) {
-                    Slog.d(TAG, "AppOps StartOp: Allowing operation: " + name);
-                    return AppOpsManager.MODE_ALLOWED;
-                }
-            } catch (Throwable ignored) {
-            }
-            return method.invoke(who, args);
+            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            Slog.d(TAG, "AppOps StartOp: Bypassing system check, allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
         }
     }
 
@@ -163,16 +162,9 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class StartOpNoThrow extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            try {
-                // args: (String op, int uid, String packageName)
-                String opStr = (String) args[0];
-                if (opStr != null && isMediaStorageOrAudioOp(opStr)) {
-                    Slog.d(TAG, "AppOps StartOpNoThrow: Allowing operation: " + opStr);
-                    return AppOpsManager.MODE_ALLOWED;
-                }
-            } catch (Throwable ignored) {
-            }
-            return method.invoke(who, args);
+            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            Slog.d(TAG, "AppOps StartOpNoThrow: Bypassing system check, allowing operation");
+            return AppOpsManager.MODE_ALLOWED;
         }
     }
 

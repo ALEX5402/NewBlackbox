@@ -58,7 +58,7 @@ public class AttributionSourceUtils {
                 try {
                     java.lang.reflect.Field uidField = attributionSourceClass.getDeclaredField(fieldName);
                     uidField.setAccessible(true);
-                    uidField.set(attributionSource, BActivityThread.getBUid());
+                    uidField.set(attributionSource, BlackBoxCore.getHostUid());
                     Slog.d(TAG, "Fixed AttributionSource UID via field: " + fieldName);
                     break;
                 } catch (NoSuchFieldException e) {
@@ -70,7 +70,7 @@ public class AttributionSourceUtils {
             try {
                 java.lang.reflect.Method setUidMethod = attributionSourceClass.getDeclaredMethod("setUid", int.class);
                 setUidMethod.setAccessible(true);
-                setUidMethod.invoke(attributionSource, BActivityThread.getBUid());
+                setUidMethod.invoke(attributionSource, BlackBoxCore.getHostUid());
                 Slog.d(TAG, "Fixed AttributionSource UID via setter method");
             } catch (Exception e) {
                 // Ignore setter method errors
@@ -140,7 +140,7 @@ public class AttributionSourceUtils {
                 // Try constructor with UID and package name
                 java.lang.reflect.Constructor<?> constructor = attributionSourceClass.getDeclaredConstructor(int.class, String.class);
                 constructor.setAccessible(true);
-                attributionSource = constructor.newInstance(BActivityThread.getBUid(), BlackBoxCore.getHostPkg());
+                attributionSource = constructor.newInstance(BlackBoxCore.getHostUid(), BlackBoxCore.getHostPkg());
             } catch (Exception e) {
                 try {
                     // Try default constructor

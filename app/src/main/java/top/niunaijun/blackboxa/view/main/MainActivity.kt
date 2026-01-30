@@ -25,7 +25,6 @@ import top.niunaijun.blackboxa.view.fake.FakeManagerActivity
 import top.niunaijun.blackboxa.view.list.ListActivity
 import top.niunaijun.blackboxa.view.setting.SettingActivity
 
-
 class MainActivity : LoadingActivity() {
 
     private val viewBinding: ActivityMainBinding by inflate()
@@ -38,7 +37,7 @@ class MainActivity : LoadingActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
-        
+
         fun start(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
@@ -61,6 +60,9 @@ class MainActivity : LoadingActivity() {
             initFab()
             initToolbarSubTitle()
 
+            // Check and request storage permission on Android 11+
+            checkStoragePermission()
+
             try {
                 BlackBoxCore.get().onAfterMainActivityOnCreate(this)
             } catch (e: Exception) {
@@ -73,14 +75,81 @@ class MainActivity : LoadingActivity() {
         }
     }
 
+    private fun checkStoragePermission() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                if (!android.os.Environment.isExternalStorageManager()) {
+                    Log.w(TAG, "MANAGE_EXTERNAL_STORAGE permission not granted")
+                    showStoragePermissionDialog()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking storage permission: ${e.message}")
+        }
+    }
+
+    private fun showStoragePermissionDialog() {
+        try {
+            MaterialDialog(this).show {
+                title(text = "Storage Permission Required")
+                message(
+                        text =
+                                "This app needs 'All Files Access' permission to properly run sandboxed apps. Without this permission, some apps may not work correctly.\n\nPlease grant permission in the next screen."
+                )
+                positiveButton(text = "Grant Permission") { openAllFilesAccessSettings() }
+                negativeButton(text = "Later") { Log.w(TAG, "User postponed storage permission") }
+                cancelable(false)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error showing storage permission dialog: ${e.message}")
+        }
+    }
+
+    private fun openAllFilesAccessSettings() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                val intent =
+                        Intent(
+                                android.provider.Settings
+                                        .ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+                        )
+                intent.data = Uri.parse("package:$packageName")
+                storagePermissionResult.launch(intent)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error opening storage settings: ${e.message}")
+            // Fallback: open general manage all files settings
+            try {
+                val intent =
+                        Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                storagePermissionResult.launch(intent)
+            } catch (e2: Exception) {
+                Log.e(TAG, "Error opening fallback storage settings: ${e2.message}")
+            }
+        }
+    }
+
+    private val storagePermissionResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                try {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                        if (android.os.Environment.isExternalStorageManager()) {
+                            Log.d(TAG, "Storage permission granted!")
+                        } else {
+                            Log.w(TAG, "Storage permission still not granted")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error handling storage permission result: ${e.message}")
+                }
+            }
+
     private fun showErrorDialog(message: String) {
         try {
             MaterialDialog(this).show {
                 title(text = "Error")
                 message(text = message)
-                positiveButton(text = "OK") {
-                    finish()
-                }
+                positiveButton(text = "OK") { finish() }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error showing error dialog: ${e.message}")
@@ -91,14 +160,14 @@ class MainActivity : LoadingActivity() {
     private fun initToolbarSubTitle() {
         try {
             updateUserRemark(0)
-            //hack code
+            // hack code
             viewBinding.toolbarLayout.toolbar.getChildAt(1)?.setOnClickListener {
                 try {
                     MaterialDialog(this).show {
                         title(res = R.string.userRemark)
                         input(
-                            hintRes = R.string.userRemark,
-                            prefill = viewBinding.toolbarLayout.toolbar.subtitle
+                                hintRes = R.string.userRemark,
+                                prefill = viewBinding.toolbarLayout.toolbar.subtitle
                         ) { _, input ->
                             try {
                                 AppManager.mRemarkSharedPreferences.edit {
@@ -124,9 +193,7 @@ class MainActivity : LoadingActivity() {
     private fun initViewPager() {
         try {
             val userList = BlackBoxCore.get().users
-            userList.forEach {
-                fragmentList.add(AppsFragment.newInstance(it.id))
-            }
+            userList.forEach { fragmentList.add(AppsFragment.newInstance(it.id)) }
 
             currentUser = userList.firstOrNull()?.id ?: 0
             fragmentList.add(AppsFragment.newInstance(userList.size))
@@ -135,19 +202,20 @@ class MainActivity : LoadingActivity() {
             mViewPagerAdapter.replaceData(fragmentList)
             viewBinding.viewPager.adapter = mViewPagerAdapter
             viewBinding.dotsIndicator.setViewPager2(viewBinding.viewPager)
-            viewBinding.viewPager.registerOnPageChangeCallback(object :
-                ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    try {
-                        super.onPageSelected(position)
-                        currentUser = fragmentList[position].userID
-                        updateUserRemark(currentUser)
-                        showFloatButton(true)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error in onPageSelected: ${e.message}")
+            viewBinding.viewPager.registerOnPageChangeCallback(
+                    object : ViewPager2.OnPageChangeCallback() {
+                        override fun onPageSelected(position: Int) {
+                            try {
+                                super.onPageSelected(position)
+                                currentUser = fragmentList[position].userID
+                                updateUserRemark(currentUser)
+                                showFloatButton(true)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error in onPageSelected: ${e.message}")
+                            }
+                        }
                     }
-                }
-            })
+            )
         } catch (e: Exception) {
             Log.e(TAG, "Error in initViewPager: ${e.message}")
         }
@@ -175,11 +243,9 @@ class MainActivity : LoadingActivity() {
             val tranY: Float = Resolution.convertDpToPixel(120F, App.getContext())
             val time = 200L
             if (show) {
-                viewBinding.fab.animate().translationY(0f).alpha(1f).setDuration(time)
-                    .start()
+                viewBinding.fab.animate().translationY(0f).alpha(1f).setDuration(time).start()
             } else {
-                viewBinding.fab.animate().translationY(tranY).alpha(0f).setDuration(time)
-                    .start()
+                viewBinding.fab.animate().translationY(tranY).alpha(0f).setDuration(time).start()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in showFloatButton: ${e.message}")
@@ -204,7 +270,8 @@ class MainActivity : LoadingActivity() {
 
     private fun updateUserRemark(userId: Int) {
         try {
-            var remark = AppManager.mRemarkSharedPreferences.getString("Remark$userId", "User $userId")
+            var remark =
+                    AppManager.mRemarkSharedPreferences.getString("Remark$userId", "User $userId")
             if (remark.isNullOrEmpty()) {
                 remark = "User $userId"
             }
@@ -217,21 +284,21 @@ class MainActivity : LoadingActivity() {
     }
 
     private val apkPathResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            try {
-                if (it.resultCode == RESULT_OK) {
-                    it.data?.let { data ->
-                        val userId = data.getIntExtra("userID", 0)
-                        val source = data.getStringExtra("source")
-                        if (source != null) {
-                            fragmentList[userId].installApk(source)
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                try {
+                    if (it.resultCode == RESULT_OK) {
+                        it.data?.let { data ->
+                            val userId = data.getIntExtra("userID", 0)
+                            val source = data.getStringExtra("source")
+                            if (source != null) {
+                                fragmentList[userId].installApk(source)
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error handling APK path result: ${e.message}")
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error handling APK path result: ${e.message}")
             }
-        }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         try {
@@ -248,20 +315,19 @@ class MainActivity : LoadingActivity() {
             when (item.itemId) {
                 R.id.main_git -> {
                     val intent =
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ALEX5402/NewBlackbox"))
+                            Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://github.com/ALEX5402/NewBlackbox")
+                            )
                     startActivity(intent)
                 }
-
                 R.id.main_setting -> {
                     SettingActivity.start(this)
                 }
-
                 R.id.main_tg -> {
-                    val intent =
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/newblackboxa"))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/newblackboxa"))
                     startActivity(intent)
                 }
-
                 R.id.fake_location -> {
                     // toast("Still Developing")
                     val intent = Intent(this, FakeManagerActivity::class.java)

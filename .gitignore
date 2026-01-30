@@ -3,6 +3,7 @@
 .gradle
 /logs/
 /local.properties
+/inspiration
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml

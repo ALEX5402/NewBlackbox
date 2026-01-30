@@ -19,6 +19,7 @@ import top.niunaijun.blackbox.fake.service.IAppOpsManagerProxy;
 import top.niunaijun.blackbox.fake.service.IAppWidgetManagerProxy;
 import top.niunaijun.blackbox.fake.service.IAttributionSourceProxy;
 import top.niunaijun.blackbox.fake.service.IAutofillManagerProxy;
+import top.niunaijun.blackbox.fake.service.ISensitiveContentProtectionManagerProxy;
 import top.niunaijun.blackbox.fake.service.ISettingsSystemProxy;
 import top.niunaijun.blackbox.fake.service.IConnectivityManagerProxy;
 import top.niunaijun.blackbox.fake.service.ISystemSensorManagerProxy;
@@ -191,6 +192,10 @@ public class HookManager {
             if (BuildCompat.isS()) {
                 addInjector(new IActivityClientProxy(null));
                 addInjector(new IVpnManagerProxy());
+            }
+            // 14.0 (Safe to try on S+, will skip if service missing)
+            if (BuildCompat.isS()) {
+                addInjector(new ISensitiveContentProtectionManagerProxy());
             }
             // 11.0
             if (BuildCompat.isR()) {
