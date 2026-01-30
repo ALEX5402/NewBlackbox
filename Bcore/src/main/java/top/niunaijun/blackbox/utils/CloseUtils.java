@@ -9,7 +9,7 @@ import java.io.IOException;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class CloseUtils {
     public static void close(Closeable... closeables) {

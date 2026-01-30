@@ -14,7 +14,7 @@ import top.niunaijun.blackbox.entity.pm.InstallResult;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class GmsCore {
     private static final String TAG = "GmsCore";

@@ -22,7 +22,7 @@ import top.niunaijun.blackbox.utils.FileUtils;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BPackageSettings implements Parcelable {
     public BPackage pkg;
@@ -77,11 +77,7 @@ public class BPackageSettings implements Parcelable {
         }
         state = new BPackageUserState(state);
         // xp模块所有用户可见、如果开启的话
-        if (installOption.isFlag(InstallOption.FLAG_XPOSED) &&
-                BXposedManagerService.get().isModuleEnable(pkg.packageName) &&
-                BXposedManagerService.get().isXPEnable()) {
-            state.installed = true;
-        }
+
         if (userId == BUserHandle.USER_ALL) {
             state.installed = true;
         }

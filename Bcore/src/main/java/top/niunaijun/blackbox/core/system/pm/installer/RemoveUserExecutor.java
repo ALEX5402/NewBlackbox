@@ -11,7 +11,7 @@ import top.niunaijun.blackbox.utils.FileUtils;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  * 创建用户相关
  */
 public class RemoveUserExecutor implements Executor {

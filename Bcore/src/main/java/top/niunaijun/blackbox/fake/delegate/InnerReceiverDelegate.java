@@ -21,7 +21,7 @@ import top.niunaijun.blackbox.proxy.record.ProxyBroadcastRecord;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class InnerReceiverDelegate extends IIntentReceiver.Stub {
     public static final String TAG = "InnerReceiverDelegate";

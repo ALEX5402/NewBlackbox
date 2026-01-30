@@ -17,7 +17,7 @@ import top.niunaijun.blackbox.BlackBoxCore;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class AbiUtils {
     private final Set<String> mLibs = new HashSet<>();

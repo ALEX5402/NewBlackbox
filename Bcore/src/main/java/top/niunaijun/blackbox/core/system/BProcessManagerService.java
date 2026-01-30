@@ -39,7 +39,7 @@ import top.niunaijun.blackbox.utils.provider.ProviderCall;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BProcessManagerService implements ISystemService {
     public static final String TAG = "BProcessManager";

@@ -20,7 +20,7 @@ import top.niunaijun.blackbox.utils.compat.TaskDescriptionCompat;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 @ScanClass(ActivityManagerCommonProxy.class)
 public class IActivityTaskManagerProxy extends BinderInvocationStub {

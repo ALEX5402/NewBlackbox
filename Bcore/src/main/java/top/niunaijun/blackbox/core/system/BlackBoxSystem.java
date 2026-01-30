@@ -21,7 +21,7 @@ import top.niunaijun.blackbox.core.system.notification.BNotificationManagerServi
 import top.niunaijun.blackbox.core.system.os.BStorageManagerService;
 import top.niunaijun.blackbox.core.system.pm.BPackageInstallerService;
 import top.niunaijun.blackbox.core.system.pm.BPackageManagerService;
-import top.niunaijun.blackbox.core.system.pm.BXposedManagerService;
+
 import top.niunaijun.blackbox.core.system.user.BUserHandle;
 import top.niunaijun.blackbox.core.system.user.BUserManagerService;
 import top.niunaijun.blackbox.entity.pm.InstallOption;
@@ -35,7 +35,7 @@ import top.niunaijun.blackbox.core.system.JarManager;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BlackBoxSystem {
     private static BlackBoxSystem sBlackBoxSystem;
@@ -64,7 +64,7 @@ public class BlackBoxSystem {
         mServices.add(BJobManagerService.get());
         mServices.add(BStorageManagerService.get());
         mServices.add(BPackageInstallerService.get());
-        mServices.add(BXposedManagerService.get());
+
         mServices.add(BProcessManagerService.get());
         mServices.add(BAccountManagerService.get());
         mServices.add(BLocationManagerService.get());

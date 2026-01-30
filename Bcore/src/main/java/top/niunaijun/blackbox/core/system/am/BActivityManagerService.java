@@ -36,7 +36,7 @@ import static android.content.pm.PackageManager.GET_META_DATA;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BActivityManagerService extends IBActivityManagerService.Stub implements ISystemService {
     public static final String TAG = "BActivityManagerService";

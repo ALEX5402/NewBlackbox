@@ -25,7 +25,7 @@ import static android.app.Service.START_NOT_STICKY;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class AppServiceDispatcher {
     public static final String TAG = "AppServiceDispatcher";

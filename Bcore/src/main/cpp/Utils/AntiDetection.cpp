@@ -17,7 +17,7 @@
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 struct SpoofedProp {
     const char* key;
@@ -36,7 +36,7 @@ static int (*orig_system_property_get)(const char *name, char *value) = nullptr;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 static const char* blocked_files[] = {
     // Root detection files
@@ -165,9 +165,16 @@ static ssize_t (*orig_readlink)(const char *pathname, char *buf, size_t bufsiz) 
 static DIR* (*orig_opendir)(const char *name) = nullptr;
 
 // Hook implementations
+// Safe whitelist for network and critical paths
+static bool is_safe_path(const char* path) {
+    if (!path) return false;
+    if (strstr(path, "/proc/net/")) return true;
+    if (strstr(path, "/dev/socket/")) return true;
+    return false;
+}
+
 static int my_access(const char *pathname, int mode) {
-    if (pathname && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
-        LOGD("[file-hide] access blocked: %s", pathname);
+    if (pathname && !is_safe_path(pathname) && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
         errno = ENOENT;
         return -1;
     }
@@ -175,8 +182,7 @@ static int my_access(const char *pathname, int mode) {
 }
 
 static int my_stat(const char *pathname, struct stat *buf) {
-    if (pathname && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
-        LOGD("[file-hide] stat blocked: %s", pathname);
+    if (pathname && !is_safe_path(pathname) && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
         errno = ENOENT;
         return -1;
     }
@@ -184,8 +190,7 @@ static int my_stat(const char *pathname, struct stat *buf) {
 }
 
 static int my_lstat(const char *pathname, struct stat *buf) {
-    if (pathname && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
-        LOGD("[file-hide] lstat blocked: %s", pathname);
+    if (pathname && !is_safe_path(pathname) && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
         errno = ENOENT;
         return -1;
     }
@@ -193,8 +198,7 @@ static int my_lstat(const char *pathname, struct stat *buf) {
 }
 
 static FILE* my_fopen(const char *pathname, const char *mode) {
-    if (pathname && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
-        LOGD("[file-hide] fopen blocked: %s", pathname);
+    if (pathname && !is_safe_path(pathname) && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
         errno = ENOENT;
         return nullptr;
     }
@@ -202,8 +206,7 @@ static FILE* my_fopen(const char *pathname, const char *mode) {
 }
 
 static int my_open(const char *pathname, int flags, ...) {
-    if (pathname && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
-        LOGD("[file-hide] open blocked: %s", pathname);
+    if (pathname && !is_safe_path(pathname) && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
         errno = ENOENT;
         return -1;
     }
@@ -222,8 +225,7 @@ static int my_open(const char *pathname, int flags, ...) {
 }
 
 static ssize_t my_readlink(const char *pathname, char *buf, size_t bufsiz) {
-    if (pathname && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
-        LOGD("[file-hide] readlink blocked: %s", pathname);
+    if (pathname && !is_safe_path(pathname) && (is_blocked_file(pathname) || is_blocked_package(pathname))) {
         errno = ENOENT;
         return -1;
     }
@@ -231,8 +233,7 @@ static ssize_t my_readlink(const char *pathname, char *buf, size_t bufsiz) {
 }
 
 static DIR* my_opendir(const char *name) {
-    if (name && (is_blocked_file(name) || is_blocked_package(name))) {
-        LOGD("[file-hide] opendir blocked: %s", name);
+    if (name && !is_safe_path(name) && (is_blocked_file(name) || is_blocked_package(name))) {
         errno = ENOENT;
         return nullptr;
     }
@@ -246,37 +247,6 @@ static void install_file_hooks() {
         LOGD("xdl_open failed for libc.so");
         return;
     }
-    
-  // Hook file access functions
-
-
-
-    void* fopen_addr = xdl_dsym(handle, "fopen", nullptr); // gives the read write permisson erron on games and apps
-    if (fopen_addr) DobbyHook(fopen_addr, (void*)my_fopen, (void**)&orig_fopen);
-
-    void* lstat_addr = xdl_dsym(handle, "lstat", nullptr);
-    if (lstat_addr) DobbyHook(lstat_addr, (void*)my_lstat, (void**)&orig_lstat);
-
-
-
-
-    /*
-     *
-      void* access_addr = xdl_dsym(handle, "access", nullptr); // crash
-    if (access_addr) DobbyHook(access_addr, (void*)my_access, (void**)&orig_access);
-
-         void* stat_addr = xdl_dsym(handle, "stat", nullptr); // crash
-    if (stat_addr) DobbyHook(stat_addr, (void*)my_stat, (void**)&orig_stat);
-
-  void* open_addr = xdl_dsym(handle, "open", nullptr);  // crash
-    if (open_addr) DobbyHook(open_addr, (void*)my_open, (void**)&orig_open);
-
-       void* readlink_addr = xdl_dsym(handle, "readlink", nullptr);  // crash
-    if (readlink_addr) DobbyHook(readlink_addr, (void*)my_readlink, (void**)&orig_readlink);
-
-   void* opendir_addr = xdl_dsym(handle, "opendir", nullptr); // gives crash
-    if (opendir_addr) DobbyHook(opendir_addr, (void*)my_opendir, (void**)&orig_opendir);
-     */
 
 
     xdl_close(handle);
@@ -285,7 +255,7 @@ static void install_file_hooks() {
 
 // Main installer function - call this once at startup
 __attribute__((constructor)) void install_antidetection_hooks() {
-//    LOGD("Installing anti-detection hooks...");
-//    install_file_hooks(); // gives the read write permisson erron on games and apps
-//    LOGD("Anti-detection hooks installation complete");
+    LOGD("Installing anti-detection hooks...");
+    install_file_hooks(); 
+    LOGD("Anti-detection hooks installation complete");
 }

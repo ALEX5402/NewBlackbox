@@ -17,7 +17,7 @@ import top.niunaijun.blackbox.utils.MethodParameterUtils;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public abstract class ClassInvocationStub implements InvocationHandler, IInjectHook {
     public static final String TAG = ClassInvocationStub.class.getSimpleName();

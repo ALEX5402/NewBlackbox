@@ -8,7 +8,7 @@ import android.os.IInterface;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public interface BContentProvider {
     IInterface wrapper(final IInterface contentProviderProxy, final String appPkg);

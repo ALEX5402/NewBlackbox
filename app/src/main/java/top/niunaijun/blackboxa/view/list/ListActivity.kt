@@ -19,7 +19,6 @@ import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.view.base.BaseActivity
 
-
 class ListActivity : BaseActivity() {
 
     private val viewBinding: ActivityListBinding by inflate()
@@ -36,54 +35,49 @@ class ListActivity : BaseActivity() {
 
         initToolbar(viewBinding.toolbarLayout.toolbar, R.string.installed_app, true)
 
-        mAdapter = RVAdapter<InstalledAppBean>(this,ListAdapter()).bind(viewBinding.recyclerView).setItemClickListener { _, item, _ ->
-            finishWithResult(item.packageName)
-        }
+        mAdapter =
+                RVAdapter<InstalledAppBean>(this, ListAdapter())
+                        .bind(viewBinding.recyclerView)
+                        .setItemClickListener { _, item, _ -> finishWithResult(item.packageName) }
 
         viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
-
 
         initSearchView()
         initViewModel()
     }
 
     private fun initSearchView() {
-        viewBinding.searchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String): Boolean {
-                filterApp(newText)
-                return true
-            }
+        viewBinding.searchView.setOnQueryTextListener(
+                object : SimpleSearchView.OnQueryTextListener {
+                    override fun onQueryTextChange(newText: String): Boolean {
+                        filterApp(newText)
+                        return true
+                    }
 
-            override fun onQueryTextCleared(): Boolean {
-                return true
-            }
+                    override fun onQueryTextCleared(): Boolean {
+                        return true
+                    }
 
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
-
-        })
+                    override fun onQueryTextSubmit(query: String): Boolean {
+                        return true
+                    }
+                }
+        )
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(this, InjectionUtil.getListFactory()).get(ListViewModel::class.java)
-        val onlyShowXp = intent.getBooleanExtra("onlyShowXp", false)
-        val userID = intent.getIntExtra("userID",0)
-
-        if (onlyShowXp) {
-            viewModel.getInstalledModules()
-            viewBinding.toolbarLayout.toolbar.setTitle(R.string.installed_module)
-        } else {
-            viewModel.getInstallAppList(userID)
-            viewBinding.toolbarLayout.toolbar.setTitle(R.string.installed_app)
-        }
+        viewModel =
+                ViewModelProvider(this, InjectionUtil.getListFactory())
+                        .get(ListViewModel::class.java)
+        val userID = intent.getIntExtra("userID", 0)
+        viewModel.getInstallAppList(userID)
+        viewBinding.toolbarLayout.toolbar.setTitle(R.string.installed_app)
 
         viewModel.loadingLiveData.observe(this) {
             if (it) {
                 viewBinding.stateView.showLoading()
             } else {
                 viewBinding.stateView.showContent()
-
             }
         }
 
@@ -103,28 +97,25 @@ class ListActivity : BaseActivity() {
     }
 
     private fun filterApp(newText: String) {
-        val newList = this.appList.filter {
-            it.name.contains(newText, true) or it.packageName.contains(newText, true)
-        }
+        val newList =
+                this.appList.filter {
+                    it.name.contains(newText, true) or it.packageName.contains(newText, true)
+                }
         mAdapter.setItems(newList)
     }
 
-    private val openDocumentedResult = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        it?.run {
-            finishWithResult(it.toString())
-        }
-    }
+    private val openDocumentedResult =
+            registerForActivityResult(ActivityResultContracts.GetContent()) {
+                it?.run { finishWithResult(it.toString()) }
+            }
 
     private fun finishWithResult(source: String) {
         intent.putExtra("source", source)
         setResult(Activity.RESULT_OK, intent)
         val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        window.peekDecorView()?.run {
-            imm.hideSoftInputFromWindow(windowToken, 0)
-        }
+        window.peekDecorView()?.run { imm.hideSoftInputFromWindow(windowToken, 0) }
         finish()
     }
-
 
     override fun onBackPressed() {
         if (viewBinding.searchView.isSearchOpen) {
@@ -157,11 +148,9 @@ class ListActivity : BaseActivity() {
         viewModel.appsLiveData.removeObservers(this)
     }
 
-
-    companion object{
-        fun start(context: Context,onlyShowXp:Boolean){
-            val intent = Intent(context,ListActivity::class.java)
-            intent.putExtra("onlyShowXp",onlyShowXp)
+    companion object {
+        fun start(context: Context) {
+            val intent = Intent(context, ListActivity::class.java)
             context.startActivity(intent)
         }
     }

@@ -84,7 +84,7 @@ public class WebViewProxy extends ClassInvocationStub {
                 if (result instanceof WebView) {
                     WebView webView = (WebView) result;
                     // Configure WebView for better compatibility
-                    configureWebView(webView, context);
+                    configureWebView(webView);
                 }
 
                 return result;
@@ -95,7 +95,7 @@ public class WebViewProxy extends ClassInvocationStub {
             }
         }
         
-        private void configureWebView(WebView webView, Context context) {
+        private void configureWebView(WebView webView) {
             try {
                 WebSettings settings = webView.getSettings();
                 if (settings != null) {
@@ -107,16 +107,60 @@ public class WebViewProxy extends ClassInvocationStub {
                     settings.setDatabaseEnabled(true);
                     // Set cache mode
                     settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+                    // Enable AppCache (Restored per user request, deprecated/removed in new SDKs)
+                    try {
+                        // Use reflection because methods are removed in API 33+ SDK
+                        Method setAppCacheEnabled = settings.getClass().getMethod("setAppCacheEnabled", boolean.class);
+                        setAppCacheEnabled.invoke(settings, true);
+
+                        if (webView.getContext() != null) {
+                            Method setAppCachePath = settings.getClass().getMethod("setAppCachePath", String.class);
+                            setAppCachePath.invoke(settings, webView.getContext().getCacheDir().getAbsolutePath());
+                        }
+                    } catch (Throwable e) {
+                        // Method missing on newer Android versions/SDKs, ignore
+                        Slog.w(TAG, "WebView: AppCache not supported: " + e.getMessage());
+                    }
+
+                    // CRITICAL: Enable network access explicitly
+                    settings.setBlockNetworkLoads(false);
+                    settings.setBlockNetworkImage(false);
+
+                    // Enable file access for local resources
+                    settings.setAllowFileAccess(true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        settings.setAllowFileAccessFromFileURLs(true);
+                        settings.setAllowUniversalAccessFromFileURLs(true);
+                    }
+
                     // Enable mixed content (for HTTPS sites with HTTP resources)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                     }
+
                     // Set user agent
                     String userAgent = settings.getUserAgentString();
                     if (userAgent != null && !userAgent.contains("BlackBox")) {
                         settings.setUserAgentString(userAgent + " BlackBox");
                     }
-                    Slog.d(TAG, "WebView: Configured successfully");
+
+                    // Force network available
+                    try {
+                        webView.setNetworkAvailable(true);
+                    } catch (Exception e) {
+                        // Ignore
+                    }
+
+                    // Allow content access
+                    settings.setAllowContentAccess(true);
+
+                    // Disable safe browsing (API 26+) - often fails in sandbox
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                         settings.setSafeBrowsingEnabled(false);
+                    }
+
+                    Slog.d(TAG, "WebView: Configured successfully with network access enabled");
                 }
             } catch (Exception e) {
                 Slog.w(TAG, "WebView: Failed to configure settings", e);

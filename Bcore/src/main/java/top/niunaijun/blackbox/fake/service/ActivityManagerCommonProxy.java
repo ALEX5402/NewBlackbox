@@ -30,7 +30,7 @@ import static android.content.pm.PackageManager.GET_META_DATA;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ActivityManagerCommonProxy {
     public static final String TAG = "CommonStub";

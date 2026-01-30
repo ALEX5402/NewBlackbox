@@ -14,7 +14,7 @@ list<IO::RelocateInfo> relocate_rule;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 char *replace(const char *str, const char *src, const char *dst) {
     const char *pos = str;

@@ -26,7 +26,7 @@ import top.niunaijun.blackbox.utils.FileUtils;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BUserManagerService extends IBUserManagerService.Stub implements ISystemService {
     private static BUserManagerService sService = new BUserManagerService();

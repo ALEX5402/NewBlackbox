@@ -19,7 +19,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethods;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class IAccessibilityManagerProxy extends BinderInvocationStub {
 

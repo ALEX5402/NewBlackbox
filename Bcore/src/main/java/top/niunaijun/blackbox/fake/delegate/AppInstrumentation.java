@@ -118,7 +118,7 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
     @Override
     public Application newApplication(ClassLoader cl, String className, Context context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         ContextCompat.fix(context);
-        BActivityThread.currentActivityThread().loadXposed(context);
+
         return super.newApplication(cl, className, context);
     }
 

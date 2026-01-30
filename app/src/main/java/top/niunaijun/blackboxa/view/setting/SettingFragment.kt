@@ -1,16 +1,13 @@
 package top.niunaijun.blackboxa.view.setting
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
-import top.niunaijun.blackboxa.view.xp.XpActivity
 
 /**
  *
@@ -20,37 +17,12 @@ import top.niunaijun.blackboxa.view.xp.XpActivity
  */
 class SettingFragment : PreferenceFragmentCompat() {
 
-    private lateinit var xpEnable: SwitchPreferenceCompat
-
-    private lateinit var xpModule: Preference
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.setting, rootKey)
 
-        xpEnable = findPreference("xp_enable")!!
-        xpEnable.isChecked = BlackBoxCore.get().isXPEnable
-
-        xpEnable.setOnPreferenceChangeListener { _, newValue ->
-            BlackBoxCore.get().isXPEnable = (newValue == true)
-            true
-        }
-        //xp模块跳转
-        xpModule = findPreference("xp_module")!!
-        xpModule.setOnPreferenceClickListener {
-            val intent = Intent(requireActivity(), XpActivity::class.java)
-            requireContext().startActivity(intent)
-            true
-        }
         initGms()
 
-        invalidHideState{
-            val xpHidePreference: Preference = (findPreference("xp_hide")!!)
-            val hideXposed = AppManager.mBlackBoxLoader.hideXposed()
-            xpHidePreference.setDefaultValue(hideXposed)
-            xpHidePreference
-        }
-
-        invalidHideState{
+        invalidHideState {
             val rootHidePreference: Preference = (findPreference("root_hide")!!)
             val hideRoot = AppManager.mBlackBoxLoader.hideRoot()
             rootHidePreference.setDefaultValue(hideRoot)
@@ -85,15 +57,10 @@ class SettingFragment : PreferenceFragmentCompat() {
         pref.setOnPreferenceChangeListener { preference, newValue ->
             val tmpHide = (newValue == true)
             when (preference.key) {
-                "xp_hide" -> {
-                    AppManager.mBlackBoxLoader.invalidHideXposed(tmpHide)
-                }
-
                 "root_hide" -> {
 
                     AppManager.mBlackBoxLoader.invalidHideRoot(tmpHide)
                 }
-
                 "daemon_enable" -> {
                     AppManager.mBlackBoxLoader.invalidDaemonEnable(tmpHide)
                 }

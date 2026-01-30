@@ -11,7 +11,7 @@ import top.niunaijun.jnihook.jni.JniHook;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ReflectCore {
 

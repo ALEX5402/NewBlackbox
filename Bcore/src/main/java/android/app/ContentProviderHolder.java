@@ -10,7 +10,7 @@ import android.os.IBinder;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class ContentProviderHolder {
     public final ProviderInfo info = null;

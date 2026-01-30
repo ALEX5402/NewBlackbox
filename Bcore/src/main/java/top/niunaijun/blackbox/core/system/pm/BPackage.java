@@ -28,7 +28,7 @@ import top.niunaijun.blackbox.utils.compat.BuildCompat;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BPackage implements Parcelable {
     public ArrayList<Activity> activities = new ArrayList<Activity>(0);

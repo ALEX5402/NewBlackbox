@@ -16,7 +16,7 @@ import top.niunaijun.blackbox.utils.NativeUtils;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  * 拷贝文件相关
  */
 public class CopyExecutor implements Executor {

@@ -46,14 +46,14 @@ import top.niunaijun.blackbox.core.system.user.BUserHandle;
 import top.niunaijun.blackbox.core.system.user.BUserInfo;
 import top.niunaijun.blackbox.entity.pm.InstallOption;
 import top.niunaijun.blackbox.entity.pm.InstallResult;
-import top.niunaijun.blackbox.entity.pm.InstalledModule;
+
 import top.niunaijun.blackbox.fake.delegate.ContentProviderDelegate;
 import top.niunaijun.blackbox.fake.frameworks.BActivityManager;
 import top.niunaijun.blackbox.fake.frameworks.BJobManager;
 import top.niunaijun.blackbox.fake.frameworks.BPackageManager;
 import top.niunaijun.blackbox.fake.frameworks.BStorageManager;
 import top.niunaijun.blackbox.fake.frameworks.BUserManager;
-import top.niunaijun.blackbox.fake.frameworks.BXposedManager;
+
 import top.niunaijun.blackbox.fake.hook.HookManager;
 import top.niunaijun.blackbox.proxy.ProxyManifest;
 import top.niunaijun.blackbox.utils.FileUtils;
@@ -62,7 +62,7 @@ import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.SimpleCrashFix;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 import top.niunaijun.blackbox.utils.compat.BundleCompat;
-import top.niunaijun.blackbox.utils.compat.XposedParserCompat;
+
 import top.niunaijun.blackbox.utils.provider.ProviderCall;
 import top.niunaijun.blackbox.utils.StackTraceFilter;
 import top.niunaijun.blackbox.utils.SocialMediaAppCrashPrevention;
@@ -77,7 +77,7 @@ import top.niunaijun.blackbox.utils.StoragePermissionHelper;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 @SuppressLint({"StaticFieldLeak", "NewApi"})
 @SuppressWarnings({"unchecked", "deprecation"})
@@ -239,7 +239,7 @@ public class BlackBoxCore extends ClientConfiguration {
                     ServiceManager.STORAGE_MANAGER,
                     ServiceManager.USER_MANAGER,
                     ServiceManager.JOB_MANAGER,
-                    ServiceManager.XPOSED_MANAGER,
+
                     ServiceManager.ACCOUNT_MANAGER,
                     ServiceManager.LOCATION_MANAGER,
                     ServiceManager.NOTIFICATION_MANAGER
@@ -270,7 +270,7 @@ public class BlackBoxCore extends ClientConfiguration {
                 ServiceManager.STORAGE_MANAGER,
                 ServiceManager.USER_MANAGER,
                 ServiceManager.JOB_MANAGER,
-                ServiceManager.XPOSED_MANAGER,
+
                 ServiceManager.ACCOUNT_MANAGER,
                 ServiceManager.LOCATION_MANAGER,
                 ServiceManager.NOTIFICATION_MANAGER
@@ -303,7 +303,7 @@ public class BlackBoxCore extends ClientConfiguration {
                     ServiceManager.STORAGE_MANAGER,
                     ServiceManager.USER_MANAGER,
                     ServiceManager.JOB_MANAGER,
-                    ServiceManager.XPOSED_MANAGER,
+
                     ServiceManager.ACCOUNT_MANAGER,
                     ServiceManager.LOCATION_MANAGER,
                     ServiceManager.NOTIFICATION_MANAGER
@@ -1239,58 +1239,9 @@ public class BlackBoxCore extends ClientConfiguration {
         return getBPackageManager().installPackageAsUser(apk.toString(), InstallOption.installByStorage().makeUriFile(), userId);
     }
 
-    public InstallResult installXPModule(File apk) {
-        return getBPackageManager().installPackageAsUser(apk.getAbsolutePath(), InstallOption.installByStorage().makeXposed(), BUserHandle.USER_XPOSED);
-    }
 
-    public InstallResult installXPModule(Uri apk) {
-        return getBPackageManager().installPackageAsUser(apk.toString(), InstallOption.installByStorage()
-                .makeXposed()
-                .makeUriFile(), BUserHandle.USER_XPOSED);
-    }
 
-    public InstallResult installXPModule(String packageName) {
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(packageName, 0);
-            String path = packageInfo.applicationInfo.sourceDir;
-            return getBPackageManager().installPackageAsUser(path, InstallOption.installBySystem().makeXposed(), BUserHandle.USER_XPOSED);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return new InstallResult().installError(e.getMessage());
-        }
-    }
 
-    public void uninstallXPModule(String packageName) {
-        uninstallPackage(packageName);
-    }
-
-    public boolean isXPEnable() {
-        return BXposedManager.get().isXPEnable();
-    }
-
-    public void setXPEnable(boolean enable) {
-        BXposedManager.get().setXPEnable(enable);
-    }
-
-    public boolean isXposedModule(File file) {
-        return XposedParserCompat.isXPModule(file.getAbsolutePath());
-    }
-
-    public boolean isInstalledXposedModule(String packageName) {
-        return isInstalled(packageName, BUserHandle.USER_XPOSED);
-    }
-
-    public boolean isModuleEnable(String packageName) {
-        return BXposedManager.get().isModuleEnable(packageName);
-    }
-
-    public void setModuleEnable(String packageName, boolean enable) {
-        BXposedManager.get().setModuleEnable(packageName, enable);
-    }
-
-    public List<InstalledModule> getInstalledXPModules() {
-        return BXposedManager.get().getInstalledModules();
-    }
 
     public List<ApplicationInfo> getInstalledApplications(int flags, int userId) {
         return getBPackageManager().getInstalledApplications(flags, userId);
@@ -1384,10 +1335,7 @@ public class BlackBoxCore extends ClientConfiguration {
         return mClientConfiguration.isHideRoot();
     }
 
-    @Override
-    public boolean isHideXposed() {
-        return mClientConfiguration.isHideXposed();
-    }
+
 
     @Override
     public String getHostPackageName() {

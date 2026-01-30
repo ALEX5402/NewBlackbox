@@ -13,7 +13,7 @@ import top.niunaijun.blackbox.core.system.os.IBStorageManagerService;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 public class BStorageManager extends BlackManager<IBStorageManagerService> {
     private static final BStorageManager sStorageManager = new BStorageManager();

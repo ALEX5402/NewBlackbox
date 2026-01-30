@@ -27,7 +27,7 @@ import top.niunaijun.blackbox.utils.Slog;
  * (`･ω･∥
  * 丶　つ０
  * しーＪ
- * TFNQw5HgWUS33Ke1eNmSFTwoQySGU7XNsK (USDT TRC20)
+ * 
  */
 @ScanClass(VpnCommonProxy.class)
 public class IConnectivityManagerProxy extends BinderInvocationStub {
@@ -271,6 +271,75 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
         }
     }
 
+    // Hook for getAllNetworks - critical for modern apps to list networks
+    @ProxyMethod("getAllNetworks")
+    public static class GetAllNetworks extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            try {
+                // Try original
+                Object result = method.invoke(who, args);
+                if (result != null) {
+                    // Check if array is empty
+                    if (Array.getLength(result) > 0) {
+                         return result;
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+
+            Slog.d(TAG, "Creating fallback Network[] for getAllNetworks");
+            
+            // Try to align with GetActiveNetwork to ensure consistency
+            try {
+                 // Finds the getActiveNetwork method on the proxy to call it properly
+                 Method getActiveNetworkMethod = null;
+                 try {
+                     getActiveNetworkMethod = who.getClass().getMethod("getActiveNetwork");
+                 } catch (NoSuchMethodException e) {
+                     // Try searching by name if exact match fails
+                     for (Method m : who.getClass().getMethods()) {
+                         if (m.getName().equals("getActiveNetwork")) {
+                             getActiveNetworkMethod = m;
+                             break;
+                         }
+                     }
+                 }
+
+                 if (getActiveNetworkMethod != null) {
+                     Object activeNetwork = getActiveNetworkMethod.invoke(who);
+                     if (activeNetwork != null) {
+                         Class<?> networkClass = activeNetwork.getClass();
+                         Object networkArray = Array.newInstance(networkClass, 1);
+                         Array.set(networkArray, 0, activeNetwork);
+                         Slog.d(TAG, "Refilled getAllNetworks with Active Network: " + activeNetwork);
+                         return networkArray;
+                     }
+                 }
+            } catch (Exception e) {
+                 Slog.w(TAG, "Failed to use Active Network for fallback: " + e.getMessage());
+            }
+
+            // Create array with 1 fake network as last resort
+            try {
+                Class<?> networkClass = Class.forName("android.net.Network");
+                Object networkArray = Array.newInstance(networkClass, 1);
+                
+                // Create fake network (Network(1))
+                // Note: Network(int) is hidden, but accessible via reflection
+                Constructor<?> constructor = networkClass.getConstructor(int.class);
+                Object network = constructor.newInstance(1);
+                
+                Array.set(networkArray, 0, network);
+                return networkArray;
+            } catch (Exception e) {
+                 Slog.w(TAG, "Failed to create fallback Network[]: " + e.getMessage());
+                 return method.invoke(who, args);
+            }
+        }
+    }
+
     // Enhanced hook for getNetworkCapabilities for API 21+
     @ProxyMethod("getNetworkCapabilities")
     public static class GetNetworkCapabilities extends MethodHook {
@@ -278,21 +347,33 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             if (android.os.Build.VERSION.SDK_INT >= 21) {
                 try {
+                    // Try to get real capabilities first
+                    Object result = method.invoke(who, args);
+                    if (result != null) {
+                        // Force add capabilities to the real result to ensure app thinks it has internet
+                        try {
+                            Method addCapabilityMethod = result.getClass().getMethod("addCapability", int.class);
+                            addCapabilityMethod.setAccessible(true);
+                            addCapabilityMethod.invoke(result, 12); // NET_CAPABILITY_INTERNET
+                            addCapabilityMethod.invoke(result, 16); // NET_CAPABILITY_VALIDATED
+                        } catch (Exception e) {
+                             // Ignore if method not found (e.g. immutable on some versions)
+                            e.printStackTrace();
+                        }
+                        return result;
+                    }
+
                     // Create NetworkCapabilities using API-specific methods
                     Object nc;
                     // Use the universal NetworkCapabilities creation method for all API levels
                     nc = IConnectivityManagerProxy.createNetworkCapabilities();
                     
                     if (nc != null) {
-                        Slog.d(TAG, "Created enhanced NetworkCapabilities for sandboxed app");
+                        Slog.d(TAG, "Created enhanced NetworkCapabilities for sandboxed app (fallback)");
                         return nc;
-                    } else {
-                        Slog.w(TAG, "Failed to create NetworkCapabilities, falling back to original method");
-                        return method.invoke(who, args);
                     }
                 } catch (Exception e) {
                     Slog.w(TAG, "Error creating NetworkCapabilities: " + e.getMessage());
-                    return method.invoke(who, args);
                 }
             }
             return method.invoke(who, args);
@@ -306,6 +387,12 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             if (android.os.Build.VERSION.SDK_INT >= 21) {
                 try {
+                    // Try to get real active network first
+                    Object result = method.invoke(who, args);
+                    if (result != null) {
+                        return result;
+                    }
+
                     // Create a mock Network object to ensure proper binding
                     // Use reflection to handle different constructor signatures
                     android.net.Network network;
@@ -325,14 +412,40 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
                             return method.invoke(who, args);
                         }
                     }
-                    Slog.d(TAG, "Created mock Network object for sandboxed app");
+                    Slog.d(TAG, "Created mock Network object for sandboxed app (fallback)");
                     return network;
                 } catch (Exception e) {
                     Slog.w(TAG, "Error creating Network object: " + e.getMessage());
-                    return method.invoke(who, args);
                 }
             }
             return method.invoke(who, args);
+        }
+    }
+
+    // Hook for getActiveNetworkInfo - critical for legacy internet checks
+    @ProxyMethod("getActiveNetworkInfo")
+    public static class GetActiveNetworkInfo extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            try {
+                Object result = method.invoke(who, args);
+                if (result != null) {
+                    // Force CONNECTED state
+                    try {
+                        Method setDetailedState = result.getClass().getMethod("setDetailedState", 
+                             android.net.NetworkInfo.DetailedState.class, String.class, String.class);
+                        setDetailedState.setAccessible(true);
+                        setDetailedState.invoke(result, android.net.NetworkInfo.DetailedState.CONNECTED, null, null);
+                    } catch (Exception e) {
+                         // Ignore
+                    }
+                    return result;
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+            Slog.d(TAG, "Creating fallback NetworkInfo for getActiveNetworkInfo");
+            return createNetworkInfo(ConnectivityManager.TYPE_WIFI, 0, "WIFI", "");
         }
     }
 
@@ -343,20 +456,21 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             if (android.os.Build.VERSION.SDK_INT >= 21) {
                 try {
+                    // Try to get real link properties first
+                    Object result = method.invoke(who, args);
+                    if (result != null) {
+                        return result;
+                    }
+
                     // Create LinkProperties using the universal method for all API levels
                     Object linkProperties = IConnectivityManagerProxy.createLinkProperties();
                     
                     if (linkProperties != null) {
-                        Slog.d(TAG, "Created LinkProperties with DNS configuration for sandboxed app");
+                        Slog.d(TAG, "Created LinkProperties with DNS configuration for sandboxed app (fallback)");
                         return linkProperties;
-                    } else {
-                        Slog.w(TAG, "Failed to create LinkProperties, falling back to original method");
-                        return method.invoke(who, args);
                     }
-                    
                 } catch (Exception e) {
                     Slog.w(TAG, "Error creating LinkProperties: " + e.getMessage());
-                    return method.invoke(who, args);
                 }
             }
             return method.invoke(who, args);
@@ -506,6 +620,15 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
                 // Try to use the original method first
                 Object result = method.invoke(who, args);
                 if (result != null) {
+                    // Force CONNECTED state
+                    try {
+                        Method setDetailedState = result.getClass().getMethod("setDetailedState", 
+                             android.net.NetworkInfo.DetailedState.class, String.class, String.class);
+                        setDetailedState.setAccessible(true);
+                        setDetailedState.invoke(result, android.net.NetworkInfo.DetailedState.CONNECTED, null, null);
+                    } catch (Exception e) {
+                         // Ignore
+                    }
                     return result;
                 }
                 
@@ -690,6 +813,15 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
                 // Try to use the original method first
                 Object result = method.invoke(who, args);
                 if (result != null) {
+                    // Force CONNECTED state
+                    try {
+                        Method setDetailedState = result.getClass().getMethod("setDetailedState", 
+                             android.net.NetworkInfo.DetailedState.class, String.class, String.class);
+                        setDetailedState.setAccessible(true);
+                        setDetailedState.invoke(result, android.net.NetworkInfo.DetailedState.CONNECTED, null, null);
+                    } catch (Exception e) {
+                         // Ignore
+                    }
                     return result;
                 }
                 
@@ -724,6 +856,15 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
                 // Try to use the original method first
                 Object result = method.invoke(who, args);
                 if (result != null) {
+                    // Force CONNECTED state
+                    try {
+                        Method setDetailedState = result.getClass().getMethod("setDetailedState", 
+                             android.net.NetworkInfo.DetailedState.class, String.class, String.class);
+                        setDetailedState.setAccessible(true);
+                        setDetailedState.invoke(result, android.net.NetworkInfo.DetailedState.CONNECTED, null, null);
+                    } catch (Exception e) {
+                         // Ignore
+                    }
                     return result;
                 }
                 
