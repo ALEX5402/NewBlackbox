@@ -9,12 +9,6 @@ import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/5/6 22:13
- */
 class SettingFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -34,6 +28,13 @@ class SettingFragment : PreferenceFragmentCompat() {
             val mDaemonEnable = AppManager.mBlackBoxLoader.daemonEnable()
             daemonPreference.setDefaultValue(mDaemonEnable)
             daemonPreference
+        }
+
+        invalidHideState {
+            val vpnPreference: Preference = (findPreference("use_vpn_network")!!)
+            val mUseVpnNetwork = AppManager.mBlackBoxLoader.useVpnNetwork()
+            vpnPreference.setDefaultValue(mUseVpnNetwork)
+            vpnPreference
         }
     }
 
@@ -63,6 +64,9 @@ class SettingFragment : PreferenceFragmentCompat() {
                 }
                 "daemon_enable" -> {
                     AppManager.mBlackBoxLoader.invalidDaemonEnable(tmpHide)
+                }
+                "use_vpn_network" -> {
+                    AppManager.mBlackBoxLoader.invalidUseVpnNetwork(tmpHide)
                 }
             }
 

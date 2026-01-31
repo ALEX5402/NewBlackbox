@@ -29,6 +29,15 @@ public abstract class ClientConfiguration {
     }
 
     /**
+     * Whether to use VPN network mode for sandboxed apps.
+     * When enabled, network traffic is routed through the VPN service.
+     * Default is false (normal network mode).
+     */
+    public boolean isUseVpnNetwork() {
+        return false;
+    }
+
+    /**
      * This method is called when an internal application requests to install a new application.
      *
      * @return Is it handled?

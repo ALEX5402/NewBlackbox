@@ -1353,6 +1353,10 @@ public class BlackBoxCore extends ClientConfiguration {
             Context context = getContext();
             String fileName = context.getPackageName() + "_logcat.txt";
             boolean useMediaStore = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
+            
+            // Log comprehensive device information
+            logDeviceInfo();
+            
             try {
                 if (useMediaStore) {
                     // Use MediaStore for Android 10+
@@ -1390,6 +1394,97 @@ public class BlackBoxCore extends ClientConfiguration {
                 Slog.e(TAG, "Failed to save logcat: " + e.getMessage());
             }
         }).start();
+    }
+
+    /**
+     * Log comprehensive device information for debugging purposes
+     */
+    private void logDeviceInfo() {
+        try {
+            Slog.i(TAG, "╔══════════════════════════════════════════════════════════════╗");
+            Slog.i(TAG, "║                    DEVICE INFORMATION                        ║");
+            Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+            
+            // Android Version Info
+            Slog.i(TAG, "║ Android Version: " + Build.VERSION.RELEASE);
+            Slog.i(TAG, "║ SDK Level: " + Build.VERSION.SDK_INT);
+            Slog.i(TAG, "║ Build ID: " + Build.ID);
+            Slog.i(TAG, "║ Build Display: " + Build.DISPLAY);
+            
+            // Security Patch (API 23+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Slog.i(TAG, "║ Security Patch: " + Build.VERSION.SECURITY_PATCH);
+            }
+            
+            // Device Info
+            Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+            Slog.i(TAG, "║ Manufacturer: " + Build.MANUFACTURER);
+            Slog.i(TAG, "║ Brand: " + Build.BRAND);
+            Slog.i(TAG, "║ Model: " + Build.MODEL);
+            Slog.i(TAG, "║ Device: " + Build.DEVICE);
+            Slog.i(TAG, "║ Product: " + Build.PRODUCT);
+            Slog.i(TAG, "║ Board: " + Build.BOARD);
+            Slog.i(TAG, "║ Hardware: " + Build.HARDWARE);
+            
+            // CPU/ABI Info
+            Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+            Slog.i(TAG, "║ Supported ABIs: " + String.join(", ", Build.SUPPORTED_ABIS));
+            if (Build.SUPPORTED_32_BIT_ABIS.length > 0) {
+                Slog.i(TAG, "║ 32-bit ABIs: " + String.join(", ", Build.SUPPORTED_32_BIT_ABIS));
+            }
+            if (Build.SUPPORTED_64_BIT_ABIS.length > 0) {
+                Slog.i(TAG, "║ 64-bit ABIs: " + String.join(", ", Build.SUPPORTED_64_BIT_ABIS));
+            }
+            
+            // Build Fingerprint
+            Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+            Slog.i(TAG, "║ Fingerprint: " + Build.FINGERPRINT);
+            Slog.i(TAG, "║ Type: " + Build.TYPE);
+            Slog.i(TAG, "║ Tags: " + Build.TAGS);
+            
+            // Memory Info
+            try {
+                Runtime runtime = Runtime.getRuntime();
+                long maxMem = runtime.maxMemory() / (1024 * 1024);
+                long totalMem = runtime.totalMemory() / (1024 * 1024);
+                long freeMem = runtime.freeMemory() / (1024 * 1024);
+                Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+                Slog.i(TAG, "║ Max Heap: " + maxMem + " MB");
+                Slog.i(TAG, "║ Total Heap: " + totalMem + " MB");
+                Slog.i(TAG, "║ Free Heap: " + freeMem + " MB");
+                Slog.i(TAG, "║ Used Heap: " + (totalMem - freeMem) + " MB");
+            } catch (Exception e) {
+                Slog.w(TAG, "║ Memory info unavailable: " + e.getMessage());
+            }
+            
+            // App Info
+            try {
+                Context context = getContext();
+                if (context != null) {
+                    Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+                    Slog.i(TAG, "║ Package: " + context.getPackageName());
+                    android.content.pm.PackageInfo pInfo = context.getPackageManager()
+                            .getPackageInfo(context.getPackageName(), 0);
+                    Slog.i(TAG, "║ App Version: " + pInfo.versionName);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        Slog.i(TAG, "║ Version Code: " + pInfo.getLongVersionCode());
+                    } else {
+                        Slog.i(TAG, "║ Version Code: " + pInfo.versionCode);
+                    }
+                }
+            } catch (Exception e) {
+                Slog.w(TAG, "║ App info unavailable: " + e.getMessage());
+            }
+            
+            // Timestamp
+            Slog.i(TAG, "╠══════════════════════════════════════════════════════════════╣");
+            Slog.i(TAG, "║ Timestamp: " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", 
+                    java.util.Locale.getDefault()).format(new java.util.Date()));
+            Slog.i(TAG, "╚══════════════════════════════════════════════════════════════╝");
+            
+        } catch (Exception e) {
+            Slog.e(TAG, "Failed to log device info: " + e.getMessage());
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -1665,6 +1760,12 @@ public class BlackBoxCore extends ClientConfiguration {
      */
     private void initVpnService() {
         try {
+            // Check if VPN mode is enabled in settings
+            if (mClientConfiguration == null || !mClientConfiguration.isUseVpnNetwork()) {
+                Slog.d(TAG, "VPN network mode disabled, using normal network");
+                return;
+            }
+            
             // Start the VPN service asynchronously to prevent blocking main thread
             new Thread(new Runnable() {
                 @Override

@@ -21,6 +21,11 @@
                 app:key="daemon_enable"
                 app:title="@string/daemon_enable" />
 
+        <SwitchPreferenceCompat
+                app:key="use_vpn_network"
+                app:title="@string/use_vpn_network"
+                app:summary="@string/use_vpn_network_summary" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
