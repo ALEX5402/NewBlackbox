@@ -60,9 +60,12 @@ public class SystemProviderStub extends ClassInvocationStub implements BContentP
         if ("call".equals(methodName)) {
             // Only fix AttributionSource in call() args, don't replace method name
             if (args != null) {
+                Class<?> attributionSourceClass = BRAttributionSource.getRealClass();
                 for (int i = 0; i < args.length; i++) {
                     Object arg = args[i];
-                    if (arg != null && arg.getClass().getName().equals(BRAttributionSource.getRealClass().getName())) {
+                    // Check for null - AttributionSource doesn't exist on Android < S (31)
+                    if (arg != null && attributionSourceClass != null && 
+                            arg.getClass().getName().equals(attributionSourceClass.getName())) {
                         ContextCompat.fixAttributionSourceState(arg, BlackBoxCore.getHostUid());
                     }
                 }
@@ -79,8 +82,12 @@ public class SystemProviderStub extends ClassInvocationStub implements BContentP
                 if (!isSystemProviderAuthority(authority)) {
                     args[0] = BlackBoxCore.getHostPkg();
                 }
-            } else if (arg != null && arg.getClass().getName().equals(BRAttributionSource.getRealClass().getName())) {
-                ContextCompat.fixAttributionSourceState(arg, BlackBoxCore.getHostUid());
+            } else if (arg != null) {
+                Class<?> attrSourceClass = BRAttributionSource.getRealClass();
+                // Check for null - AttributionSource doesn't exist on Android < S (31)
+                if (attrSourceClass != null && arg.getClass().getName().equals(attrSourceClass.getName())) {
+                    ContextCompat.fixAttributionSourceState(arg, BlackBoxCore.getHostUid());
+                }
             }
         }
         return method.invoke(mBase, args);
