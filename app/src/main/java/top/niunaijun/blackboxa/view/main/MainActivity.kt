@@ -37,6 +37,7 @@ class MainActivity : LoadingActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val STORAGE_PERMISSION_REQUEST_CODE = 1001
 
         fun start(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
@@ -78,13 +79,65 @@ class MainActivity : LoadingActivity() {
     private fun checkStoragePermission() {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                // Android 11+: Need MANAGE_EXTERNAL_STORAGE
                 if (!android.os.Environment.isExternalStorageManager()) {
                     Log.w(TAG, "MANAGE_EXTERNAL_STORAGE permission not granted")
                     showStoragePermissionDialog()
                 }
+            } else {
+                // Android 10 and below: Need READ/WRITE_EXTERNAL_STORAGE
+                if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                this,
+                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                                androidx.core.content.ContextCompat.checkSelfPermission(
+                                        this,
+                                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                ) {
+                    Log.w(
+                            TAG,
+                            "Storage permissions not granted on Android ${android.os.Build.VERSION.SDK_INT}"
+                    )
+                    requestLegacyStoragePermission()
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error checking storage permission: ${e.message}")
+        }
+    }
+
+    private fun requestLegacyStoragePermission() {
+        try {
+            androidx.core.app.ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ),
+                    STORAGE_PERMISSION_REQUEST_CODE
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error requesting storage permission: ${e.message}")
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() &&
+                            grantResults.all {
+                                it == android.content.pm.PackageManager.PERMISSION_GRANTED
+                            }
+            ) {
+                Log.d(TAG, "Storage permissions granted")
+            } else {
+                Log.w(TAG, "Storage permissions denied")
+            }
         }
     }
 
