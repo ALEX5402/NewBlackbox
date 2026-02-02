@@ -36,6 +36,8 @@ class SettingFragment : PreferenceFragmentCompat() {
             vpnPreference.setDefaultValue(mUseVpnNetwork)
             vpnPreference
         }
+
+        initSendLogs()
     }
 
     private fun initGms() {
@@ -72,6 +74,14 @@ class SettingFragment : PreferenceFragmentCompat() {
 
             toast(R.string.restart_module)
             return@setOnPreferenceChangeListener true
+        }
+    }
+    private fun initSendLogs() {
+        val sendLogsPreference: Preference? = findPreference("send_logs")
+        sendLogsPreference?.setOnPreferenceClickListener {
+            BlackBoxCore.get().sendLogs("Manual Log Upload from Settings", true)
+            toast("Sending logs... (Check notifications for status)")
+            true
         }
     }
 }

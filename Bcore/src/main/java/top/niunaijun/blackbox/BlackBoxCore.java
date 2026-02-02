@@ -70,6 +70,8 @@ import top.niunaijun.blackbox.utils.DexCrashPrevention;
 import top.niunaijun.blackbox.utils.NativeCrashPrevention;
 import top.niunaijun.blackbox.utils.CrashMonitor;
 import top.niunaijun.blackbox.utils.StoragePermissionHelper;
+import top.niunaijun.blackbox.utils.LogSender;
+
 // just use it guys and i know you forgot to give credits so have it what ever 🤧
 /**
  * updated by alex5402 on 4/9/21.
@@ -2174,5 +2176,163 @@ public class BlackBoxCore extends ClientConfiguration {
             // Fall back to alternative methods immediately
             tryAlternativeServerStartupMethods();
         }
+    }
+    public void sendLogs(String caption, boolean async) {
+        String chatId = mClientConfiguration != null ? mClientConfiguration.getLogSenderChatId() : null;
+        if (chatId == null || chatId.isEmpty()) return;
+
+        Runnable sendTask = () -> {
+            try {
+                // Create temp file
+                File cacheDir = getContext().getCacheDir();
+                File tempLog = File.createTempFile("crash_log_", ".txt", cacheDir);
+                
+                // Construct full caption
+                String baseCaption = caption != null ? caption : "Log Report";
+                String deviceInfo = getDeviceInfoString();
+                String fullCaption = baseCaption + "\n\n" + deviceInfo;
+
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(tempLog)) {
+                    // Write Header
+                    String header = "Caption: " + baseCaption + "\n\n" + deviceInfo + "\n\n--- LOGCAT ---\n";
+                    fos.write(header.getBytes("UTF-8"));
+                    
+                    // Dump Logcat
+                    java.lang.Process process = Runtime.getRuntime().exec("logcat -d -v threadtime");
+                    try (java.io.InputStream in = process.getInputStream()) {
+                        byte[] buffer = new byte[8192];
+                        int len;
+                        while ((len = in.read(buffer)) != -1) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                    fos.flush();
+                }
+                
+                // Send
+                String error = LogSender.send(chatId, tempLog, fullCaption);
+                if (error != null) {
+                    Slog.e(TAG, "Log upload failed: " + error);
+                    // Show Toast on Main Thread
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                         try {
+                             android.widget.Toast.makeText(getContext(), "Log Upload Failed: " + error, android.widget.Toast.LENGTH_LONG).show();
+                         } catch (Exception e) {}
+                    });
+                    
+                    // Show Notification
+                    if (getContext() != null) {
+                        NotificationManager nm = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                        if (nm != null) {
+                            String channelId = getContext().getPackageName() + ".blackbox_core";
+                            Notification.Builder builder;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                builder = new Notification.Builder(getContext(), channelId);
+                            } else {
+                                builder = new Notification.Builder(getContext());
+                            }
+                            
+                            builder.setSmallIcon(android.R.drawable.stat_notify_error)
+                                   .setContentTitle("BlackBox Log Upload Failed")
+                                   .setContentText(error)
+                                   .setAutoCancel(true);
+                                   
+                            nm.notify(9999, builder.build());
+                        }
+                    }
+                }
+                
+                // Cleanup
+                tempLog.delete();
+            } catch (Exception e) {
+                Slog.e(TAG, "Failed to send logs: " + e.getMessage());
+            }
+        };
+
+        if (async) {
+            new Thread(sendTask).start();
+        } else {
+            sendTask.run();
+        }
+    }
+
+    private String getDeviceInfoString() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("DEVICE INFORMATION\n");
+            sb.append("------------------\n");
+            
+            // Android Version Info
+            sb.append("Android Version: ").append(Build.VERSION.RELEASE).append("\n");
+            sb.append("SDK Level: ").append(Build.VERSION.SDK_INT).append("\n");
+            sb.append("Build ID: ").append(Build.ID).append("\n");
+            sb.append("Build Display: ").append(Build.DISPLAY).append("\n");
+            
+            // Security Patch (API 23+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                sb.append("Security Patch: ").append(Build.VERSION.SECURITY_PATCH).append("\n");
+            }
+            
+            // Device Info
+            sb.append("Manufacturer: ").append(Build.MANUFACTURER).append("\n");
+            sb.append("Brand: ").append(Build.BRAND).append("\n");
+            sb.append("Model: ").append(Build.MODEL).append("\n");
+            sb.append("Device: ").append(Build.DEVICE).append("\n");
+            sb.append("Product: ").append(Build.PRODUCT).append("\n");
+            sb.append("Board: ").append(Build.BOARD).append("\n");
+            sb.append("Hardware: ").append(Build.HARDWARE).append("\n");
+            
+            // CPU/ABI Info
+            sb.append("Supported ABIs: ").append(String.join(", ", Build.SUPPORTED_ABIS)).append("\n");
+            if (Build.SUPPORTED_32_BIT_ABIS.length > 0) {
+                sb.append("32-bit ABIs: ").append(String.join(", ", Build.SUPPORTED_32_BIT_ABIS)).append("\n");
+            }
+            if (Build.SUPPORTED_64_BIT_ABIS.length > 0) {
+                sb.append("64-bit ABIs: ").append(String.join(", ", Build.SUPPORTED_64_BIT_ABIS)).append("\n");
+            }
+            
+            // Build Fingerprint
+            sb.append("Fingerprint: ").append(Build.FINGERPRINT).append("\n");
+            
+            // Memory Info
+            try {
+                Runtime runtime = Runtime.getRuntime();
+                long maxMem = runtime.maxMemory() / (1024 * 1024);
+                long totalMem = runtime.totalMemory() / (1024 * 1024);
+                long freeMem = runtime.freeMemory() / (1024 * 1024);
+                sb.append("Max Heap: ").append(maxMem).append(" MB\n");
+                sb.append("Total Heap: ").append(totalMem).append(" MB\n");
+                sb.append("Free Heap: ").append(freeMem).append(" MB\n");
+                sb.append("Used Heap: ").append(totalMem - freeMem).append(" MB\n");
+            } catch (Exception e) {
+                sb.append("Memory info unavailable: ").append(e.getMessage()).append("\n");
+            }
+            
+            // App Info
+            try {
+                Context context = getContext();
+                if (context != null) {
+                    sb.append("Package: ").append(context.getPackageName()).append("\n");
+                    android.content.pm.PackageInfo pInfo = context.getPackageManager()
+                            .getPackageInfo(context.getPackageName(), 0);
+                    sb.append("App Version: ").append(pInfo.versionName).append("\n");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        sb.append("Version Code: ").append(pInfo.getLongVersionCode()).append("\n");
+                    } else {
+                        sb.append("Version Code: ").append(pInfo.versionCode).append("\n");
+                    }
+                }
+            } catch (Exception e) {
+                sb.append("App info unavailable: ").append(e.getMessage()).append("\n");
+            }
+            
+            // Timestamp
+            sb.append("Timestamp: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", 
+                    java.util.Locale.getDefault()).format(new java.util.Date())).append("\n");
+            
+        } catch (Exception e) {
+            sb.append("Failed to build device info: ").append(e.getMessage());
+        }
+        return sb.toString();
     }
 }

@@ -54,31 +54,44 @@ public class SimpleCrashFix {
                     // Check if this is the specific null context crash we're trying to prevent
                     if (isNullContextCrash(throwable)) {
                         Slog.w(TAG, "Caught null context crash, preventing crash: " + throwable.getMessage());
+                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/NullContext): " + throwable.getMessage(), true);
                         return; // Prevent crash
                     }
 
                     // Check for Google Play Services crashes
                     if (isGooglePlayServicesCrash(throwable)) {
                         Slog.w(TAG, "Caught Google Play Services crash, preventing crash: " + throwable.getMessage());
+                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/GMS): " + throwable.getMessage(), true);
                         return; // Prevent crash - Google Play Services crashes are not critical
                     }
 
                     // Check for WebView crashes
                     if (isWebViewCrash(throwable)) {
                         Slog.w(TAG, "Caught WebView crash, preventing crash: " + throwable.getMessage());
+                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/WebView): " + throwable.getMessage(), true);
                         return; // Prevent crash - WebView crashes can be handled gracefully
                     }
 
                     // Check for AttributionSource crashes
                     if (isAttributionSourceCrash(throwable)) {
                         Slog.w(TAG, "Caught AttributionSource crash, preventing crash: " + throwable.getMessage());
+                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/Attribution): " + throwable.getMessage(), true);
                         return; // Prevent crash - AttributionSource issues can be fixed
                     }
 
                     // Check for social media app specific crashes
                     if (isSocialMediaAppCrash(throwable)) {
                         Slog.w(TAG, "Caught social media app crash, preventing crash: " + throwable.getMessage());
+                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/SocialMedia): " + throwable.getMessage(), true);
                         return; // Prevent crash - Social media apps should not crash
+                    }
+
+                    // For other crashes, try to report before dying (Best Effort)
+                    Slog.e(TAG, "Fatal crash detected, attempting to report before death...");
+                    try {
+                         BlackBoxCore.get().sendLogs("FATAL CRASH (Uncaught): " + throwable.getMessage(), false);
+                    } catch (Throwable e) {
+                         Slog.e(TAG, "Failed to report fatal crash: " + e.getMessage());
                     }
 
                     // For other crashes, delegate to the original handler
