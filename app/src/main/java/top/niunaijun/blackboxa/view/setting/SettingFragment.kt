@@ -9,12 +9,6 @@ import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/5/6 22:13
- */
 class SettingFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -35,6 +29,15 @@ class SettingFragment : PreferenceFragmentCompat() {
             daemonPreference.setDefaultValue(mDaemonEnable)
             daemonPreference
         }
+
+        invalidHideState {
+            val vpnPreference: Preference = (findPreference("use_vpn_network")!!)
+            val mUseVpnNetwork = AppManager.mBlackBoxLoader.useVpnNetwork()
+            vpnPreference.setDefaultValue(mUseVpnNetwork)
+            vpnPreference
+        }
+
+        initSendLogs()
     }
 
     private fun initGms() {
@@ -64,10 +67,21 @@ class SettingFragment : PreferenceFragmentCompat() {
                 "daemon_enable" -> {
                     AppManager.mBlackBoxLoader.invalidDaemonEnable(tmpHide)
                 }
+                "use_vpn_network" -> {
+                    AppManager.mBlackBoxLoader.invalidUseVpnNetwork(tmpHide)
+                }
             }
 
             toast(R.string.restart_module)
             return@setOnPreferenceChangeListener true
+        }
+    }
+    private fun initSendLogs() {
+        val sendLogsPreference: Preference? = findPreference("send_logs")
+        sendLogsPreference?.setOnPreferenceClickListener {
+            BlackBoxCore.get().sendLogs("Manual Log Upload from Settings", true)
+            toast("Sending logs... (Check notifications for status)")
+            true
         }
     }
 }

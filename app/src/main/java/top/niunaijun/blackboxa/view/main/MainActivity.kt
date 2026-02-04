@@ -3,6 +3,7 @@ package top.niunaijun.blackboxa.view.main
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -38,6 +39,7 @@ class MainActivity : LoadingActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val STORAGE_PERMISSION_REQUEST_CODE = 1001
+        private const val VPN_PERMISSION_REQUEST_CODE = 1002
 
         fun start(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
@@ -63,6 +65,9 @@ class MainActivity : LoadingActivity() {
 
             // Check and request storage permission on Android 11+
             checkStoragePermission()
+
+            // Check and request VPN permission
+            checkVpnPermission()
 
             try {
                 BlackBoxCore.get().onAfterMainActivityOnCreate(this)
@@ -194,6 +199,40 @@ class MainActivity : LoadingActivity() {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error handling storage permission result: ${e.message}")
+                }
+            }
+
+    /**
+     * Check and request VPN permission if needed. VpnService.prepare() must be called from an
+     * Activity before VPN can be established.
+     */
+    private fun checkVpnPermission() {
+        try {
+            val vpnIntent = VpnService.prepare(this)
+            if (vpnIntent != null) {
+                // User needs to grant VPN permission
+                Log.d(TAG, "VPN permission not granted, requesting...")
+                vpnPermissionResult.launch(vpnIntent)
+            } else {
+                // VPN permission already granted
+                Log.d(TAG, "VPN permission already granted")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking VPN permission: ${e.message}")
+        }
+    }
+
+    private val vpnPermissionResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                try {
+                    if (result.resultCode == RESULT_OK) {
+                        Log.d(TAG, "VPN permission granted!")
+                        // VPN service will now be able to establish connection
+                    } else {
+                        Log.w(TAG, "VPN permission denied by user")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error handling VPN permission result: ${e.message}")
                 }
             }
 

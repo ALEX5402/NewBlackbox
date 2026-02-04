@@ -56,6 +56,8 @@
     <string name="uninstall_module_toast">Please uninstall the xposed module in the Module Manager</string>
     <string name="other">Others</string>
     <string name="daemon_enable">Daemon</string>
+    <string name="use_vpn_network">Use VPN Network</string>
+    <string name="use_vpn_network_summary">Route traffic through VPN for sandboxed apps (may improve network access)</string>
     <string name="gms_manager">GMS Manager</string>
     <string name="jump_gms">Go to Gms Manager</string>
     <string name="enable_gms">Enable Service</string>

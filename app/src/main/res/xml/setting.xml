@@ -21,6 +21,16 @@
                 app:key="daemon_enable"
                 app:title="@string/daemon_enable" />
 
+        <SwitchPreferenceCompat
+                app:key="use_vpn_network"
+                app:title="@string/use_vpn_network"
+                app:summary="@string/use_vpn_network_summary" />
+
+        <Preference
+                android:key="send_logs"
+                android:title="Send Logs"
+                android:summary="Upload debug logs to developer" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
