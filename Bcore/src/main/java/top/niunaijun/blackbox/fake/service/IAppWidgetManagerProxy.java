@@ -10,14 +10,7 @@ import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.service.base.ValueMethodProxy;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
-/**
- * updated by alex5402 on 4/5/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IAppWidgetManagerProxy extends BinderInvocationStub {
 
     public IAppWidgetManagerProxy() {

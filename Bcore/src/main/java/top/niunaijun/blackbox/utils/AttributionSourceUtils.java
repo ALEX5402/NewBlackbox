@@ -4,16 +4,11 @@ import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Centralized utility class for fixing AttributionSource UID issues
- * This eliminates code duplication across multiple proxy classes
- */
+
 public class AttributionSourceUtils {
     private static final String TAG = "AttributionSourceUtils";
 
-    /**
-     * Fix AttributionSource objects in method arguments
-     */
+    
     public static void fixAttributionSourceInArgs(Object[] args) {
         if (args == null) return;
         
@@ -29,7 +24,7 @@ public class AttributionSourceUtils {
             }
         }
         
-        // Also check for Bundle objects that might contain AttributionSource
+        
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
             if (arg != null && arg.getClass().getName().contains("Bundle")) {
@@ -42,16 +37,14 @@ public class AttributionSourceUtils {
         }
     }
 
-    /**
-     * Fix AttributionSource UID
-     */
+    
     public static void fixAttributionSourceUid(Object attributionSource) {
         try {
             if (attributionSource == null) return;
             
             Class<?> attributionSourceClass = attributionSource.getClass();
             
-            // Try multiple field names that might exist
+            
             String[] uidFieldNames = {"mUid", "uid", "mCallingUid", "callingUid", "mSourceUid", "sourceUid"};
             
             for (String fieldName : uidFieldNames) {
@@ -62,21 +55,21 @@ public class AttributionSourceUtils {
                     Slog.d(TAG, "Fixed AttributionSource UID via field: " + fieldName);
                     break;
                 } catch (NoSuchFieldException e) {
-                    // Continue to next field name
+                    
                 }
             }
             
-            // Try using setter methods if fields don't work
+            
             try {
                 java.lang.reflect.Method setUidMethod = attributionSourceClass.getDeclaredMethod("setUid", int.class);
                 setUidMethod.setAccessible(true);
                 setUidMethod.invoke(attributionSource, BlackBoxCore.getHostUid());
                 Slog.d(TAG, "Fixed AttributionSource UID via setter method");
             } catch (Exception e) {
-                // Ignore setter method errors
+                
             }
             
-            // Fix package name
+            
             String[] packageFieldNames = {"mPackageName", "packageName", "mSourcePackage", "sourcePackage"};
             
             for (String fieldName : packageFieldNames) {
@@ -87,7 +80,7 @@ public class AttributionSourceUtils {
                     Slog.d(TAG, "Fixed AttributionSource package name via field: " + fieldName);
                     break;
                 } catch (NoSuchFieldException e) {
-                    // Continue to next field name
+                    
                 }
             }
             
@@ -96,14 +89,12 @@ public class AttributionSourceUtils {
         }
     }
 
-    /**
-     * Fix AttributionSource objects in Bundle objects
-     */
+    
     public static void fixAttributionSourceInBundle(Object bundle) {
         try {
             if (bundle == null) return;
             
-            // Try to get the keySet and iterate through values
+            
             java.lang.reflect.Method keySetMethod = bundle.getClass().getMethod("keySet");
             java.util.Set<String> keys = (java.util.Set<String>) keySetMethod.invoke(bundle);
             
@@ -117,7 +108,7 @@ public class AttributionSourceUtils {
                         Slog.d(TAG, "Fixed AttributionSource UID in Bundle key: " + key);
                     }
                 } catch (Exception e) {
-                    // Ignore individual key errors
+                    
                 }
             }
         } catch (Exception e) {
@@ -125,30 +116,28 @@ public class AttributionSourceUtils {
         }
     }
 
-    /**
-     * Create a safe AttributionSource object
-     */
+    
     public static Object createSafeAttributionSource() {
         try {
-            // Try to create a safe AttributionSource using reflection
+            
             Class<?> attributionSourceClass = Class.forName("android.content.AttributionSource");
             
-            // Try different constructor signatures
+            
             Object attributionSource = null;
             
             try {
-                // Try constructor with UID and package name
+                
                 java.lang.reflect.Constructor<?> constructor = attributionSourceClass.getDeclaredConstructor(int.class, String.class);
                 constructor.setAccessible(true);
                 attributionSource = constructor.newInstance(BlackBoxCore.getHostUid(), BlackBoxCore.getHostPkg());
             } catch (Exception e) {
                 try {
-                    // Try default constructor
+                    
                     java.lang.reflect.Constructor<?> constructor = attributionSourceClass.getDeclaredConstructor();
                     constructor.setAccessible(true);
                     attributionSource = constructor.newInstance();
                     
-                    // Set UID and package name using reflection
+                    
                     fixAttributionSourceUid(attributionSource);
                 } catch (Exception e2) {
                     Slog.w(TAG, "Could not create safe AttributionSource: " + e2.getMessage());
@@ -163,14 +152,12 @@ public class AttributionSourceUtils {
         }
     }
 
-    /**
-     * Enhanced method to handle AttributionSource validation errors
-     */
+    
     public static boolean validateAttributionSource(Object attributionSource) {
         try {
             if (attributionSource == null) return false;
             
-            // Check if UID is valid
+            
             Class<?> attributionSourceClass = attributionSource.getClass();
             String[] uidFieldNames = {"mUid", "uid", "mCallingUid", "callingUid", "mSourceUid", "sourceUid"};
             
@@ -187,11 +174,11 @@ public class AttributionSourceUtils {
                         }
                     }
                 } catch (Exception e) {
-                    // Continue to next field
+                    
                 }
             }
             
-            // If validation fails, fix the AttributionSource
+            
             Slog.w(TAG, "AttributionSource validation failed, attempting to fix");
             fixAttributionSourceUid(attributionSource);
             return true;

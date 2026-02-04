@@ -11,9 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.utils.Reflector;
 
-/**
- * Created by BlackBox on 2022/3/23.
- */
+
 public abstract class BlackManager<Service extends IInterface> {
     public static final String TAG = "BlackManager";
 
@@ -21,25 +19,25 @@ public abstract class BlackManager<Service extends IInterface> {
     private final AtomicBoolean mServiceCreationFailed = new AtomicBoolean(false);
     private long mLastRetryTime = 0;
     private long mLastServiceCreationTime = 0;
-    private static final long RETRY_TIMEOUT_MS = 2000; // Shorter timeout
-    private static final long MIN_SERVICE_CREATION_INTERVAL_MS = 50; // Shorter interval
+    private static final long RETRY_TIMEOUT_MS = 2000; 
+    private static final long MIN_SERVICE_CREATION_INTERVAL_MS = 50; 
     
-    // Global service failure tracking to prevent cascade failures
+    
     private static final AtomicInteger globalServiceFailureCount = new AtomicInteger(0);
-    private static final long GLOBAL_FAILURE_RESET_INTERVAL_MS = 30000; // 30 seconds
+    private static final long GLOBAL_FAILURE_RESET_INTERVAL_MS = 30000; 
     private static long lastGlobalFailureReset = 0;
 
     protected abstract String getServiceName();
 
     public Service getService() {
-        // If service creation previously failed and we're within retry timeout, return null
+        
         if (mServiceCreationFailed.get()) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - mLastRetryTime < RETRY_TIMEOUT_MS) {
                 Log.d(TAG, "Skipping service creation for " + getServiceName() + " due to recent failure");
                 return null;
             }
-            // Reset the flag after timeout
+            
             mServiceCreationFailed.set(false);
         }
 
@@ -47,11 +45,11 @@ public abstract class BlackManager<Service extends IInterface> {
             return mService;
         }
 
-        // Rate limiting: don't create services too frequently
+        
         long currentTime = System.currentTimeMillis();
         if (currentTime - mLastServiceCreationTime < MIN_SERVICE_CREATION_INTERVAL_MS) {
             Log.d(TAG, "Rate limiting service creation for " + getServiceName());
-            return mService; // Return existing service (might be null)
+            return mService; 
         }
 
         try {
@@ -62,7 +60,7 @@ public abstract class BlackManager<Service extends IInterface> {
                 return null;
             }
             
-            // Check if binder is alive before proceeding
+            
             if (!binder.isBinderAlive()) {
                 Log.w(TAG, "Binder is not alive for service: " + getServiceName());
                 markServiceCreationFailed();
@@ -76,7 +74,7 @@ public abstract class BlackManager<Service extends IInterface> {
                     .call(binder);
             
             if (mService != null) {
-                // Additional health check
+                
                 try {
                     if (!mService.asBinder().isBinderAlive()) {
                         Log.w(TAG, "Service binder is not alive after creation: " + getServiceName());
@@ -91,7 +89,7 @@ public abstract class BlackManager<Service extends IInterface> {
                     return null;
                 }
                 
-                final Service serviceRef = mService; // Capture reference for death recipient
+                final Service serviceRef = mService; 
                 try {
                     serviceRef.asBinder().linkToDeath(new IBinder.DeathRecipient() {
                         @Override
@@ -109,12 +107,12 @@ public abstract class BlackManager<Service extends IInterface> {
                     }, 0);
                 } catch (Exception e) {
                     Log.w(TAG, "Error linking death recipient for " + getServiceName(), e);
-                    // Continue anyway, the service might still work
+                    
                 }
                 
                 Log.d(TAG, "Successfully created service: " + getServiceName());
-                mServiceCreationFailed.set(false); // Reset failure flag on success
-                mLastServiceCreationTime = currentTime; // Update creation time
+                mServiceCreationFailed.set(false); 
+                mLastServiceCreationTime = currentTime; 
             } else {
                 Log.w(TAG, "Failed to create service instance for: " + getServiceName());
                 markServiceCreationFailed();
@@ -133,17 +131,13 @@ public abstract class BlackManager<Service extends IInterface> {
         mLastRetryTime = System.currentTimeMillis();
     }
     
-    /**
-     * Clear the cached service - call this when the service dies
-     */
+    
     public void clearServiceCache() {
         mService = null;
         Log.d(TAG, "Cleared service cache for " + getServiceName());
     }
     
-    /**
-     * Check if the service is healthy and available
-     */
+    
     public boolean isServiceHealthy() {
         if (mService == null) {
             return false;

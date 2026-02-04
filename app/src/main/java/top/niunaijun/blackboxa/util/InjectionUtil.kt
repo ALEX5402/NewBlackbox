@@ -10,12 +10,7 @@ import top.niunaijun.blackboxa.view.gms.GmsFactory
 import top.niunaijun.blackboxa.view.list.ListFactory
 
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 22:38
- */
+
 object InjectionUtil {
 
     private val appsRepository = AppsRepository()

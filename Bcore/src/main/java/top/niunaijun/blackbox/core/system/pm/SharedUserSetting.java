@@ -1,18 +1,4 @@
-/*
- * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 
 package top.niunaijun.blackbox.core.system.pm;
 
@@ -28,9 +14,7 @@ import top.niunaijun.blackbox.core.env.BEnvironment;
 import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Settings data for a particular shared user ID we know about.
- */
+
 public final class SharedUserSetting implements Parcelable {
     public static final String TAG = "SharedUserSetting";
     public static final Map<String, SharedUserSetting> sSharedUsers = new HashMap<>();
@@ -38,8 +22,8 @@ public final class SharedUserSetting implements Parcelable {
     String name;
     int userId;
 
-    // The lowest targetSdkVersion of all apps in the sharedUserSetting, used to assign seinfo so
-    // that all apps within the sharedUser run in the same selinux context.
+    
+    
     int seInfoTargetSdkVersion;
 
     SharedUserSetting(String _name) {
@@ -47,7 +31,7 @@ public final class SharedUserSetting implements Parcelable {
     }
 
     SharedUserSetting() {
-        // Default constructor for Parcelable
+        
     }
 
     @Override
@@ -79,13 +63,13 @@ public final class SharedUserSetting implements Parcelable {
         try {
             byte[] sharedUsersBytes = FileUtils.toByteArray(BEnvironment.getSharedUserConf());
             if (sharedUsersBytes == null || sharedUsersBytes.length == 0) {
-                // No data to load, start fresh
+                
                 return;
             }
             
-            // Check if this is old format data (before seInfoTargetSdkVersion was added)
-            // If the data is too small, it's likely the old format
-            if (sharedUsersBytes.length < 100) { // Arbitrary threshold for old format
+            
+            
+            if (sharedUsersBytes.length < 100) { 
                 Slog.w(TAG, "Detected old format SharedUserSetting data, clearing for fresh start");
                 BEnvironment.getSharedUserConf().delete();
                 synchronized (sSharedUsers) {
@@ -103,15 +87,15 @@ public final class SharedUserSetting implements Parcelable {
                 sSharedUsers.putAll(hashMap);
             }
         } catch (Exception e) {
-            // If loading fails, clear the corrupted data and start fresh
+            
             try {
-                // Delete the corrupted file
+                
                 BEnvironment.getSharedUserConf().delete();
             } catch (Exception deleteException) {
-                // Ignore delete errors
+                
             }
             
-            // Clear the shared users map to start fresh
+            
             synchronized (sSharedUsers) {
                 sSharedUsers.clear();
             }

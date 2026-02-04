@@ -33,14 +33,7 @@ import top.niunaijun.blackbox.utils.compat.ApplicationThreadCompat;
 import top.niunaijun.blackbox.utils.compat.BundleCompat;
 import top.niunaijun.blackbox.utils.provider.ProviderCall;
 
-/**
- * updated by alex5402 on 4/2/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BProcessManagerService implements ISystemService {
     public static final String TAG = "BProcessManager";
 
@@ -95,7 +88,7 @@ public class BProcessManagerService implements ISystemService {
                 mProcessMap.put(buid, bProcess);
             }
             if (!initAppProcessL(app)) {
-                //init process fail
+                
                 bProcess.remove(processName);
                 mPidsSelfLocked.remove(app);
                 app = null;
@@ -147,7 +140,7 @@ public class BProcessManagerService implements ISystemService {
             try {
                 return Integer.parseInt(stubProcessName.substring(prefix.length()));
             } catch (NumberFormatException e) {
-                // ignore
+                
             }
         }
         return -1;

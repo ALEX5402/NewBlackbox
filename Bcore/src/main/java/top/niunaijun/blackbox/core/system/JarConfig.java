@@ -2,15 +2,10 @@ package top.niunaijun.blackbox.core.system;
 
 import java.io.File;
 
-/**
- * Configuration class for JAR file management
- * Centralizes JAR-related settings and requirements
- */
+
 public class JarConfig {
     
-    /**
-     * JAR file definitions
-     */
+    
     public static class JarDefinition {
         private final String assetName;
         private final String fileName;
@@ -33,7 +28,7 @@ public class JarConfig {
         public boolean isRequired() { return required; }
     }
     
-    // JAR file definitions
+    
     public static final JarDefinition EMPTY_JAR = new JarDefinition(
         "empty.jar", 
         "empty.apk", 
@@ -50,35 +45,31 @@ public class JarConfig {
         false
     );
     
-    // Performance settings
-    public static final int DEFAULT_BUFFER_SIZE = 8192; // 8KB
-    public static final int MAX_BUFFER_SIZE = 32768; // 32KB
-    public static final int MIN_BUFFER_SIZE = 1024; // 1KB
     
-    // Retry settings
+    public static final int DEFAULT_BUFFER_SIZE = 8192; 
+    public static final int MAX_BUFFER_SIZE = 32768; 
+    public static final int MIN_BUFFER_SIZE = 1024; 
+    
+    
     public static final int MAX_RETRY_ATTEMPTS = 3;
-    public static final long RETRY_DELAY_MS = 1000; // 1 second
-    public static final long MAX_RETRY_DELAY_MS = 5000; // 5 seconds
+    public static final long RETRY_DELAY_MS = 1000; 
+    public static final long MAX_RETRY_DELAY_MS = 5000; 
     
-    // Validation settings
+    
     public static final boolean ENABLE_FILE_HASHING = true;
     public static final boolean ENABLE_SIZE_VALIDATION = true;
     public static final boolean ENABLE_ASYNC_LOADING = true;
     
-    // Cache settings
-    public static final int MAX_CACHE_SIZE = 10;
-    public static final long CACHE_CLEANUP_INTERVAL_MS = 300000; // 5 minutes
     
-    /**
-     * Get all required JAR definitions
-     */
+    public static final int MAX_CACHE_SIZE = 10;
+    public static final long CACHE_CLEANUP_INTERVAL_MS = 300000; 
+    
+    
     public static JarDefinition[] getRequiredJars() {
         return new JarDefinition[]{EMPTY_JAR, JUNIT_JAR};
     }
     
-    /**
-     * Get JAR definition by asset name
-     */
+    
     public static JarDefinition getJarDefinition(String assetName) {
         for (JarDefinition jar : getRequiredJars()) {
             if (jar.getAssetName().equals(assetName)) {
@@ -88,9 +79,7 @@ public class JarConfig {
         return null;
     }
     
-    /**
-     * Validate file against JAR definition
-     */
+    
     public static boolean validateFile(File file, JarDefinition definition) {
         if (file == null || !file.exists()) {
             return false;
@@ -103,17 +92,15 @@ public class JarConfig {
         return true;
     }
     
-    /**
-     * Get optimal buffer size based on available memory
-     */
+    
     public static int getOptimalBufferSize() {
         Runtime runtime = Runtime.getRuntime();
         long maxMemory = runtime.maxMemory();
         
-        // Use larger buffer for devices with more memory
-        if (maxMemory > 512 * 1024 * 1024) { // > 512MB
+        
+        if (maxMemory > 512 * 1024 * 1024) { 
             return MAX_BUFFER_SIZE;
-        } else if (maxMemory > 256 * 1024 * 1024) { // > 256MB
+        } else if (maxMemory > 256 * 1024 * 1024) { 
             return DEFAULT_BUFFER_SIZE;
         } else {
             return MIN_BUFFER_SIZE;

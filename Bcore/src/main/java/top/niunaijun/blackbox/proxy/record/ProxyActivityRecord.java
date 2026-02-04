@@ -6,14 +6,7 @@ import android.os.IBinder;
 
 import top.niunaijun.blackbox.utils.compat.BundleCompat;
 
-/**
- * updated by alex5402 on 3/31/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ProxyActivityRecord {
     public int mUserId;
     public ActivityInfo mActivityInfo;

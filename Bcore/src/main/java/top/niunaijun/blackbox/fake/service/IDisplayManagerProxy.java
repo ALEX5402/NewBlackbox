@@ -11,14 +11,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.fake.service.base.PkgMethodProxy;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
-/**
- * updated by alex5402 on 4/16/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IDisplayManagerProxy extends ClassInvocationStub {
 
     public IDisplayManagerProxy() {

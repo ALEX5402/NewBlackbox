@@ -12,10 +12,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Hook for ISensitiveContentProtectionManager (Android 14+)
- * Fixes SecurityException: Specified calling package [pkg] does not match the calling uid
- */
+
 public class ISensitiveContentProtectionManagerProxy extends BinderInvocationStub {
     public static final String TAG = "ISensitiveContentProtection";
 
@@ -58,7 +55,7 @@ public class ISensitiveContentProtectionManagerProxy extends BinderInvocationStu
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             if (args != null && args.length > 0) {
-                // setSensitiveContentProtection(IBinder windowToken, String packageName, boolean isProtected)
+                
                 for (int i = 0; i < args.length; i++) {
                     if (args[i] instanceof String) {
                         String pkg = (String) args[i];

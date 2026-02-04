@@ -22,14 +22,7 @@ import top.niunaijun.blackbox.core.env.BEnvironment;
 import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.TrieTree;
 
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 @SuppressLint("SdCardPath")
 public class IOCore {
     public static final String TAG = "IOCore";
@@ -45,11 +38,11 @@ public class IOCore {
         return sIOCore;
     }
 
-    // /data/data/com.google/  ----->  /data/data/com.virtual/data/com.google/
+    
     public void addRedirect(String origPath, String redirectPath) {
         if (TextUtils.isEmpty(origPath) || TextUtils.isEmpty(redirectPath) || mRedirectMap.get(origPath) != null)
             return;
-        //Add the key to TrieTree
+        
         mTrieTree.add(origPath);
         mRedirectMap.put(origPath, redirectPath);
         File redirectFile = new File(redirectPath);
@@ -75,7 +68,7 @@ public class IOCore {
         if (!TextUtils.isEmpty(search))
             return search;
 
-        //Search the key from TrieTree
+        
         String key = mTrieTree.search(path);
         if (!TextUtils.isEmpty(key))
             path = path.replace(key, Objects.requireNonNull(mRedirectMap.get(key)));
@@ -94,7 +87,7 @@ public class IOCore {
         if (TextUtils.isEmpty(path))
             return path;
 
-        //Search the key from TrieTree
+        
         String key = mTrieTree.search(path);
         if (!TextUtils.isEmpty(key))
             path = path.replace(key, Objects.requireNonNull(rule.get(key)));
@@ -109,7 +102,7 @@ public class IOCore {
         return new File(redirectPath(pathStr, rule));
     }
 
-    // i love china but not the language because it is hard man
+    
 
     public void enableRedirect(Context context) {
         Map<String, String> rule = new LinkedHashMap<>();
@@ -125,10 +118,10 @@ public class IOCore {
             rule.put(String.format("/data/data/%s", packageName), packageInfo.dataDir);
             rule.put(String.format("/data/user/%d/%s", systemUserId, packageName), packageInfo.dataDir);
 
-            // Ensure ART profile directories exist and redirect both current and reference profiles
+            
             File profilesRoot = new File(BEnvironment.getVirtualRoot(), "profiles");
             FileUtils.mkdirs(profilesRoot.getAbsolutePath());
-            // broad redirect as a safety net
+            
             rule.put("/data/misc/profiles", profilesRoot.getAbsolutePath());
 
             File profilesCurDir = new File(profilesRoot, String.format("cur/%d/%s", BlackBoxCore.getUserId(), packageName));
@@ -141,7 +134,7 @@ public class IOCore {
             if (BlackBoxCore.getContext().getExternalCacheDir() != null && context.getExternalCacheDir() != null) {
                 File external = BEnvironment.getExternalUserDir(BlackBoxCore.getUserId());
 
-                // sdcard
+                
                 rule.put("/sdcard", external.getAbsolutePath());
                 rule.put(String.format("/storage/emulated/%d", systemUserId), external.getAbsolutePath());
 

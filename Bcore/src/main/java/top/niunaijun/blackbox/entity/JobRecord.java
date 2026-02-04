@@ -7,14 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 
-/**
- * updated by alex5402 on 4/2/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class JobRecord implements Parcelable {
 
     public JobInfo mJobInfo;

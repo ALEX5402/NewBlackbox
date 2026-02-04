@@ -4,12 +4,7 @@ import android.view.KeyEvent
 import com.roger.catloadinglibrary.CatLoadingView
 import top.niunaijun.blackboxa.R
 
-/**
- *
- * @Description: loading activity
- * @Author: BlackBox
- * @CreateDate: 2022/3/2 21:49
- */
+
 abstract class LoadingActivity : BaseActivity() {
 
     private lateinit var loadingView: CatLoadingView

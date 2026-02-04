@@ -11,9 +11,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Reflector;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Force microphone sensor privacy OFF for sandboxed apps (Android 12+).
- */
+
 public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
     public static final String TAG = "SensorPrivacyProxy";
 
@@ -24,24 +22,24 @@ public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
     @Override
     protected Object getWho() {
         try {
-            // Try multiple reflection paths for different Android versions
+            
             Object stub = null;
             
-            // Android 16+ path
+            
             try {
                 stub = Reflector.on("android.hardware.ISensorPrivacyManager$Stub")
                         .call("asInterface", BRServiceManager.get().getService("sensor_privacy"));
             } catch (Exception e1) {
                 Slog.d(TAG, "Failed Android 16+ path, trying alternative: " + e1.getMessage());
                 
-                // Alternative path for older versions
+                
                 try {
                     stub = Reflector.on("android.hardware.ISensorPrivacyManager")
                             .call("asInterface", BRServiceManager.get().getService("sensor_privacy"));
                 } catch (Exception e2) {
                     Slog.d(TAG, "Failed alternative path: " + e2.getMessage());
                     
-                    // Last resort: try direct interface casting
+                    
                     try {
                         Class<?> stubClass = Class.forName("android.hardware.ISensorPrivacyManager$Stub");
                         Method asInterfaceMethod = stubClass.getMethod("asInterface", android.os.IBinder.class);
@@ -77,7 +75,7 @@ public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
         return false;
     }
 
-    // Newer APIs: boolean isSensorPrivacyEnabled(int sensor)
+    
     @ProxyMethod("isSensorPrivacyEnabled")
     public static class IsSensorPrivacyEnabled extends MethodHook {
         @Override
@@ -87,7 +85,7 @@ public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
         }
     }
 
-    // Some versions: boolean isSensorPrivacyEnabled(int userId, int sensor)
+    
     @ProxyMethod("isSensorPrivacyEnabledForUser")
     public static class IsSensorPrivacyEnabledForUser extends MethodHook {
         @Override
@@ -97,7 +95,7 @@ public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
         }
     }
 
-    // Some versions: boolean isSensorPrivacyEnabled(int userId, int sensor, String packageName)
+    
     @ProxyMethod("isSensorPrivacyEnabledForProfile")
     public static class IsSensorPrivacyEnabledForProfile extends MethodHook {
         @Override
@@ -107,7 +105,7 @@ public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow sensor access
+    
     @ProxyMethod("setSensorPrivacy")
     public static class SetSensorPrivacy extends MethodHook {
         @Override
@@ -117,7 +115,7 @@ public class ISensorPrivacyManagerProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow sensor access
+    
     @ProxyMethod("setSensorPrivacyForProfile")
     public static class SetSensorPrivacyForProfile extends MethodHook {
         @Override

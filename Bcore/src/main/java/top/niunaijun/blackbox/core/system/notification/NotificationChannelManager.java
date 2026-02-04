@@ -11,9 +11,7 @@ import androidx.annotation.RequiresApi;
 
 import top.niunaijun.blackbox.BlackBoxCore;
 
-/**
- * Created by BlackBox on 2022/3/18.
- */
+
 public class NotificationChannelManager {
     private final static NotificationChannelManager sManager = new NotificationChannelManager();
 

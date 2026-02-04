@@ -9,63 +9,63 @@ public class BuildCompat {
             try {
                 return Build.VERSION.PREVIEW_SDK_INT;
             } catch (Throwable e) {
-                // ignore
+                
             }
         }
         return 0;
     }
 
-    // 14
+    
     public static boolean isU() {
         return Build.VERSION.SDK_INT >= 33 || (Build.VERSION.SDK_INT >= 32 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 13
+    
     public static boolean isTiramisu() {
         return Build.VERSION.SDK_INT >= 32 || (Build.VERSION.SDK_INT >= 31 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 12
+    
     public static boolean isS() {
         return Build.VERSION.SDK_INT >= 31 || (Build.VERSION.SDK_INT >= 30 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 11
+    
     public static boolean isR() {
         return Build.VERSION.SDK_INT >= 30 || (Build.VERSION.SDK_INT >= 29 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 10
+    
     public static boolean isQ() {
         return Build.VERSION.SDK_INT >= 29 || (Build.VERSION.SDK_INT >= 28 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 9
+    
     public static boolean isPie() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P || (Build.VERSION.SDK_INT >= 27 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 8
+    
     public static boolean isOreo() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || (Build.VERSION.SDK_INT >= 25 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 7.1
+    
     public static boolean isN_MR1() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 || (Build.VERSION.SDK_INT >= 24 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 7
+    
     public static boolean isN() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || (Build.VERSION.SDK_INT >= 23 && Build.VERSION.PREVIEW_SDK_INT == 1);
     }
 
-    // 6
+    
     public static boolean isM() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
-    // 5
+    
     public static boolean isL() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }

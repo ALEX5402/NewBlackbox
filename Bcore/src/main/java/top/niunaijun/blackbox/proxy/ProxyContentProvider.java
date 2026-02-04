@@ -14,14 +14,7 @@ import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.entity.AppConfig;
 import top.niunaijun.blackbox.utils.compat.BundleCompat;
 
-/**
- * updated by alex5402 on 3/30/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ProxyContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {

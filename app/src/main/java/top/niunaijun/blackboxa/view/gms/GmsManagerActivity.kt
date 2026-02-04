@@ -16,12 +16,7 @@ import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
 
-/**
- *
- * @Description: gms manager activity
- * @Author: BlackBox
- * @CreateDate: 2022/3/2 21:06
- */
+
 class GmsManagerActivity : LoadingActivity() {
 
     private lateinit var viewModel: GmsViewModel

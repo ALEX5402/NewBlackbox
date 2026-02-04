@@ -11,9 +11,7 @@ import black.android.os.BRServiceManager;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
-/**
- * Created by BlackBox on 2022/3/3.
- */
+
 @TargetApi(Build.VERSION_CODES.O)
 public class IStorageStatsManagerProxy extends BinderInvocationStub {
 

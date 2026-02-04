@@ -14,20 +14,20 @@ public interface PackageParserMarshmallow {
     @BConstructor
     PackageParser _new();
 
-//    @BStaticMethod
-//    ActivityInfo generateActivityInfo();
-//
-//    @BStaticMethod
-//    ApplicationInfo generateApplicationInfo();
-//
-//    @BStaticMethod
-//    PackageInfo generatePackageInfo();
-//
-//    @BStaticMethod
-//    ProviderInfo generateProviderInfo();
-//
-//    @BStaticMethod
-//    ServiceInfo generateServiceInfo();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @BMethod
     void collectCertificates(Package p, int flags);

@@ -13,10 +13,7 @@ import top.niunaijun.blackbox.fake.service.base.UidMethodProxy;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Enhanced Network Management Service Proxy for BlackBox
- * Created by BlackBox on 2022/3/5.
- */
+
 public class INetworkManagementServiceProxy extends BinderInvocationStub {
     public static final String NAME = "network_management";
 

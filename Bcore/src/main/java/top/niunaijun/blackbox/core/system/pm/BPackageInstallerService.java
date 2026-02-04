@@ -13,14 +13,7 @@ import top.niunaijun.blackbox.core.system.pm.installer.RemoveUserExecutor;
 import top.niunaijun.blackbox.entity.pm.InstallOption;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * updated by alex5402 on 4/21/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BPackageInstallerService extends IBPackageInstallerService.Stub implements ISystemService {
     private static final BPackageInstallerService sService = new BPackageInstallerService();
 
@@ -33,11 +26,11 @@ public class BPackageInstallerService extends IBPackageInstallerService.Stub imp
     @Override
     public int installPackageAsUser(BPackageSettings ps, int userId) {
         List<Executor> executors = new ArrayList<>();
-        // 创建用户环境相关操作
+        
         executors.add(new CreateUserExecutor());
-        // 创建应用环境相关操作
+        
         executors.add(new CreatePackageExecutor());
-        // 拷贝应用相关文件
+        
         executors.add(new CopyExecutor());
         InstallOption option = ps.installOption;
         for (Executor executor : executors) {
@@ -54,10 +47,10 @@ public class BPackageInstallerService extends IBPackageInstallerService.Stub imp
     public int uninstallPackageAsUser(BPackageSettings ps, boolean removeApp, int userId) {
         List<Executor> executors = new ArrayList<>();
         if (removeApp) {
-            // 移除App
+            
             executors.add(new RemoveAppExecutor());
         }
-        // 移除用户相关目录
+        
         executors.add(new RemoveUserExecutor());
         InstallOption option = ps.installOption;
         for (Executor executor : executors) {
@@ -73,9 +66,9 @@ public class BPackageInstallerService extends IBPackageInstallerService.Stub imp
     @Override
     public int clearPackage(BPackageSettings ps, int userId) {
         List<Executor> executors = new ArrayList<>();
-        // 移除用户相关目录
+        
         executors.add(new RemoveUserExecutor());
-        // 创建用户环境相关操作
+        
         executors.add(new CreateUserExecutor());
         InstallOption option = ps.installOption;
         for (Executor executor : executors) {

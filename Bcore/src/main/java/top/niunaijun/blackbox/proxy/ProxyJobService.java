@@ -7,14 +7,7 @@ import android.content.res.Configuration;
 
 import top.niunaijun.blackbox.app.dispatcher.AppJobServiceDispatcher;
 
-/**
- * updated by alex5402 on 4/2/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ProxyJobService extends JobService {
     public static final String TAG = "StubJobService";
 

@@ -15,20 +15,11 @@ import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.util.ContextUtil.openAppSystemSettings
 import top.niunaijun.blackboxa.view.main.ShortcutActivity
 
-/**
- *
- * @Description: 桌面快捷方式 工具类
- * @Author: BlackBox
- * @CreateDate: 2022/2/27 22:56
- */
+
 object ShortcutUtil {
 
 
-    /**
-     * 创建桌面快捷方式
-     * @param userID Int userID
-     * @param info AppInfo
-     */
+    
     fun createShortcut(context: Context,userID: Int, info: AppInfo) {
 
         if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {

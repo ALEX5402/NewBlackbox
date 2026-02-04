@@ -21,7 +21,7 @@ android {
             abi {
                 enable true
                 reset()
-                //noinspection ChromeOsAbiSupport
+                
                 include 'armeabi-v7a', "arm64-v8a"
                 universalApk true
             }
@@ -36,14 +36,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     buildFeatures {
         viewBinding true
     }
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '21'
     }
 
     applicationVariants.configureEach { variant ->
@@ -66,25 +66,25 @@ dependencies {
     androidTestImplementation libs.espresso.core
 
     implementation "androidx.preference:preference-ktx:1.1.1"
-    //viewModel liveData  lifecycle
+    
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
 
-    //列表
+    
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'com.gitee.cbfg5210:RVAdapter:0.3.7'
 
-    //searchView
+    
     implementation 'com.github.Othershe:CornerLabelView:1.0.0'
-    //dialog
+    
     implementation 'com.github.nukc.stateview:kotlin:2.2.0'
-    //加载dialog
+    
     implementation 'com.github.Ferfalk:SimpleSearchView:0.2.0'
     implementation 'com.tbuonomo:dotsindicator:4.2'
-    // osmdroid
+    
     implementation 'org.osmdroid:osmdroid-android:6.1.11'
-    //viewPager2 指示点
+    
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
 
@@ -92,7 +92,7 @@ dependencies {
 
 
 
-    // WorkManager
+    
     implementation 'androidx.work:work-runtime:2.7.1'
 
 }

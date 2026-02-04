@@ -8,12 +8,7 @@ import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.InstalledAppBean
 import top.niunaijun.blackboxa.databinding.ItemPackageBinding
 
-/**
- *
- * @Description: 软件显示界面适配器
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 21:52
- */
+
 
 class ListAdapter : RVHolderFactory() {
 

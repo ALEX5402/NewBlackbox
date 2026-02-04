@@ -1,8 +1,6 @@
 package top.niunaijun.blackbox.proxy;
 
-/**
- * Created by BlackBox on 2022/3/17.
- */
+
 public class TransparentProxyActivity extends ProxyActivity {
 
     public static class P0 extends TransparentProxyActivity {

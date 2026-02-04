@@ -26,47 +26,34 @@ import top.niunaijun.blackbox.entity.pm.InstallResult;
 import top.niunaijun.blackbox.entity.pm.InstalledPackage;
 import top.niunaijun.blackbox.utils.TransactionThrottler;
 
-/**
- * updated by alex5402 on 4/14/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BPackageManager extends BlackManager<IBPackageManagerService> {
     private static final BPackageManager sPackageManager = new BPackageManager();
     private final TransactionThrottler transactionThrottler = new TransactionThrottler();
-    private static volatile boolean sIsFindingApkPath = false; // Flag to prevent recursion
+    private static volatile boolean sIsFindingApkPath = false; 
 
     public static BPackageManager get() {
         return sPackageManager;
     }
     
-    /**
-     * Reset the transaction throttler - call this when the app is restarted or when you want to clear failure state
-     */
+    
     public void resetTransactionThrottler() {
         transactionThrottler.reset();
         Log.d(TAG, "Transaction throttler reset");
     }
     
-    /**
-     * Check if we should use fallback mode due to service health issues
-     */
+    
     private boolean shouldUseFallbackMode() {
         return transactionThrottler.getFailureCount() >= 2 || !isServiceHealthy();
     }
 
-    /**
-     * Force reinitialize the service - useful when the service becomes null
-     */
+    
     public void forceReinitialize() {
         Log.d(TAG, "Force reinitializing PackageManager service");
         clearServiceCache();
         resetTransactionThrottler();
         
-        // Try to get the service again
+        
         try {
             IBPackageManagerService service = getService();
             if (service != null) {
@@ -79,9 +66,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         }
     }
 
-    /**
-     * Get service with fallback - if service is null, try to reinitialize
-     */
+    
     public IBPackageManagerService getServiceWithFallback() {
         IBPackageManagerService service = getService();
         if (service == null) {
@@ -98,7 +83,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
     }
 
     public Intent getLaunchIntentForPackage(String packageName, int userId) {
-        // If we've had too many failures, try a simple fallback approach
+        
         if (shouldUseFallbackMode()) {
             Log.w(TAG, "Using fallback launch intent for " + packageName + " due to service failures");
             return createFallbackLaunchIntent(packageName);
@@ -112,9 +97,9 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                 intentToResolve.resolveTypeIfNeeded(BlackBoxCore.getContext().getContentResolver()),
                 userId);
 
-        // Otherwise, try to find a main launcher activity.
+        
         if (ris == null || ris.size() <= 0) {
-            // reuse the intent instance
+            
             intentToResolve.removeCategory(Intent.CATEGORY_INFO);
             intentToResolve.addCategory(Intent.CATEGORY_LAUNCHER);
             intentToResolve.setPackage(packageName);
@@ -133,12 +118,10 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         return intent;
     }
     
-    /**
-     * Create a simple fallback launch intent when the service is unavailable
-     */
+    
     private Intent createFallbackLaunchIntent(String packageName) {
         try {
-            // Try to get the launch intent from the system PackageManager as fallback
+            
             Intent intent = BlackBoxCore.getContext().getPackageManager().getLaunchIntentForPackage(packageName);
             if (intent != null) {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -148,7 +131,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             Log.w(TAG, "Fallback launch intent failed for " + packageName, e);
         }
         
-        // Last resort: create a generic intent
+        
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setPackage(packageName);
@@ -157,7 +140,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
     }
 
     public ResolveInfo resolveService(Intent intent, int flags, String resolvedType, int userId) {
-        // Check if we should throttle due to too many recent failures
+        
         if (transactionThrottler.shouldThrottle()) {
             Log.w(TAG, "Throttling resolveService due to recent failures");
             return null;
@@ -167,7 +150,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             IBPackageManagerService service = getService();
             if (service != null) {
                 ResolveInfo result = service.resolveService(intent, flags, resolvedType, userId);
-                // Reset throttler on success
+                
                 transactionThrottler.reset();
                 return result;
             } else {
@@ -176,14 +159,14 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during resolveService, clearing service and retrying", e);
             transactionThrottler.recordFailure();
-            // Clear the service so it gets recreated on next call
+            
             clearServiceCache();
-            // Try one more time
+            
             try {
                 IBPackageManagerService service = getService();
                 if (service != null) {
                     ResolveInfo result = service.resolveService(intent, flags, resolvedType, userId);
-                    transactionThrottler.reset(); // Reset on successful retry
+                    transactionThrottler.reset(); 
                     return result;
                 }
             } catch (Exception retryException) {
@@ -201,7 +184,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
     }
 
     public ResolveInfo resolveActivity(Intent intent, int flags, String resolvedType, int userId) {
-        // Check if we should throttle due to too many recent failures
+        
         if (transactionThrottler.shouldThrottle()) {
             Log.w(TAG, "Throttling resolveActivity due to recent failures");
             return null;
@@ -211,7 +194,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             IBPackageManagerService service = getService();
             if (service != null) {
                 ResolveInfo result = service.resolveActivity(intent, flags, resolvedType, userId);
-                // Reset throttler on success
+                
                 transactionThrottler.reset();
                 return result;
             } else {
@@ -220,14 +203,14 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during resolveActivity, clearing service and retrying", e);
             transactionThrottler.recordFailure();
-            // Clear the service so it gets recreated on next call
+            
             clearServiceCache();
-            // Try one more time
+            
             try {
                 IBPackageManagerService service = getService();
                 if (service != null) {
                     ResolveInfo result = service.resolveActivity(intent, flags, resolvedType, userId);
-                    transactionThrottler.reset(); // Reset on successful retry
+                    transactionThrottler.reset(); 
                     return result;
                 }
             } catch (Exception retryException) {
@@ -245,7 +228,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
     }
 
     public ProviderInfo resolveContentProvider(String authority, int flags, int userId) {
-        // Check if we should throttle due to too many recent failures
+        
         if (transactionThrottler.shouldThrottle()) {
             Log.w(TAG, "Throttling resolveContentProvider due to recent failures");
             return null;
@@ -255,7 +238,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             IBPackageManagerService service = getService();
             if (service != null) {
                 ProviderInfo result = service.resolveContentProvider(authority, flags, userId);
-                // Reset throttler on success
+                
                 transactionThrottler.reset();
                 return result;
             } else {
@@ -264,14 +247,14 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during resolveContentProvider, clearing service and retrying", e);
             transactionThrottler.recordFailure();
-            // Clear the service so it gets recreated on next call
+            
             clearServiceCache();
-            // Try one more time
+            
             try {
                 IBPackageManagerService service = getService();
                 if (service != null) {
                     ProviderInfo result = service.resolveContentProvider(authority, flags, userId);
-                    transactionThrottler.reset(); // Reset on successful retry
+                    transactionThrottler.reset(); 
                     return result;
                 }
             } catch (Exception retryException) {
@@ -400,13 +383,13 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
     }
 
     public List<ResolveInfo> queryIntentActivities(Intent intent, int flags, String resolvedType, int userId) {
-        // Check if we should throttle due to too many recent failures
+        
         if (transactionThrottler.shouldThrottle()) {
             Log.w(TAG, "Throttling queryIntentActivities due to recent failures");
             return Collections.emptyList();
         }
         
-        // If we've had too many failures, don't even try
+        
         if (transactionThrottler.getFailureCount() >= 2) {
             Log.w(TAG, "Too many failures, returning empty list for queryIntentActivities");
             return Collections.emptyList();
@@ -416,7 +399,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             IBPackageManagerService service = getService();
             if (service != null) {
                 List<ResolveInfo> result = service.queryIntentActivities(intent, flags, resolvedType, userId);
-                // Reset throttler on success
+                
                 transactionThrottler.reset();
                 return result;
             } else {
@@ -426,16 +409,16 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during queryIntentActivities, clearing cache and retrying", e);
             transactionThrottler.recordFailure();
-            clearServiceCache(); // Clear cached service
+            clearServiceCache(); 
             
-            // Only retry if we haven't had too many failures
+            
             if (transactionThrottler.getFailureCount() < 3) {
                 try {
-                    // Retry once with fresh service
+                    
                     IBPackageManagerService service = getService();
                     if (service != null) {
                         List<ResolveInfo> result = service.queryIntentActivities(intent, flags, resolvedType, userId);
-                        transactionThrottler.reset(); // Reset on successful retry
+                        transactionThrottler.reset(); 
                         return result;
                     }
                 } catch (Exception retryException) {
@@ -465,9 +448,9 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             }
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during queryBroadcastReceivers, clearing cache and retrying", e);
-            clearServiceCache(); // Clear cached service
+            clearServiceCache(); 
             try {
-                // Retry once with fresh service
+                
                 IBPackageManagerService service = getService();
                 if (service != null) {
                     return service.queryBroadcastReceivers(intent, flags, resolvedType, userId);
@@ -494,9 +477,9 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             }
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during queryContentProviders, clearing cache and retrying", e);
-            clearServiceCache(); // Clear cached service
+            clearServiceCache(); 
             try {
-                // Retry once with fresh service
+                
                 IBPackageManagerService service = getService();
                 if (service != null) {
                     return service.queryContentProviders(processName, uid, flags, userId);
@@ -514,10 +497,10 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
 
     public InstallResult installPackageAsUser(String file, InstallOption option, int userId) {
         try {
-            // Additional check to prevent cloning BlackBox app
+            
             if (file != null && !file.isEmpty()) {
                 try {
-                    // Try to check if this is a BlackBox app
+                    
                     PackageInfo packageInfo = BlackBoxCore.getPackageManager().getPackageArchiveInfo(file, 0);
                     if (packageInfo != null) {
                         String packageName = packageInfo.packageName;
@@ -590,7 +573,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
     }
 
     public boolean isInstalled(String packageName, int userId) {
-        // Check if we should use fallback mode
+        
         if (shouldUseFallbackMode()) {
             Log.w(TAG, "Using fallback isInstalled check for " + packageName + " due to service failures");
             return isInstalledFallback(packageName);
@@ -600,7 +583,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             IBPackageManagerService service = getService();
             if (service != null) {
                 boolean result = service.isInstalled(packageName, userId);
-                transactionThrottler.reset(); // Reset on success
+                transactionThrottler.reset(); 
                 return result;
             } else {
                 Log.w(TAG, "PackageManager service is null, returning false for isInstalled check");
@@ -608,14 +591,14 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         } catch (android.os.DeadObjectException e) {
             Log.w(TAG, "PackageManager service died during isInstalled check, clearing service and retrying", e);
             transactionThrottler.recordFailure();
-            // Clear the service so it gets recreated on next call
+            
             clearServiceCache();
-            // Try one more time
+            
             try {
                 IBPackageManagerService service = getService();
                 if (service != null) {
                     boolean result = service.isInstalled(packageName, userId);
-                    transactionThrottler.reset(); // Reset on successful retry
+                    transactionThrottler.reset(); 
                     return result;
                 }
             } catch (Exception retryException) {
@@ -632,17 +615,15 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         return false;
     }
     
-    /**
-     * Fallback method for checking if a package is installed
-     */
+    
     private boolean isInstalledFallback(String packageName) {
         try {
-            // Try to get package info from system PackageManager as fallback
+            
             BlackBoxCore.getContext().getPackageManager().getPackageInfo(packageName, 0);
             return true;
         } catch (Exception e) {
             Log.d(TAG, "Fallback isInstalled check failed for " + packageName + ", assuming not installed");
-            // For known apps that should be available, return true even if fallback fails
+            
             if (packageName != null && (packageName.equals("com.media.bestrecorder.audiorecorder") || 
                                        packageName.startsWith("top.niunaijun.blackbox"))) {
                 Log.w(TAG, "Returning true for known app " + packageName + " despite fallback failure");
@@ -679,19 +660,19 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         ApplicationInfo info = new ApplicationInfo();
         info.packageName = packageName;
         info.flags = flags;
-        info.uid = 0; // Placeholder, actual UID would require more context
+        info.uid = 0; 
         
-        // Use more realistic paths that are less likely to cause issues
-        // Try to find the actual APK path first, fallback to system paths
+        
+        
         String apkPath = findActualApkPath(packageName);
         if (apkPath != null) {
             info.sourceDir = apkPath;
             info.publicSourceDir = apkPath;
         } else {
-            // If no APK exists, use null or existing system paths to prevent I/O errors
+            
             Log.w(TAG, "No APK found for " + packageName + ", using null paths to prevent I/O errors");
-            info.sourceDir = null; // Use null instead of fake path
-            info.publicSourceDir = null; // Use null instead of fake path
+            info.sourceDir = null; 
+            info.publicSourceDir = null; 
         }
         
         info.dataDir = "/data/data/" + packageName;
@@ -699,16 +680,14 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         info.metaData = new Bundle();
         info.splitNames = new String[]{};
         
-        // Set some basic flags to make it look more realistic
+        
         info.flags |= ApplicationInfo.FLAG_ALLOW_BACKUP;
         info.flags |= ApplicationInfo.FLAG_SUPPORTS_RTL;
         
         return info;
     }
 
-    /**
-     * Try to find the actual APK path for a package
-     */
+    
     private String findActualApkPath(String packageName) {
         if (sIsFindingApkPath) {
             Log.w(TAG, "findActualApkPath called recursively, returning null to prevent infinite loop.");
@@ -716,22 +695,22 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         }
         sIsFindingApkPath = true;
         try {
-            // Skip PackageManager call to prevent infinite recursion
-            // The PackageManager is hooked and would cause infinite loops
+            
+            
             Log.d(TAG, "Skipping PackageManager call to prevent recursion for " + packageName);
             
-            // Try common paths including real-world hash-based paths
+            
             String[] commonPaths = {
-                // Real-world hash-based paths (most common)
+                
                 "/data/app/~~*/" + packageName + "-*/base.apk",
                 "/data/app/~~*/" + packageName + "*/base.apk",
                 
-                // Legacy paths
+                
                 "/data/app/" + packageName + "-1/base.apk",
                 "/data/app/" + packageName + "-2/base.apk",
                 "/data/app/" + packageName + "/base.apk",
                 
-                // System paths
+                
                 "/system/app/" + packageName + ".apk",
                 "/system/priv-app/" + packageName + ".apk",
                 "/system_ext/app/" + packageName + ".apk",
@@ -739,7 +718,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                 "/vendor/app/" + packageName + ".apk"
             };
             
-            // First try exact path matching
+            
             for (String path : commonPaths) {
                 if (isValidApkPath(path)) {
                     Log.d(TAG, "Found existing APK at: " + path);
@@ -747,7 +726,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                 }
             }
             
-            // If exact paths don't work, try to find hash-based paths dynamically
+            
             String hashBasedPath = findHashBasedApkPath(packageName);
             if (hashBasedPath != null) {
                 Log.d(TAG, "Found hash-based APK at: " + hashBasedPath);
@@ -757,13 +736,11 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             Log.w(TAG, "No existing APK found for " + packageName + ", using null path");
             return null;
         } finally {
-            sIsFindingApkPath = false; // Reset flag
+            sIsFindingApkPath = false; 
         }
     }
 
-    /**
-     * Find APK path using hash-based directory structure
-     */
+    
     private String findHashBasedApkPath(String packageName) {
         try {
             File dataAppDir = new File("/data/app");
@@ -771,7 +748,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                 return null;
             }
             
-            // Look for hash directories (~~hash==)
+            
             File[] hashDirs = dataAppDir.listFiles((dir, name) -> name.startsWith("~~") && name.endsWith("=="));
             if (hashDirs == null) {
                 return null;
@@ -782,7 +759,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                     continue;
                 }
                 
-                // Look for package directories within hash directories
+                
                 File[] packageDirs = hashDir.listFiles((dir, name) -> name.startsWith(packageName));
                 if (packageDirs == null) {
                     continue;
@@ -793,7 +770,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                         continue;
                     }
                     
-                    // Look for base.apk within package directory
+                    
                     File baseApk = new File(packageDir, "base.apk");
                     if (isValidApkPath(baseApk.getAbsolutePath())) {
                         return baseApk.getAbsolutePath();
@@ -807,12 +784,10 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         return null;
     }
 
-    /**
-     * Check if an APK path is valid and accessible
-     */
+    
     private boolean isValidApkPath(String path) {
         try {
-            // Skip wildcard patterns - they need to be resolved first
+            
             if (path.contains("*")) {
                 return false;
             }
@@ -822,14 +797,14 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                 return false;
             }
             
-            // Additional validation: check if it's readable and has reasonable size
+            
             if (!apkFile.canRead()) {
                 Log.d(TAG, "APK file not readable: " + path);
                 return false;
             }
             
             long fileSize = apkFile.length();
-            if (fileSize < 1024) { // Less than 1KB is probably not a valid APK
+            if (fileSize < 1024) { 
                 Log.d(TAG, "APK file too small: " + path + " (size: " + fileSize + ")");
                 return false;
             }
@@ -845,15 +820,15 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         Log.w(TAG, "Creating fallback PackageInfo for " + packageName);
         PackageInfo info = new PackageInfo();
         info.packageName = packageName;
-        info.versionCode = 1; // Placeholder
-        info.versionName = "1.0"; // Placeholder
+        info.versionCode = 1; 
+        info.versionName = "1.0"; 
         info.applicationInfo = createFallbackApplicationInfo(packageName, flags, userId);
-        info.firstInstallTime = System.currentTimeMillis(); // Placeholder
-        info.lastUpdateTime = System.currentTimeMillis(); // Placeholder
-        info.installLocation = 0; // Placeholder
-        info.gids = new int[]{}; // Placeholder
-        info.splitNames = new String[]{}; // Placeholder
-        info.signatures = new Signature[]{}; // Placeholder
+        info.firstInstallTime = System.currentTimeMillis(); 
+        info.lastUpdateTime = System.currentTimeMillis(); 
+        info.installLocation = 0; 
+        info.gids = new int[]{}; 
+        info.splitNames = new String[]{}; 
+        info.signatures = new Signature[]{}; 
         return info;
     }
 }

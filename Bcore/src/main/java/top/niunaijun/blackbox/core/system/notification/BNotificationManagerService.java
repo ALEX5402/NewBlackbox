@@ -28,9 +28,7 @@ import top.niunaijun.blackbox.core.system.ISystemService;
 import top.niunaijun.blackbox.core.system.ProcessRecord;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
-/**
- * Created by BlackBox on 2022/3/15.
- */
+
 public class BNotificationManagerService extends IBNotificationManagerService.Stub implements ISystemService {
     private final static BNotificationManagerService sService = new BNotificationManagerService();
     public static final String CHANNEL_BLACK = "@black-";
@@ -177,12 +175,12 @@ public class BNotificationManagerService extends IBNotificationManagerService.St
 
         if (BuildCompat.isOreo()) {
             NotificationOContext notificationOContext = BRNotificationO.get(notification);
-            // channel
+            
             if (notificationOContext._check_mChannelId() != null) {
                 String blackChannelId = getBlackChannelId(notificationOContext.mChannelId(), userId);
                 notificationOContext._set_mChannelId(blackChannelId);
             }
-            // group
+            
             if (notificationOContext._check_mGroupKey() != null) {
                 String blackGroupId = getBlackGroupId(notificationOContext.mGroupKey(), userId);
                 notificationOContext._set_mGroupKey(blackGroupId);

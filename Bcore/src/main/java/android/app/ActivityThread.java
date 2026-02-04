@@ -12,14 +12,7 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * updated by alex5402 on 2021/5/7.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ActivityThread {
     public H mH = null;
     public AppBindData mBoundApplication;

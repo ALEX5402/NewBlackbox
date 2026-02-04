@@ -20,18 +20,11 @@ import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.utils.DrawableUtils;
 
-/**
- * updated by alex5402 on 3/31/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ActivityCompat {
 
     public static void fix(Activity activity) {
-        // mContentResolver
+        
         BRActivity.get(activity).mActivityInfo();
 
         Context baseContext = activity.getBaseContext();

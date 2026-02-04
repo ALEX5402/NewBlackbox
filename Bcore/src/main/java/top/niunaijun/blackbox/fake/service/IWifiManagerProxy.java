@@ -14,14 +14,7 @@ import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 
-/**
- * updated by alex5402 on 4/12/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IWifiManagerProxy extends BinderInvocationStub {
     public static final String TAG = "IWifiManagerProxy";
 
@@ -46,11 +39,7 @@ public class IWifiManagerProxy extends BinderInvocationStub {
 
     @ProxyMethod("getConnectionInfo")
     public static class GetConnectionInfo extends MethodHook {
-        /*
-        * It doesn't have public method to set BSSID and SSID fields in WifiInfo class,
-        * So the reflection framework invocation appeared.
-        * commented by BlackBoxing at 2022/03/08
-        * */
+        
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             WifiInfo wifiInfo = (WifiInfo) method.invoke(who, args);
@@ -68,13 +57,13 @@ public class IWifiManagerProxy extends BinderInvocationStub {
         }
 
         public static int ip2Int(String ipString) {
-            // 取 ip 的各段
+            
             String[] ipSlices = ipString.split("\\.");
             int rs = 0;
             for (int i = 0; i < ipSlices.length; i++) {
-                // 将 ip 的每一段解析为 int，并根据位置左移 8 位
+                
                 int intSlice = Integer.parseInt(ipSlices[i]) << 8 * i;
-                // 或运算
+                
                 rs = rs | intSlice;
             }
             return rs;

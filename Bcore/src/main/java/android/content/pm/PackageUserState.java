@@ -2,20 +2,13 @@ package android.content.pm;
 
 import android.util.ArraySet;
 
-/**
- * updated by alex5402 on 2021/5/7.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class PackageUserState {
 
     public boolean stopped;
     public boolean notLaunched;
     public boolean installed;
-    public boolean hidden; // Is the app restricted by owner / admin
+    public boolean hidden; 
     public int enabled;
     public boolean blockUninstall;
 

@@ -1,6 +1,6 @@
-//
-// updated by alex5402 on 5/5/21.
-//
+
+
+
 
 #ifndef BLACKBOX_RUNTIMEHOOK_H
 #define BLACKBOX_RUNTIMEHOOK_H
@@ -15,4 +15,4 @@ public:
 };
 
 
-#endif //BLACKBOX_RUNTIMEHOOK_H
+#endif 

@@ -6,14 +6,7 @@ import java.util.List;
 import dalvik.system.DexFile;
 import top.niunaijun.blackbox.utils.Reflector;
 
-/**
- * updated by alex5402 on 2021/5/16.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class DexFileCompat {
 
     public static List<Long> getCookies(ClassLoader classLoader) {

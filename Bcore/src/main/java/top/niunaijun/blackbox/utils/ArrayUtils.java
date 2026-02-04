@@ -36,10 +36,7 @@ public class ArrayUtils {
 		return false;
 	}
 
-	/**
-	 * Return first index of {@code value} in {@code array}, or {@code -1} if
-	 * not found.
-	 */
+	
 	public static <T> int indexOf(T[] array, T value) {
 		if (array == null) return -1;
 		for (int i = 0; i < array.length; i++) {

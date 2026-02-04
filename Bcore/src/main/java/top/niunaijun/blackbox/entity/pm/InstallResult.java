@@ -5,14 +5,7 @@ import android.os.Parcelable;
 
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * updated by alex5402 on 4/20/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class InstallResult implements Parcelable {
     public static final String TAG = "InstallResult";
 

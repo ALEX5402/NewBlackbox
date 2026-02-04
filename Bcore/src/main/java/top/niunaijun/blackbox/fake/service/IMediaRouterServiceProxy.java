@@ -11,9 +11,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
-/**
- * Created by BlackBox on 2022/3/1.
- */
+
 public class IMediaRouterServiceProxy extends BinderInvocationStub {
 
     public IMediaRouterServiceProxy() {

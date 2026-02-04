@@ -17,10 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.animation.OvershootInterpolator;
 
-/**
- * LauncherActivity - Handles the launch of virtual apps
- * This activity serves as a bridge between the host app and virtual apps
- */
+
 public class LauncherActivity extends Activity {
     public static final String TAG = "SplashScreen";
 
@@ -33,7 +30,7 @@ public class LauncherActivity extends Activity {
         try {
             Intent splash = new Intent();
             splash.setClass(BlackBoxCore.getContext(), LauncherActivity.class);
-            // Only use FLAG_ACTIVITY_NEW_TASK
+            
             splash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             splash.putExtra(LauncherActivity.KEY_INTENT, intent);
             splash.putExtra(LauncherActivity.KEY_PKG, intent.getPackage());
@@ -69,17 +66,17 @@ public class LauncherActivity extends Activity {
 
             Slog.d(TAG, "LauncherActivity.onCreate() for package: " + packageName + ", userId: " + userId);
 
-            // Get package info with enhanced error handling
+            
             PackageInfo packageInfo = getPackageInfoWithFallback(packageName, userId);
             
             if (packageInfo == null) {
                 Slog.w(TAG, "Package info not available for " + packageName + ", but proceeding with launch");
-                // Don't fail immediately - try to proceed anyway
+                
             } else {
                 Slog.d(TAG, "Successfully retrieved package info for " + packageName);
             }
             
-            // Properly load the app icon and app name
+            
             Drawable drawable = null;
             String appName = packageName;
             try {
@@ -124,7 +121,7 @@ public class LauncherActivity extends Activity {
                     .start();
             }
             
-            // Launch the app in a separate thread to avoid blocking the UI
+            
             launchAppAsync(launchIntent, userId);
             
         } catch (Exception e) {
@@ -133,30 +130,28 @@ public class LauncherActivity extends Activity {
         }
     }
 
-    /**
-     * Get package info with enhanced error handling and fallback mechanisms
-     */
+    
     private PackageInfo getPackageInfoWithFallback(String packageName, int userId) {
         try {
-            // First attempt: Try to get package info normally
+            
             return BlackBoxCore.getBPackageManager().getPackageInfo(packageName, 0, userId);
         } catch (Exception e) {
             Slog.w(TAG, "Failed to get package info for " + packageName + " (attempt 1): " + e.getMessage());
             
             try {
-                // Second attempt: Try with different flags
+                
                 return BlackBoxCore.getBPackageManager().getPackageInfo(packageName, 
                     android.content.pm.PackageManager.GET_META_DATA, userId);
             } catch (Exception e2) {
                 Slog.w(TAG, "Failed to get package info for " + packageName + " (attempt 2): " + e2.getMessage());
                 
                 try {
-                    // Third attempt: Try to get application info instead
+                    
                     android.content.pm.ApplicationInfo appInfo = BlackBoxCore.getBPackageManager()
                         .getApplicationInfo(packageName, 0, userId);
                     
                     if (appInfo != null) {
-                        // Create a minimal PackageInfo from ApplicationInfo
+                        
                         PackageInfo fallbackInfo = new PackageInfo();
                         fallbackInfo.packageName = packageName;
                         fallbackInfo.applicationInfo = appInfo;
@@ -177,28 +172,26 @@ public class LauncherActivity extends Activity {
         return null;
     }
 
-    /**
-     * Launch the app asynchronously to avoid blocking the UI thread
-     */
+    
     private void launchAppAsync(final Intent launchIntent, final int userId) {
         new Thread(() -> {
             try {
                 Slog.d(TAG, "Starting app launch in background thread");
                 
-                // Add a small delay to ensure the launcher activity is properly displayed
+                
                 Thread.sleep(100);
                 
-                // Launch the app
+                
                 BlackBoxCore.getBActivityManager().startActivity(launchIntent, userId);
                 
                 Slog.d(TAG, "App launch initiated successfully");
             } catch (Exception e) {
                 Slog.e(TAG, "Error launching app", e);
                 
-                // Try to show an error message to the user
+                
                 runOnUiThread(() -> {
                     try {
-                        // You could show a toast or dialog here
+                        
                         Slog.e(TAG, "Failed to launch app: " + e.getMessage());
                     } catch (Exception uiException) {
                         Slog.e(TAG, "Error showing error message", uiException);

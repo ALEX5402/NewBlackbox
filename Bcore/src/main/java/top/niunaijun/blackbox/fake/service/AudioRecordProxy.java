@@ -9,9 +9,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * AudioRecord proxy to handle low-level audio recording in sandboxed apps.
- */
+
 public class AudioRecordProxy extends ClassInvocationStub {
     public static final String TAG = "AudioRecordProxy";
 
@@ -21,12 +19,12 @@ public class AudioRecordProxy extends ClassInvocationStub {
 
     @Override
     protected Object getWho() {
-        return null; // Not needed for class method hooks
+        return null; 
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // Hook AudioRecord class methods directly
+        
     }
 
     @Override
@@ -34,7 +32,7 @@ public class AudioRecordProxy extends ClassInvocationStub {
         return false;
     }
 
-    // Hook AudioRecord constructor
+    
     @ProxyMethod("<init>")
     public static class Constructor extends MethodHook {
         @Override
@@ -44,7 +42,7 @@ public class AudioRecordProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook startRecording
+    
     @ProxyMethod("startRecording")
     public static class StartRecording extends MethodHook {
         @Override
@@ -54,7 +52,7 @@ public class AudioRecordProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook stop
+    
     @ProxyMethod("stop")
     public static class Stop extends MethodHook {
         @Override
@@ -64,7 +62,7 @@ public class AudioRecordProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook read
+    
     @ProxyMethod("read")
     public static class Read extends MethodHook {
         @Override
@@ -74,7 +72,7 @@ public class AudioRecordProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook release
+    
     @ProxyMethod("release")
     public static class Release extends MethodHook {
         @Override
@@ -84,7 +82,7 @@ public class AudioRecordProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook getState
+    
     @ProxyMethod("getState")
     public static class GetState extends MethodHook {
         @Override

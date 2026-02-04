@@ -5,14 +5,7 @@ import android.os.Parcelable;
 
 import java.util.jar.Attributes;
 
-/**
- * updated by alex5402 on 2021/5/7.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ManifestDigest implements Parcelable {
 
     ManifestDigest(final byte[] digest) {

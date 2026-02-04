@@ -6,14 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-/**
- * updated by alex5402 on 5/5/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class AppLifecycleCallback implements Application.ActivityLifecycleCallbacks {
     public static AppLifecycleCallback EMPTY = new AppLifecycleCallback() {
 
@@ -23,17 +16,9 @@ public class AppLifecycleCallback implements Application.ActivityLifecycleCallba
 
     }
     
-    /**
-     * Called when storage permission is needed before launching an app.
-     * Override this in your host app to show permission request UI.
-     * 
-     * @param packageName The package being launched
-     * @param userId The user ID
-     * @return true if the host app will handle the permission request (launch will be cancelled),
-     *         false to continue launching anyway
-     */
+    
     public boolean onStoragePermissionNeeded(String packageName, int userId) {
-        // Default: don't block the launch, just warn
+        
         return false;
     }
 

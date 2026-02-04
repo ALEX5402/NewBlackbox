@@ -16,14 +16,7 @@ import top.niunaijun.blackbox.core.system.pm.BPackageManagerService;
 
 import top.niunaijun.blackbox.core.system.user.BUserManagerService;
 
-/**
- * updated by alex5402 on 3/31/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ServiceManager {
     private static ServiceManager sServiceManager = null;
     public static final String ACTIVITY_MANAGER = "activity_manager";

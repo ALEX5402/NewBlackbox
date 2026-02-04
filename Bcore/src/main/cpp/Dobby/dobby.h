@@ -1,7 +1,7 @@
 #ifndef dobby_h
 #define dobby_h
 
-// obfuscated interface
+
 #if 0
 #define DobbyBuildVersion c343f74888dffad84d9ad08d9c433456
 #define DobbyHook c8dc3ffa44f22dbd10ccae213dd8b1f8
@@ -38,7 +38,7 @@ typedef uint64_t addr64_t;
 
 #define ARM64_TMP_REG_NDX_0 17
 
-// float register
+
 typedef union _FPReg {
   __int128_t q;
   struct {
@@ -53,12 +53,12 @@ typedef union _FPReg {
   } f;
 } FPReg;
 
-// register context
+
 typedef struct _RegisterContext {
-  uint64_t dmmpy_0; // dummy placeholder
+  uint64_t dmmpy_0; 
   uint64_t sp;
 
-  uint64_t dmmpy_1; // dummy placeholder
+  uint64_t dmmpy_1; 
   union {
     uint64_t x[29];
     struct {
@@ -74,8 +74,8 @@ typedef struct _RegisterContext {
     FPReg q[32];
     struct {
       FPReg q0, q1, q2, q3, q4, q5, q6, q7;
-      // [!!! READ ME !!!]
-      // for Arm64, can't access q8 - q31, unless you enable full floating-point register pack
+      
+      
       FPReg q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25, q26, q27, q28, q29,
           q30, q31;
     } regs;
@@ -142,44 +142,44 @@ typedef struct _HookEntryInfo {
   };
 } HookEntryInfo;
 
-// DobbyWrap <==> DobbyInstrument, so use DobbyInstrument instead of DobbyWrap
+
 #if 0
-// wrap function with pre_call and post_call
+
 typedef void (*PreCallTy)(RegisterContext *ctx, const HookEntryInfo *info);
 typedef void (*PostCallTy)(RegisterContext *ctx, const HookEntryInfo *info);
 int DobbyWrap(void *function_address, PreCallTy pre_call, PostCallTy post_call);
 #endif
 
-// return dobby build date
+
 const char *DobbyBuildVersion();
 
-// replace function
+
 int DobbyHook(void *address, void *replace_call, void **origin_call);
 
-// dynamic binary instrument for instruction
-// [!!! READ ME !!!]
-// for Arm64, can't access q8 - q31, unless you enable full floating-point register pack
+
+
+
 typedef void (*DBICallTy)(RegisterContext *ctx, const HookEntryInfo *info);
 int DobbyInstrument(void *address, DBICallTy dbi_call);
 
-// destory and restore hook
+
 int DobbyDestroy(void *address);
 
-// iterate symbol table and find symbol
+
 void *DobbySymbolResolver(const char *image_name, const char *symbol_name);
 
-// global offset table
+
 int DobbyGlobalOffsetTableReplace(char *image_name, char *symbol_name, void *fake_func, void **orig_func);
 
-// [!!! READ ME !!!]
-// for arm, Arm64, dobby will use b xxx instead of ldr absolute indirect branch
-// for x64, dobby always use absolute indirect jump
+
+
+
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_X64) || defined(__x86_64__)
 void dobby_enable_near_branch_trampoline();
 void dobby_disable_near_branch_trampoline();
 #endif
 
-// register linker load image callback
+
 typedef void (*linker_load_callback_t)(const char *image_name, void *handle);
 void dobby_register_image_load_callback(linker_load_callback_t func);
 

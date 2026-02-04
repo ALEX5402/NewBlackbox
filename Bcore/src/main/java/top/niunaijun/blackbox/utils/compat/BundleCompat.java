@@ -38,23 +38,23 @@ public class BundleCompat {
         return null;
     }
 
-//    public static void clearParcelledData(Bundle bundle) {
-//        Parcel obtain = Parcel.obtain();
-//        obtain.writeInt(0);
-//        obtain.setDataPosition(0);
-//        Parcel parcel;
-//        if (BaseBundle.TYPE != null) {
-//            parcel = BaseBundle.mParcelledData.get(bundle);
-//            if (parcel != null) {
-//                parcel.recycle();
-//            }
-//            BaseBundle.mParcelledData.set(bundle, obtain);
-//        } else if (BundleICS.TYPE != null) {
-//            parcel = BundleICS.mParcelledData.get(bundle);
-//            if (parcel != null) {
-//                parcel.recycle();
-//            }
-//            BundleICS.mParcelledData.set(bundle, obtain);
-//        }
-//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

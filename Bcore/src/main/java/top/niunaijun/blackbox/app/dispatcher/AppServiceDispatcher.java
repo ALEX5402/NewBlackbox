@@ -19,14 +19,7 @@ import top.niunaijun.blackbox.proxy.record.ProxyServiceRecord;
 import static android.app.Service.START_NOT_STICKY;
 
 
-/**
- * updated by alex5402 on 4/1/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class AppServiceDispatcher {
     public static final String TAG = "AppServiceDispatcher";
 
@@ -48,7 +41,7 @@ public class AppServiceDispatcher {
         if (intent == null || serviceInfo == null)
             return null;
 
-//        Log.d(TAG, "onBind: " + component.toString());
+
 
         Service service = getOrCreateService(serviceRecord);
         if (service == null)
@@ -81,7 +74,7 @@ public class AppServiceDispatcher {
             return START_NOT_STICKY;
         }
 
-//        Log.d(TAG, "onStartCommand: " + component.toString());
+
         Service service = getOrCreateService(stubRecord);
         if (service == null)
             return START_NOT_STICKY;
@@ -109,7 +102,7 @@ public class AppServiceDispatcher {
             }
         }
         mService.clear();
-//        Log.d(TAG, "onDestroy: ");
+
     }
 
     public void onConfigurationChanged(Configuration newConfig) {
@@ -122,7 +115,7 @@ public class AppServiceDispatcher {
                 }
             }
         }
-//        Log.d(TAG, "onConfigurationChanged");
+
     }
 
     public void onLowMemory() {
@@ -135,7 +128,7 @@ public class AppServiceDispatcher {
                 }
             }
         }
-//        Log.d(TAG, "onLowMemory");
+
     }
 
     public void onTrimMemory(int level) {
@@ -148,7 +141,7 @@ public class AppServiceDispatcher {
                 }
             }
         }
-        // Log.d(TAG, "onTrimMemory");
+        
     }
 
     public boolean onUnbind(Intent proxyIntent) {
@@ -180,7 +173,7 @@ public class AppServiceDispatcher {
                     mService.remove(new Intent.FilterComparison(intent));
                 }
                 record.setRebind(true);
-//                Log.d(TAG, "onUnbind：" + stubRecord.mServiceIntent.getComponent().toString());
+
             }
         } catch (Throwable e) {
             e.printStackTrace();

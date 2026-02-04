@@ -4,9 +4,9 @@ import javax.lang.model.element.ExecutableElement;
 
 
 public class BlackReflectionInterfaceInfo {
-    // 方法element
+    
     private ExecutableElement executableElement;
-    // 是否是字段
+    
     private boolean isField;
 
     public boolean isField() {

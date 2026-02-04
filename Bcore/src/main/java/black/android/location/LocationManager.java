@@ -63,14 +63,14 @@ public interface LocationManager {
 
     @BClassName("android.location.LocationManager$GpsStatusListenerTransport")
     interface GpsStatusListenerTransportSumsungS5 {
-//        @BMethod
-//        void onSvStatusChanged(int int0, [I int[]1, [F float[]2, [F float[]3, [F float[]4, int int5, int int6, int int7, [I int[]8);
+
+
     }
 
     @BClassName("android.location.LocationManager$GpsStatusListenerTransport")
     interface GpsStatusListenerTransportOPPO_R815T {
-//        @BMethod
-//        void onSvStatusChanged(int int0, [I int[]1, [F float[]2, [F float[]3, [F float[]4, [I int[]5, [I int[]6, [I int[]7, int int8);
+
+
     }
 
     @BClassName("android.location.LocationManager$GpsStatusListenerTransport")
@@ -93,14 +93,14 @@ public interface LocationManager {
         @BMethod
         void onNmeaReceived(long long0, String String1);
 
-//        @BMethod
-//        void onSvStatusChanged(int int0, [I int[]1, [F float[]2, [F float[]3, [F float[]4, int int5, int int6, int int7);
+
+
     }
 
     @BClassName("android.location.LocationManager$GnssStatusListenerTransport")
     interface GnssStatusListenerTransportO {
-//        @BMethod
-//        void onSvStatusChanged(int int0, [I int[]1, [F float[]2, [F float[]3, [F float[]4, [F float[]5);
+
+
     }
 
     @BClassName("android.location.LocationManager$GnssStatusListenerTransport")
@@ -123,7 +123,7 @@ public interface LocationManager {
         @BMethod
         void onNmeaReceived(long long0, String String1);
 
-//        @BMethod
-//        void onSvStatusChanged(int int0, [I int[]1, [F float[]2, [F float[]3, [F float[]4);
+
+
     }
 }

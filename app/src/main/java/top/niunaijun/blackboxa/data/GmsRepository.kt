@@ -8,12 +8,7 @@ import top.niunaijun.blackboxa.bean.GmsBean
 import top.niunaijun.blackboxa.bean.GmsInstallBean
 import top.niunaijun.blackboxa.util.getString
 
-/**
- *
- * @Description:
- * @Author: BlackBox
- * @CreateDate: 2022/3/2 21:14
- */
+
 class GmsRepository {
 
 

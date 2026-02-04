@@ -12,9 +12,7 @@ import top.niunaijun.blackbox.core.system.location.IBLocationManagerService;
 import top.niunaijun.blackbox.entity.location.BCell;
 import top.niunaijun.blackbox.entity.location.BLocation;
 
-/**
- * Created by BlackBoxing on 3/8/22.
- **/
+
 public class BLocationManager extends BlackManager<IBLocationManagerService> {
     private static final BLocationManager sLocationManager = new BLocationManager();
 

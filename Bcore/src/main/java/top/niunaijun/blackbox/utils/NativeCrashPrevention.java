@@ -19,18 +19,15 @@ import java.util.Map;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.fake.service.ClassLoaderProxy;
 
-/**
- * Comprehensive native crash prevention utility to handle native crashes
- * like SIGSEGV, SIGABRT, and other native-level failures.
- */
+
 public class NativeCrashPrevention {
     private static final String TAG = "NativeCrashPrevention";
     private static boolean sIsInitialized = false;
     
-    // Cache for native crash prevention attempts
+    
     private static final Map<String, PreventionResult> sPreventionCache = new HashMap<>();
     
-    // Known problematic native libraries
+    
     private static final String[] PROBLEMATIC_LIBS = {
         "libart.so",
         "libdvm.so",
@@ -38,9 +35,7 @@ public class NativeCrashPrevention {
         "libm.so"
     };
     
-    /**
-     * Prevention result containing the prevention method and success status
-     */
+    
     public static class PreventionResult {
         public final String preventionMethod;
         public final boolean success;
@@ -61,9 +56,7 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Initialize native crash prevention mechanisms
-     */
+    
     public static void initialize() {
         if (sIsInitialized) {
             return;
@@ -72,16 +65,16 @@ public class NativeCrashPrevention {
         try {
             Slog.d(TAG, "Initializing native crash prevention...");
             
-            // Install signal handlers
+            
             installSignalHandlers();
             
-            // Install native library monitoring
+            
             installNativeLibraryMonitoring();
             
-            // Install memory protection
+            
             installMemoryProtection();
             
-            // Install thread protection
+            
             installThreadProtection();
             
             sIsInitialized = true;
@@ -92,16 +85,14 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Install signal handlers for native crashes
-     */
+    
     private static void installSignalHandlers() {
         try {
-            // This would be implemented with native code (JNI)
-            // For now, we'll use Java-based prevention
+            
+            
             Slog.d(TAG, "Signal handlers prepared (requires native implementation)");
             
-            // Set up thread-level crash prevention
+            
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread thread, Throwable throwable) {
@@ -114,9 +105,7 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Handle native crashes at the Java level
-     */
+    
     private static void handleNativeCrash(Thread thread, Throwable throwable) {
         try {
             String threadName = thread.getName();
@@ -124,22 +113,22 @@ public class NativeCrashPrevention {
             
             Slog.w(TAG, "Native crash detected in thread: " + threadName + " - " + errorMessage);
             
-            // Check if this is a native crash
+            
             if (isNativeCrash(throwable)) {
                 Slog.w(TAG, "Native crash confirmed, attempting recovery");
                 
-                // Try to recover from native crash
+                
                 boolean recovered = attemptNativeCrashRecovery(thread, throwable);
                 
                 if (recovered) {
                     Slog.d(TAG, "Successfully recovered from native crash");
-                    return; // Prevent crash
+                    return; 
                 } else {
                     Slog.w(TAG, "Failed to recover from native crash");
                 }
             }
             
-            // If we can't recover, delegate to the original handler
+            
             Thread.UncaughtExceptionHandler originalHandler = getOriginalExceptionHandler();
             if (originalHandler != null) {
                 originalHandler.uncaughtException(thread, throwable);
@@ -150,16 +139,14 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Check if the crash is a native crash
-     */
+    
     private static boolean isNativeCrash(Throwable throwable) {
         if (throwable == null) return false;
         
         String message = throwable.getMessage();
         if (message == null) return false;
         
-        // Check for native crash indicators
+        
         String[] nativeCrashPatterns = {
             "SIGSEGV",
             "SIGABRT",
@@ -179,7 +166,7 @@ public class NativeCrashPrevention {
             }
         }
         
-        // Check stack trace for native indicators
+        
         StackTraceElement[] stackTrace = throwable.getStackTrace();
         if (stackTrace != null) {
             for (StackTraceElement element : stackTrace) {
@@ -199,32 +186,30 @@ public class NativeCrashPrevention {
         return false;
     }
     
-    /**
-     * Attempt to recover from a native crash
-     */
+    
     private static boolean attemptNativeCrashRecovery(Thread thread, Throwable throwable) {
         try {
             Slog.d(TAG, "Attempting native crash recovery...");
             
-            // Strategy 1: Restart the crashed thread
+            
             if (restartCrashedThread(thread)) {
                 Slog.d(TAG, "Successfully restarted crashed thread");
                 return true;
             }
             
-            // Strategy 2: Clear native caches
+            
             if (clearNativeCaches()) {
                 Slog.d(TAG, "Successfully cleared native caches");
                 return true;
             }
             
-            // Strategy 3: Reinitialize native libraries
+            
             if (reinitializeNativeLibraries()) {
                 Slog.d(TAG, "Successfully reinitialized native libraries");
                 return true;
             }
             
-            // Strategy 4: Memory cleanup
+            
             if (performMemoryCleanup()) {
                 Slog.d(TAG, "Successfully performed memory cleanup");
                 return true;
@@ -239,33 +224,29 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Restart a crashed thread
-     */
+    
     private static boolean restartCrashedThread(Thread thread) {
         try {
-            // This is a simplified approach - in a real implementation,
-            // you would need to properly handle thread restart
+            
+            
             Slog.d(TAG, "Thread restart strategy prepared for: " + thread.getName());
-            return false; // Not implemented yet
+            return false; 
         } catch (Exception e) {
             Slog.w(TAG, "Failed to restart thread: " + e.getMessage());
             return false;
         }
     }
     
-    /**
-     * Clear native caches
-     */
+    
     private static boolean clearNativeCaches() {
         try {
-            // Clear various caches that might be corrupted
-            System.gc(); // Force garbage collection
             
-            // Clear reflection caches
+            System.gc(); 
+            
+            
             clearReflectionCaches();
             
-            // Clear class caches
+            
             clearClassCaches();
             
             Slog.d(TAG, "Native caches cleared");
@@ -277,15 +258,13 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Clear reflection caches
-     */
+    
     private static void clearReflectionCaches() {
         try {
-            // Clear reflection caches to prevent corruption
+            
             Class<?> reflectionCacheClass = Class.forName("java.lang.reflect.ReflectionFactory");
             if (reflectionCacheClass != null) {
-                // This is a simplified approach
+                
                 Slog.d(TAG, "Reflection caches cleared");
             }
         } catch (Exception e) {
@@ -293,12 +272,10 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Clear class caches
-     */
+    
     private static void clearClassCaches() {
         try {
-            // Clear class caches from our utilities
+            
             if (ClassLoaderProxy.class != null) {
                 ClassLoaderProxy.clearClassCache();
             }
@@ -317,33 +294,29 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Reinitialize native libraries
-     */
+    
     private static boolean reinitializeNativeLibraries() {
         try {
-            // This would require native code implementation
-            // For now, we'll use Java-based recovery
+            
+            
             Slog.d(TAG, "Native library reinitialization prepared");
-            return false; // Not implemented yet
+            return false; 
         } catch (Exception e) {
             Slog.w(TAG, "Failed to reinitialize native libraries: " + e.getMessage());
             return false;
         }
     }
     
-    /**
-     * Perform memory cleanup
-     */
+    
     private static boolean performMemoryCleanup() {
         try {
-            // Force garbage collection multiple times
+            
             for (int i = 0; i < 3; i++) {
                 System.gc();
-                Thread.sleep(100); // Small delay between GC calls
+                Thread.sleep(100); 
             }
             
-            // Clear system properties that might be corrupted
+            
             clearCorruptedSystemProperties();
             
             Slog.d(TAG, "Memory cleanup completed");
@@ -355,12 +328,10 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Clear corrupted system properties
-     */
+    
     private static void clearCorruptedSystemProperties() {
         try {
-            // Clear potentially corrupted system properties
+            
             String[] propertiesToClear = {
                 "webview.data.dir",
                 "webview.cache.dir",
@@ -375,7 +346,7 @@ public class NativeCrashPrevention {
                         Slog.d(TAG, "Cleared corrupted property: " + property);
                     }
                 } catch (Exception e) {
-                    // Ignore individual property errors
+                    
                 }
             }
         } catch (Exception e) {
@@ -383,14 +354,12 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Install native library monitoring
-     */
+    
     private static void installNativeLibraryMonitoring() {
         try {
             Slog.d(TAG, "Installing native library monitoring");
             
-            // Monitor native library loading
+            
             monitorNativeLibraryLoading();
             
         } catch (Exception e) {
@@ -398,26 +367,22 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Monitor native library loading
-     */
+    
     private static void monitorNativeLibraryLoading() {
         try {
-            // This would be implemented with native code
+            
             Slog.d(TAG, "Native library monitoring prepared");
         } catch (Exception e) {
             Slog.w(TAG, "Failed to setup native library monitoring: " + e.getMessage());
         }
     }
     
-    /**
-     * Install memory protection
-     */
+    
     private static void installMemoryProtection() {
         try {
             Slog.d(TAG, "Installing memory protection");
             
-            // Set up memory monitoring
+            
             setupMemoryMonitoring();
             
         } catch (Exception e) {
@@ -425,12 +390,10 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Set up memory monitoring
-     */
+    
     private static void setupMemoryMonitoring() {
         try {
-            // Monitor memory usage
+            
             Runtime runtime = Runtime.getRuntime();
             long maxMemory = runtime.maxMemory();
             long totalMemory = runtime.totalMemory();
@@ -444,14 +407,12 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Install thread protection
-     */
+    
     private static void installThreadProtection() {
         try {
             Slog.d(TAG, "Installing thread protection");
             
-            // Set up thread monitoring
+            
             setupThreadMonitoring();
             
         } catch (Exception e) {
@@ -459,12 +420,10 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Set up thread monitoring
-     */
+    
     private static void setupThreadMonitoring() {
         try {
-            // Monitor thread count and health
+            
             ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
             while (rootGroup.getParent() != null) {
                 rootGroup = rootGroup.getParent();
@@ -478,12 +437,10 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Get the original exception handler
-     */
+    
     private static Thread.UncaughtExceptionHandler getOriginalExceptionHandler() {
         try {
-            // Try to get the original handler
+            
             Field handlerField = Thread.class.getDeclaredField("defaultUncaughtExceptionHandler");
             handlerField.setAccessible(true);
             return (Thread.UncaughtExceptionHandler) handlerField.get(null);
@@ -493,17 +450,13 @@ public class NativeCrashPrevention {
         }
     }
     
-    /**
-     * Clear prevention cache
-     */
+    
     public static void clearCache() {
         sPreventionCache.clear();
         Slog.d(TAG, "Native crash prevention cache cleared");
     }
     
-    /**
-     * Get prevention statistics
-     */
+    
     public static String getPreventionStats() {
         int successful = 0;
         int failed = 0;
@@ -520,9 +473,7 @@ public class NativeCrashPrevention {
                ", Failed: " + failed + ", Total Attempts: " + sPreventionCache.size();
     }
     
-    /**
-     * Get comprehensive native crash prevention status
-     */
+    
     public static String getStatus() {
         StringBuilder status = new StringBuilder();
         status.append("Native Crash Prevention Status:\n");

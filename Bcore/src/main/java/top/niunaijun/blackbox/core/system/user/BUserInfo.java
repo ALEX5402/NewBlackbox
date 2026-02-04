@@ -3,14 +3,7 @@ package top.niunaijun.blackbox.core.system.user;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * updated by alex5402 on 4/22/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BUserInfo implements Parcelable {
     public int id;
     public BUserStatus status;

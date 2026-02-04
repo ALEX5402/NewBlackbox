@@ -10,9 +10,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.fake.hook.ClassInvocationStub;
 
-/**
- * ContentResolver proxy to handle MediaStore audio queries in virtualized apps.
- */
+
 public class ContentResolverProxy extends ClassInvocationStub {
     public static final String TAG = "ContentResolverProxy";
 
@@ -22,13 +20,13 @@ public class ContentResolverProxy extends ClassInvocationStub {
 
     @Override
     protected Object getWho() {
-        // Return the ContentResolver from the context
+        
         return BlackBoxCore.getContext().getContentResolver();
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // Hook ContentResolver class methods directly
+        
     }
 
     @Override
@@ -36,7 +34,7 @@ public class ContentResolverProxy extends ClassInvocationStub {
         return false;
     }
 
-    // Hook ContentResolver.query() for audio URIs
+    
     @ProxyMethod("query")
     public static class Query extends MethodHook {
         @Override
@@ -45,7 +43,7 @@ public class ContentResolverProxy extends ClassInvocationStub {
                 Uri uri = (Uri) args[0];
                 String uriString = uri.toString();
                 
-                // Check if this is an audio-related query
+                
                 if (uriString.contains("audio") || uriString.contains("media") || 
                     uriString.contains("content://media/external/audio") ||
                     uriString.contains("content://media/internal/audio") ||
@@ -54,17 +52,17 @@ public class ContentResolverProxy extends ClassInvocationStub {
                     
                     Slog.d(TAG, "ContentResolver: Allowing audio query: " + uriString);
                     
-                    // Allow audio queries to proceed normally instead of returning empty cursor
+                    
                     return method.invoke(who, args);
                 }
             }
             
-            // For non-audio queries, proceed normally
+            
             return method.invoke(who, args);
         }
     }
 
-    // Hook ContentResolver.query() with projection for audio URIs
+    
     @ProxyMethod("query")
     public static class QueryWithProjection extends MethodHook {
         @Override
@@ -73,7 +71,7 @@ public class ContentResolverProxy extends ClassInvocationStub {
                 Uri uri = (Uri) args[0];
                 String uriString = uri.toString();
                 
-                // Check if this is an audio-related query
+                
                 if (uriString.contains("audio") || uriString.contains("media") || 
                     uriString.contains("content://media/external/audio") ||
                     uriString.contains("content://media/internal/audio") ||
@@ -82,17 +80,17 @@ public class ContentResolverProxy extends ClassInvocationStub {
                     
                     Slog.d(TAG, "ContentResolver: Allowing audio query with projection: " + uriString);
                     
-                    // Allow audio queries to proceed normally instead of returning empty cursor
+                    
                     return method.invoke(who, args);
                 }
             }
             
-            // For non-audio queries, proceed normally
+            
             return method.invoke(who, args);
         }
     }
 
-    // Hook ContentResolver.insert() for audio URIs
+    
     @ProxyMethod("insert")
     public static class Insert extends MethodHook {
         @Override
@@ -110,7 +108,7 @@ public class ContentResolverProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook ContentResolver.update() for audio URIs
+    
     @ProxyMethod("update")
     public static class Update extends MethodHook {
         @Override
@@ -128,7 +126,7 @@ public class ContentResolverProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook ContentResolver.delete() for audio URIs
+    
     @ProxyMethod("delete")
     public static class Delete extends MethodHook {
         @Override

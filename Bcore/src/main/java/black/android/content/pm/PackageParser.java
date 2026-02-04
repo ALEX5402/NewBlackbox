@@ -23,20 +23,20 @@ public interface PackageParser {
     @BConstructor
     android.content.pm.PackageParser _new(String String0);
 
-//    @BStaticMethod
-//    ActivityInfo generateActivityInfo();
-//
-//    @BStaticMethod
-//    ApplicationInfo generateApplicationInfo();
-//
-//    @BStaticMethod
-//    PackageInfo generatePackageInfo();
-//
-//    @BStaticMethod
-//    ProviderInfo generateProviderInfo();
-//
-//    @BStaticMethod
-//    ServiceInfo generateServiceInfo();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @BMethod
     void collectCertificates(android.content.pm.PackageParser.Package p, int flags);

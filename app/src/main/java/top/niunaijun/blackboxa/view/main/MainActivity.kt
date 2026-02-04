@@ -63,10 +63,10 @@ class MainActivity : LoadingActivity() {
             initFab()
             initToolbarSubTitle()
 
-            // Check and request storage permission on Android 11+
+            
             checkStoragePermission()
 
-            // Check and request VPN permission
+            
             checkVpnPermission()
 
             try {
@@ -76,7 +76,7 @@ class MainActivity : LoadingActivity() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Critical error in onCreate: ${e.message}")
-            // Show error dialog to user
+            
             showErrorDialog("Failed to initialize app: ${e.message}")
         }
     }
@@ -84,13 +84,13 @@ class MainActivity : LoadingActivity() {
     private fun checkStoragePermission() {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                // Android 11+: Need MANAGE_EXTERNAL_STORAGE
+                
                 if (!android.os.Environment.isExternalStorageManager()) {
                     Log.w(TAG, "MANAGE_EXTERNAL_STORAGE permission not granted")
                     showStoragePermissionDialog()
                 }
             } else {
-                // Android 10 and below: Need READ/WRITE_EXTERNAL_STORAGE
+                
                 if (androidx.core.content.ContextCompat.checkSelfPermission(
                                 this,
                                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -176,7 +176,7 @@ class MainActivity : LoadingActivity() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error opening storage settings: ${e.message}")
-            // Fallback: open general manage all files settings
+            
             try {
                 val intent =
                         Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
@@ -202,19 +202,16 @@ class MainActivity : LoadingActivity() {
                 }
             }
 
-    /**
-     * Check and request VPN permission if needed. VpnService.prepare() must be called from an
-     * Activity before VPN can be established.
-     */
+    
     private fun checkVpnPermission() {
         try {
             val vpnIntent = VpnService.prepare(this)
             if (vpnIntent != null) {
-                // User needs to grant VPN permission
+                
                 Log.d(TAG, "VPN permission not granted, requesting...")
                 vpnPermissionResult.launch(vpnIntent)
             } else {
-                // VPN permission already granted
+                
                 Log.d(TAG, "VPN permission already granted")
             }
         } catch (e: Exception) {
@@ -227,7 +224,7 @@ class MainActivity : LoadingActivity() {
                 try {
                     if (result.resultCode == RESULT_OK) {
                         Log.d(TAG, "VPN permission granted!")
-                        // VPN service will now be able to establish connection
+                        
                     } else {
                         Log.w(TAG, "VPN permission denied by user")
                     }
@@ -252,7 +249,7 @@ class MainActivity : LoadingActivity() {
     private fun initToolbarSubTitle() {
         try {
             updateUserRemark(0)
-            // hack code
+            
             viewBinding.toolbarLayout.toolbar.getChildAt(1)?.setOnClickListener {
                 try {
                     MaterialDialog(this).show {
@@ -421,7 +418,7 @@ class MainActivity : LoadingActivity() {
                     startActivity(intent)
                 }
                 R.id.fake_location -> {
-                    // toast("Still Developing")
+                    
                     val intent = Intent(this, FakeManagerActivity::class.java)
                     intent.putExtra("userID", 0)
                     startActivity(intent)

@@ -49,14 +49,7 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
 import static android.content.pm.PackageManager.MATCH_DIRECT_BOOT_UNAWARE;
 
 
-/**
- * updated by alex5402 on 4/1/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BPackageManagerService extends IBPackageManagerService.Stub implements ISystemService {
     public static final String TAG = "BPackageManagerService";
     public static BPackageManagerService sService = new BPackageManagerService();
@@ -106,9 +99,9 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             return null;
         }
         flags = updateFlags(flags, userId);
-        // reader
+        
         synchronized (mPackages) {
-            // Normalize package name to handle renamed packages and static libs
+            
             BPackageSettings ps = mPackages.get(packageName);
             if (ps != null) {
                 BPackage p = ps.pkg;
@@ -125,8 +118,8 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
                 intent, resolvedType, flags, userId);
         if (query != null) {
             if (query.size() >= 1) {
-                // If there is more than one service with the same priority,
-                // just arbitrarily pick the first one.
+                
+                
                 return query.get(0);
             }
         }
@@ -145,10 +138,10 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             final List<ResolveInfo> list = new ArrayList<>(1);
             final ServiceInfo si = getServiceInfo(comp, flags, userId);
             if (si != null) {
-                // When specifying an explicit component, we prevent the service from being
-                // used when either 1) the service is in an instant application and the
-                // caller is not the same instant application or 2) the calling package is
-                // ephemeral and the activity is not visible to ephemeral applications.
+                
+                
+                
+                
                 final ResolveInfo ri = new ResolveInfo();
                 ri.serviceInfo = si;
                 list.add(ri);
@@ -156,7 +149,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             return list;
         }
 
-        // reader
+        
         synchronized (mPackages) {
             String pkgName = intent.getPackage();
             if (pkgName != null) {
@@ -200,12 +193,12 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             if (N == 1) {
                 return query.get(0);
             } else if (N > 1) {
-                // If there is more than one activity with the same priority,
-                // then let the user decide between them.
+                
+                
                 ResolveInfo r0 = query.get(0);
                 ResolveInfo r1 = query.get(1);
-                // If the first activity has a higher priority, or a different
-                // default, then it is always desirable to pick it.
+                
+                
                 if (r0.priority != r1.priority
                         || r0.preferredOrder != r1.preferredOrder
                         || r0.isDefault != r1.isDefault) {
@@ -230,10 +223,10 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             final List<ResolveInfo> list = new ArrayList<>(1);
             final ActivityInfo ai = getActivity(comp, flags, userId);
             if (ai != null) {
-                // When specifying an explicit component, we prevent the activity from being
-                // used when either 1) the calling package is normal and the activity is within
-                // an ephemeral application or 2) the calling package is ephemeral and the
-                // activity is not visible to ephemeral applications.
+                
+                
+                
+                
                 final ResolveInfo ri = new ResolveInfo();
                 ri.activityInfo = ai;
                 list.add(ri);
@@ -241,7 +234,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             }
         }
 
-        // reader
+        
         synchronized (mPackages) {
             return mComponentResolver.queryActivities(intent, resolvedType, flags, userId);
         }
@@ -283,9 +276,9 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
 
         flags = updateFlags(flags, userId);
         BPackageSettings ps = null;
-        // reader
+        
         synchronized (mPackages) {
-            // Normalize package name to handle renamed packages and static libs
+            
             ps = mPackages.get(packageName);
         }
         if (ps != null) {
@@ -363,22 +356,22 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
     @Override
     public List<PackageInfo> getInstalledPackages(int flags, int userId) {
         final int callingUid = Binder.getCallingUid();
-//        if (getInstantAppPackageName(callingUid) != null) {
-//            return ParceledListSlice.emptyList();
-//        }
+
+
+
         if (!sUserManager.exists(userId)) return Collections.emptyList();
 
-        // writer
+        
         synchronized (mPackages) {
             ArrayList<PackageInfo> list;
             list = new ArrayList<>(mPackages.size());
             for (BPackageSettings ps : mPackages.values()) {
-//                if (filterSharedLibPackageLPr(ps, callingUid, userId, flags)) {
-//                    continue;
-//                }
-//                if (filterAppAccessLPr(ps, callingUid, userId)) {
-//                    continue;
-//                }
+
+
+
+
+
+
                 PackageInfo pi = getPackageInfo(ps.pkg.packageName, flags, userId);
                 if (pi != null) {
                     list.add(pi);
@@ -392,20 +385,20 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
                                                                        int callingUid) {
         if (!sUserManager.exists(userId)) return Collections.emptyList();
 
-        // writer
+        
         synchronized (mPackages) {
             ArrayList<ApplicationInfo> list;
             list = new ArrayList<>(mPackages.size());
             Collection<BPackageSettings> packageSettings = mPackages.values();
             for (BPackageSettings ps : packageSettings) {
-//                if (filterSharedLibPackageLPr(ps, Binder.getCallingUid(), userId, flags)) {
-//                    continue;
-//                }
-//                if (filterAppAccessLPr(ps, callingUid, userId)) {
-//                    continue;
-//                }
-//                if (GmsCore.isGoogleAppOrService(ps.pkg.packageName))
-//                    continue;
+
+
+
+
+
+
+
+
                 ApplicationInfo ai = PackageManagerCompat.generateApplicationInfo(ps.pkg, flags,
                         ps.readUserState(userId), userId);
                 if (ai != null) {
@@ -432,10 +425,10 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             final List<ResolveInfo> list = new ArrayList<>(1);
             final ActivityInfo ai = getActivityInfo(comp, flags, userId);
             if (ai != null) {
-                // When specifying an explicit component, we prevent the activity from being
-                // used when either 1) the calling package is normal and the activity is within
-                // an ephemeral application or 2) the calling package is ephemeral and the
-                // activity is not visible to ephemeral applications.
+                
+                
+                
+                
                 final ResolveInfo ri = new ResolveInfo();
                 ri.activityInfo = ai;
                 list.add(ri);
@@ -443,7 +436,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             return list;
         }
 
-        // reader
+        
         List<ResolveInfo> result;
         synchronized (mPackages) {
             if (pkgName != null) {
@@ -456,8 +449,8 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
                             intent, resolvedType, flags, pkg.activities, userId);
                 }
                 if (result == null || result.size() == 0) {
-                    // the caller wants to resolve for a particular package; however, there
-                    // were no installed results, so, try to find an ephemeral result
+                    
+                    
                     if (result == null) {
                         result = new ArrayList<>();
                     }
@@ -483,10 +476,10 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             final List<ResolveInfo> list = new ArrayList<>(1);
             final ActivityInfo ai = getReceiverInfo(comp, flags, userId);
             if (ai != null) {
-                // When specifying an explicit component, we prevent the activity from being
-                // used when either 1) the calling package is normal and the activity is within
-                // an instant application or 2) the calling package is ephemeral and the
-                // activity is not visible to instant applications.
+                
+                
+                
+                
                 ResolveInfo ri = new ResolveInfo();
                 ri.activityInfo = ai;
                 list.add(ri);
@@ -494,7 +487,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             return list;
         }
 
-        // reader
+        
         synchronized (mPackages) {
             String pkgName = intent.getPackage();
             BPackageSettings bPackageSettings = mPackages.get(pkgName);
@@ -541,7 +534,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
                 BProcessManagerService.get().killPackageAsUser(packageName, userId);
                 int i = BPackageInstallerService.get().uninstallPackageAsUser(ps, removeApp, userId);
                 if (i < 0) {
-                    // todo
+                    
                 }
 
                 if (removeApp) {
@@ -675,17 +668,17 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
                 return result.installError("getPackageArchiveInfo error.Please check whether APK is normal.");
             }
 
-            // Prevent cloning BlackBox app from within BlackBox
+            
             String packageName = packageArchiveInfo.packageName;
             String hostPackageName = BlackBoxCore.getHostPkg();
             if (packageName.equals(hostPackageName)) {
                 return result.installError("Cannot clone BlackBox app from within BlackBox. This would create infinite recursion and is not allowed for security reasons.");
             }
             
-            // Also check for common BlackBox-related package names to prevent cloning
+            
             if (packageName.contains("blackbox") || packageName.contains("niunaijun") || 
                 packageName.contains("vspace") || packageName.contains("virtual")) {
-                // Allow this but log a warning
+                
                 Slog.w(TAG, "Installing potentially BlackBox-related app: " + packageName + ". Proceed with caution.");
             }
 
@@ -706,7 +699,7 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
             }
             BPackageSettings bPackageSettings = mSettings.getPackageLPw(aPackage.packageName, aPackage, option);
 
-            // stop pkg
+            
             BProcessManagerService.get().killPackageAsUser(aPackage.packageName, userId);
 
             int i = BPackageInstallerService.get().installPackageAsUser(bPackageSettings, userId);
@@ -752,17 +745,15 @@ public class BPackageManagerService extends IBPackageManagerService.Stub impleme
         return processName;
     }
 
-    /**
-     * Update given flags based on encryption status of current user.
-     */
+    
     private int updateFlags(int flags, int userId) {
         if ((flags & (PackageManager.MATCH_DIRECT_BOOT_UNAWARE
                 | PackageManager.MATCH_DIRECT_BOOT_AWARE)) != 0) {
-            // Caller expressed an explicit opinion about what encryption
-            // aware/unaware components they want to see, so fall through and
-            // give them what they want
+            
+            
+            
         } else {
-            // Caller expressed no opinion, so match based on user state
+            
             flags |= PackageManager.MATCH_DIRECT_BOOT_AWARE | MATCH_DIRECT_BOOT_UNAWARE;
         }
         return flags;

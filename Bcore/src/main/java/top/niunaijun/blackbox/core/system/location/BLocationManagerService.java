@@ -30,14 +30,7 @@ import top.niunaijun.blackbox.utils.CloseUtils;
 import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Fake location
- * plan1: only GPS invocation is valid and other methods like addressed by cells are intercepted at all.
- * plan2: mock fake neighboring cells from LBS database and modify the result of GPS invocation.
- * plan3: cheat internal application at being given permission to access location information but get data from BB.
- * the final testing condition requires UI demo.
- * Created by BlackBoxing on 3/8/22.
- **/
+
 public class BLocationManagerService extends IBLocationManagerService.Stub implements ISystemService {
     public static final String TAG = "BLocationManagerService";
 

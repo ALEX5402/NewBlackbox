@@ -26,6 +26,11 @@
                 app:title="@string/use_vpn_network"
                 app:summary="@string/use_vpn_network_summary" />
 
+        <SwitchPreferenceCompat
+                app:key="disable_flag_secure"
+                app:title="@string/disable_flag_secure"
+                app:summary="@string/disable_flag_secure_summary" />
+
         <Preference
                 android:key="send_logs"
                 android:title="Send Logs"

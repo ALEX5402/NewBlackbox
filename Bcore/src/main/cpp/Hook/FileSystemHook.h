@@ -1,6 +1,6 @@
-//
-// Created for blocking problematic resource files
-//
+
+
+
 
 #ifndef VIRTUALM_FILESYSTEMHOOK_H
 #define VIRTUALM_FILESYSTEMHOOK_H
@@ -10,4 +10,4 @@ public:
     static void init();
 };
 
-#endif //VIRTUALM_FILESYSTEMHOOK_H
+#endif 

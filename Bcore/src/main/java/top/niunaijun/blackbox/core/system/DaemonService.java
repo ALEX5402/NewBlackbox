@@ -15,10 +15,7 @@ import androidx.core.app.NotificationCompat;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
-/**
- * Enhanced DaemonService with proper foreground service support and error handling.
- * Fixed for Android 14+ compatibility and proper notification setup.
- */
+
 public class DaemonService extends Service {
     public static final String TAG = "DaemonService";
     private static final int NOTIFY_ID = BlackBoxCore.getHostPkg().hashCode();
@@ -36,7 +33,7 @@ public class DaemonService extends Service {
         super.onCreate();
         Log.d(TAG, "DaemonService onCreate");
         
-        // Create notification channel for Android 8.0+
+        
         if (BuildCompat.isOreo()) {
             createNotificationChannel();
         }
@@ -47,11 +44,11 @@ public class DaemonService extends Service {
         Log.d(TAG, "DaemonService onStartCommand");
         
         try {
-            // Start the inner service
+            
             Intent innerIntent = new Intent(this, DaemonInnerService.class);
             startService(innerIntent);
             
-            // Start foreground service for Android 8.0+
+            
             if (BuildCompat.isOreo()) {
                 if (!startForegroundService()) {
                     Log.w(TAG, "Failed to start foreground service, falling back to regular service");
@@ -64,7 +61,7 @@ public class DaemonService extends Service {
             
         } catch (Exception e) {
             Log.e(TAG, "Error starting DaemonService: " + e.getMessage(), e);
-            // Return START_STICKY to allow the system to restart the service
+            
             return START_STICKY;
         }
     }
@@ -75,9 +72,7 @@ public class DaemonService extends Service {
         super.onDestroy();
     }
 
-    /**
-     * Create notification channel for Android 8.0+
-     */
+    
     private void createNotificationChannel() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -102,9 +97,7 @@ public class DaemonService extends Service {
         }
     }
 
-    /**
-     * Start foreground service with proper notification
-     */
+    
     private boolean startForegroundService() {
         try {
             Notification notification = createNotification();
@@ -122,9 +115,7 @@ public class DaemonService extends Service {
         }
     }
 
-    /**
-     * Create proper notification for foreground service
-     */
+    
     private Notification createNotification() {
         try {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -142,9 +133,7 @@ public class DaemonService extends Service {
         }
     }
 
-    /**
-     * Inner service to handle notification cancellation
-     */
+    
     public static class DaemonInnerService extends Service {
         @Override
         public void onCreate() {
@@ -157,14 +146,14 @@ public class DaemonService extends Service {
             Log.i(TAG, "DaemonInnerService -> onStartCommand");
             
             try {
-                // Cancel the notification from the main service
+                
                 NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 if (nm != null) {
                     nm.cancel(NOTIFY_ID);
                     Log.d(TAG, "Notification cancelled successfully");
                 }
                 
-                // Stop this inner service
+                
                 stopSelf();
                 return START_NOT_STICKY;
                 

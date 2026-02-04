@@ -4,11 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import top.niunaijun.blackboxa.data.FakeLocationRepository
 
-/**
- *
- * @Author: BlackBoxing
- * @CreateDate: 2022/3/14
- */
+
 class FakeLocationFactory(private val repo: FakeLocationRepository) :
     ViewModelProvider.NewInstanceFactory() {
 

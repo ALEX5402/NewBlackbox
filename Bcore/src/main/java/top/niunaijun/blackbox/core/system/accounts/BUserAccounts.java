@@ -9,9 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by BlackBox on 2022/3/3.
- */
+
 public class BUserAccounts implements Parcelable {
     public final Object lock = new Object();
 

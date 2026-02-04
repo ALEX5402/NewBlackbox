@@ -11,14 +11,7 @@ import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.entity.JobRecord;
 
-/**
- * updated by alex5402 on 4/1/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class AppJobServiceDispatcher {
     private static final AppJobServiceDispatcher sServiceDispatcher = new AppJobServiceDispatcher();
     private final Map<Integer, JobRecord> mJobRecords = new HashMap<>();
@@ -60,11 +53,11 @@ public class AppJobServiceDispatcher {
     }
 
     public void onDestroy() {
-//        for (JobRecord jobRecord : mJobRecords.values()) {
-//            if (jobRecord.mJobService != null) {
-//                jobRecord.mJobService.onDestroy();
-//            }
-//        }
+
+
+
+
+
     }
 
     public void onLowMemory() {
