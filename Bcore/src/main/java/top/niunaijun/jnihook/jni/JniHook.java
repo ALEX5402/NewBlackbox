@@ -3,14 +3,7 @@ package top.niunaijun.jnihook.jni;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-/**
- * updated by alex5402 on 3/7/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public final class JniHook {
     public static final int NATIVE_OFFSET = 0;
 

@@ -13,14 +13,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.proxy.ProxyManifest;
 
-/**
- * updated by alex5402 on 4/8/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IAutofillManagerProxy extends BinderInvocationStub {
     public static final String TAG = "AutofillManagerStub";
 

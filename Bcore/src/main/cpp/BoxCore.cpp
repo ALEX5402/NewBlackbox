@@ -1,6 +1,6 @@
-//
-// updated by alex5402 on 4/9/21.
-//
+
+
+
 
 #include "BoxCore.h"
 #include "Log.h"
@@ -15,14 +15,7 @@
 #include <Hook/RuntimeHook.h>
 #include "Utils/HexDump.h"
 #include "hidden_api.h"
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 struct {
     JavaVM *vm;
     jclass NativeCoreClass;
@@ -82,7 +75,7 @@ void nativeHook(JNIEnv *env) {
     UnixFileSystemHook::init(env);
     FileSystemHook::init();
     VMClassLoaderHook::init(env);
-//    RuntimeHook::init(env);
+
     BinderHook::init(env);
     DexFileHook::init(env);
 }

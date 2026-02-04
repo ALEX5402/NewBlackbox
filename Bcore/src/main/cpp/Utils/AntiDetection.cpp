@@ -11,14 +11,7 @@
 
 #define LOG_TAG "AntiDetection"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-/**
- * created by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 struct SpoofedProp {
     const char* key;
     const char* value;
@@ -27,19 +20,12 @@ struct SpoofedProp {
 
 static int (*orig_system_property_get)(const char *name, char *value) = nullptr;
 
-// =============================================================================
-// FILE SYSTEM HIDING
-// =============================================================================
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
+
+
+
 static const char* blocked_files[] = {
-    // Root detection files
+    
     "/system/xbin/su",
     "/system/bin/su",
     "/sbin/su",
@@ -58,7 +44,7 @@ static const char* blocked_files[] = {
     "/sbin/magisk",
     "/data/adb/magisk",
     
-    // Virtual environment detection
+    
     "/data/virtual",
     "/data/data/com.benny.openlauncher",
     "/data/data/io.va.exposed",
@@ -71,7 +57,7 @@ static const char* blocked_files[] = {
     "/blackbox",
     "/virtual",
     
-    // Emulator detection files
+    
     "/dev/vboxguest",
     "/dev/vboxuser",
     "/dev/qemu_pipe",
@@ -93,7 +79,7 @@ static const char* blocked_files[] = {
     "/system/lib/libmemu.so",
     "/system/lib/libbluelog.so",
     
-    // Xposed detection
+    
     "/system/xposed.prop",
     "/system/framework/XposedBridge.jar",
     "/data/data/de.robv.android.xposed.installer",
@@ -155,7 +141,7 @@ static bool is_blocked_package(const char* path) {
     return false;
 }
 
-// Hook function pointers
+
 static int (*orig_access)(const char *pathname, int mode) = nullptr;
 static int (*orig_stat)(const char *pathname, struct stat *buf) = nullptr;
 static int (*orig_lstat)(const char *pathname, struct stat *buf) = nullptr;
@@ -164,8 +150,8 @@ static int (*orig_open)(const char *pathname, int flags, ...) = nullptr;
 static ssize_t (*orig_readlink)(const char *pathname, char *buf, size_t bufsiz) = nullptr;
 static DIR* (*orig_opendir)(const char *name) = nullptr;
 
-// Hook implementations
-// Safe whitelist for network and critical paths
+
+
 static bool is_safe_path(const char* path) {
     if (!path) return false;
     if (strstr(path, "/proc/net/")) return true;
@@ -253,7 +239,7 @@ static void install_file_hooks() {
     LOGD("File system hooks installed");
 }
 
-// Main installer function - call this once at startup
+
 __attribute__((constructor)) void install_antidetection_hooks() {
     LOGD("Installing anti-detection hooks...");
     install_file_hooks(); 

@@ -5,14 +5,7 @@ import android.os.IBinder;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * updated by alex5402 on 4/25/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class UserSpace {
     public final ActiveServices mActiveServices = new ActiveServices();
     public final ActivityStack mStack = new ActivityStack();

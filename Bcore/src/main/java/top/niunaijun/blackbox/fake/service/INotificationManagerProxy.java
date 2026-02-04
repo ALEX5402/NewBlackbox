@@ -22,14 +22,7 @@ import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 import top.niunaijun.blackbox.utils.compat.ParceledListSliceCompat;
 
-/**
- * updated by alex5402 on 4/2/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class INotificationManagerProxy extends BinderInvocationStub {
     public static final String TAG = "INotificationManagerProxy";
 
@@ -50,7 +43,7 @@ public class INotificationManagerProxy extends BinderInvocationStub {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-//        Slog.d(TAG, "call: " + method.getName());
+
         MethodParameterUtils.replaceAllAppPkg(args);
         return super.invoke(proxy, method, args);
     }

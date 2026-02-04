@@ -8,12 +8,7 @@ import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.GmsBean
 import top.niunaijun.blackboxa.databinding.ItemGmsBinding
 
-/**
- *
- * @Description:
- * @Author: BlackBox
- * @CreateDate: 2022/3/2 21:13
- */
+
 class GmsAdapter : RVHolderFactory() {
 
     override fun createViewHolder(parent: ViewGroup?, viewType: Int, item: Any): RVHolder<out Any> {

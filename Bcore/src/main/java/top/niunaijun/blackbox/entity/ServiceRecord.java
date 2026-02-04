@@ -9,14 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * updated by alex5402 on 4/7/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ServiceRecord {
     private Service mService;
     private Map<Intent.FilterComparison, BoundInfo> mBounds = new HashMap<>();
@@ -103,7 +96,7 @@ public class ServiceRecord {
             return true;
         int i = boundInfo.decrementAndGetBindCount();
         if (i <= 0) {
-//            mBounds.remove(filterComparison);
+
             return true;
         }
         return false;

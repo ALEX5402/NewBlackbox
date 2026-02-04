@@ -6,13 +6,7 @@ import android.content.Context
 import android.util.Log
 import top.niunaijun.blackbox.BlackBoxCore
 
-/**
- *
- * @Description:
- * @Author: alex5402
- * @CreateDate: Saturday, August 16, 2025
- *
- */
+
 class App : Application() {
 
     companion object {

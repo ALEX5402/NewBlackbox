@@ -86,17 +86,14 @@ public class FileUtils {
         return in;
     }
 
-    /**
-     * @param path
-     * @param mode {@link FileMode}
-     */
+    
     public static void chmod(String path, int mode) throws Exception {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 Os.chmod(path, mode);
                 return;
             } catch (Exception e) {
-                // ignore
+                
             }
         }
 
@@ -115,7 +112,7 @@ public class FileUtils {
                 Os.link(oldPath, newPath);
                 return;
             } catch (Throwable e) {
-                //ignore
+                
             }
         }
         Runtime.getRuntime().exec("ln -s " + oldPath + " " + newPath).waitFor();
@@ -170,7 +167,7 @@ public class FileUtils {
             try {
                 link = isSymlink(dir);
             } catch (Exception e) {
-                //ignore
+                
             }
             if (!link) {
                 String[] children = dir.list();
@@ -233,7 +230,7 @@ public class FileUtils {
             }
             outputStream.flush();
         } catch (Throwable e) {
-            //ignore
+            
         } finally {
             closeQuietly(inputStream);
             closeQuietly(outputStream);
@@ -300,17 +297,12 @@ public class FileUtils {
         }
     }
 
-    /**
-     * Check if given filename is valid for an ext4 filesystem.
-     */
+    
     public static boolean isValidExtFilename(String name) {
         return (name != null) && name.equals(buildValidExtFilename(name));
     }
 
-    /**
-     * Mutate the given filename to make it valid for an ext4 filesystem,
-     * replacing any invalid characters with "_".
-     */
+    
     public static String buildValidExtFilename(String name) {
         if (TextUtils.isEmpty(name) || ".".equals(name) || "..".equals(name)) {
             return "(invalid)";
@@ -363,9 +355,7 @@ public class FileUtils {
                 | MODE_IROTH | MODE_IXOTH;
     }
 
-    /**
-     * Lock the specified fle
-     */
+    
     public static class FileLock {
         private static FileLock singleton;
         private Map<String, FileLockCount> mRefCountMap = new ConcurrentHashMap<String, FileLockCount>();
@@ -430,9 +420,7 @@ public class FileUtils {
             }
         }
 
-        /**
-         * unlock odex file
-         **/
+        
         public void unLock(File targetFile) {
 
             File lockFile = new File(targetFile.getParentFile().getAbsolutePath().concat("/lock"));

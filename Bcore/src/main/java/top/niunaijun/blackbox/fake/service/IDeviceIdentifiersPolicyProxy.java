@@ -11,14 +11,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Md5Utils;
 
-/**
- * updated by alex5402 on 4/3/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IDeviceIdentifiersPolicyProxy extends BinderInvocationStub {
 
     public IDeviceIdentifiersPolicyProxy() {
@@ -44,8 +37,8 @@ public class IDeviceIdentifiersPolicyProxy extends BinderInvocationStub {
     public static class x extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-//                args[0] = BlackBoxCore.getHostPkg();
-//                return method.invoke(who, args);
+
+
             return Md5Utils.md5(BlackBoxCore.getHostPkg());
         }
     }

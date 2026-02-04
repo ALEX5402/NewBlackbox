@@ -5,14 +5,7 @@ import android.content.Intent;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class TaskRecord {
     public int id;
     public int userId;

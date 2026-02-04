@@ -30,22 +30,15 @@ import top.niunaijun.blackreflection.annotation.BParamClass;
 import top.niunaijun.blackreflection.annotation.BClassNameNotProcess;
 import top.niunaijun.blackreflection.annotation.BParamClassName;
 
-/**
- * Created by sunwanquan on 2020/1/8.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 此处无Bug
- */
+
 public class BlackReflectionInterfaceProxy {
 
     private final List<BlackReflectionInterfaceInfo> mReflections = new ArrayList<>();
-    // fake.android.app.ActivityThreadStatic or ActivityThreadContext
+    
     private final String mClassName;
-    // fake.android.app
+    
     private final String mPackageName;
-    // fake.android.app.ActivityThread
+    
     private final String mOrigClassName;
     private Map<String, String> realMaps;
 
@@ -63,7 +56,7 @@ public class BlackReflectionInterfaceProxy {
                 .addMember("value","$S", realMaps.get(mOrigClassName))
                 .build();
 
-        // generaClass
+        
         TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder(finalClass)
                 .addAnnotation(annotationSpec)
                 .addModifiers(Modifier.PUBLIC);
@@ -100,16 +93,16 @@ public class BlackReflectionInterfaceProxy {
             method.returns(typeName.box());
             if (reflection.isField()) {
                 method.addAnnotation(AnnotationSpec.builder(BFieldNotProcess.class).build());
-                // set field
+                
                 interfaceBuilder.addMethod(generateFieldSet(reflection));
-                // check field
+                
                 interfaceBuilder.addMethod(generateFieldCheck(reflection));
             } else {
                 BConstructor annotation = reflection.getExecutableElement().getAnnotation(BConstructor.class);
                 if (annotation != null) {
                     method.addAnnotation(AnnotationSpec.builder(BConstructorNotProcess.class).build());
                 } else {
-                    // check method
+                    
                     interfaceBuilder.addMethod(generateMethodCheck(reflection, parameterSpecs));
                 }
             }
@@ -155,11 +148,11 @@ public class BlackReflectionInterfaceProxy {
 
     private static TypeMirror getClass(BParamClass annotation) {
         try {
-            annotation.value(); // this should throw
+            annotation.value(); 
         } catch (MirroredTypeException mte) {
             return mte.getTypeMirror();
         }
-        return null; // can this ever happen ??
+        return null; 
     }
 
     private static Class<?> parseBaseClass(String className) {

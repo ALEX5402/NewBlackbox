@@ -1,22 +1,4 @@
-/*
- * This file is part of LSPosed.
- *
- * LSPosed is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * LSPosed is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
- *
- * Copyright (C) 2019 Swift Gan
- * Copyright (C) 2021 LSPosed Contributors
- */
+
 #include <malloc.h>
 #include <cstring>
 #include <sys/mman.h>
@@ -43,7 +25,7 @@ ElfImg::ElfImg(std::string_view base_name) : elf(base_name) {
         return;
     }
 
-    //load elf
+    
     int fd = open(elf.data(), O_RDONLY);
     if (fd < 0) {
         LOGE("open(%s) failed: %s", elf.c_str(), strerror(errno));
@@ -210,20 +192,20 @@ ElfW(Addr) ElfImg::LinearLookupShort(std::string_view name) const {
         }
     }
     return 0;
-//    if (auto i = symtabs_.find(name); i != symtabs_.end()) {
-//        return i->second->st_value;
-//    } else {
-//        return 0;
-//    }
+
+
+
+
+
 }
 
 ElfImg::~ElfImg() {
-    //open elf file local
+    
     if (buffer) {
         free(buffer);
         buffer = nullptr;
     }
-    //use mmap
+    
     if (header) {
         munmap(header, size);
     }

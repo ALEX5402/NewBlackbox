@@ -10,14 +10,7 @@ import javax.lang.model.element.Modifier;
 import top.niunaijun.blackreflection.BlackReflectionInfo;
 import top.niunaijun.blackreflection.utils.ClassUtils;
 
-/**
- * Created by sunwanquan on 2020/1/8.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 此处无Bug
- */
+
 public class BlackReflectionProxy {
 
     private static final ClassName BR = ClassName.get("top.niunaijun.blackreflection", "BlackReflection");
@@ -43,7 +36,7 @@ public class BlackReflectionProxy {
                 .replace(mPackageName + ".", "")
                 .replace(".", "");
 
-        // generaClass
+        
         TypeSpec reflection = TypeSpec.classBuilder(finalClass)
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(generaNotCallerMethod(true))

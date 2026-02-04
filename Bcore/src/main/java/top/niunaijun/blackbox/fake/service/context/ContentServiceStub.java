@@ -8,14 +8,7 @@ import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 
-/**
- * updated by alex5402 on 4/6/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ContentServiceStub extends BinderInvocationStub {
 
     public ContentServiceStub() {

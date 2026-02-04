@@ -3,21 +3,21 @@
 
 
 
-    <!-- Internet permission for apps that need network access -->
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Permissions for RockerManager (floating GPS joystick) -->
+    
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!-- Additional permissions for better location spoofing -->
+    
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <!-- Permissions for WebView functionality -->
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -26,16 +26,16 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
-    <!-- Audio + Foreground service (Android 14+) -->
+    
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <!-- Optional: silence WebView bluetooth media warnings -->
+    
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
-    <!-- unknown -->
+    
     <uses-permission android:name="android.permission.WRITE_SOCIAL_STREAM" />
     <uses-permission android:name="android.permission.READ_SOCIAL_STREAM" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -45,7 +45,7 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
-    <!-- samsung start -->
+    
     <uses-permission android:name="com.samsung.svoice.sync.READ_DATABASE" />
     <uses-permission android:name="com.samsung.svoice.sync.ACCESS_SERVICE" />
     <uses-permission android:name="com.samsung.svoice.sync.WRITE_DATABASE" />
@@ -59,21 +59,21 @@
     <uses-permission android:name="sec.android.permission.READ_MSG_PREF" />
     <uses-permission android:name="com.samsung.android.scloud.backup.lib.read" />
     <uses-permission android:name="com.samsung.android.scloud.backup.lib.write" />
-    <!-- samsung end -->
+    
 
-    <!-- other app start -->
+    
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL" />
     <uses-permission android:name="com.android.voicemail.permission.READ_WRITE_ALL_VOICEMAIL" />
     <uses-permission android:name="com.huawei.authentication.HW_ACCESS_AUTH_SERVICE" />
-    <!-- other app end -->
+    
 
-    <!-- google play store start -->
+    
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
-    <!-- google play store end -->
+    
 
-    <!-- google services framework start -->
+    
     <uses-permission android:name="com.google.android.providers.talk.permission.READ_ONLY" />
     <uses-permission android:name="com.google.android.providers.talk.permission.WRITE_ONLY" />
 
@@ -132,9 +132,9 @@
     <uses-permission android:name="com.google.android.gms.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="com.google.android.gms.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.QUERY_ADVANCED_PROTECTION_MODE" />
-    <!-- google services framework end -->
+    
 
-    <!-- shortcut and badge start -->
+    
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.READ_APP_BADGE" />
@@ -174,131 +174,131 @@
     <uses-permission android:name="cn.nubia.launcher.permission.READ_SETTINGS" />
     <uses-permission android:name="com.huawei.android.launcher.permission.READ_SETTINGS" />
     <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
-    <!-- shortcut and badge end -->
-    <!-- 常用 -->
+    
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
-    <!-- 相机 -->
+    
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
-    <!-- 位置服务 -->
+    
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-    <!-- 网络 -->
+    
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <!-- sdcard -->
+    
     <uses-permission
         android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- 电量 -->
+    
     <uses-permission
         android:name="android.permission.BATTERY_STATS"
         tools:ignore="ProtectedPermissions" />
-    <!-- 身体传感器 -->
+    
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
-    <!-- 锁屏-->
+    
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <!-- 允许应用程序展开或折叠状态栏 -->
+    
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
-    <!-- 账号相关 -->
+    
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <!-- 通话状态 -->
+    
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <!-- 修改当前配置-->
+    
     <uses-permission
         android:name="android.permission.CHANGE_CONFIGURATION"
         tools:ignore="ProtectedPermissions" />
-    <!-- 设置 -->
+    
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-    <!-- 最近任务/进程 -->
+    
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.PERSISTENT_ACTIVITY" />
-    <!-- 录音 -->
+    
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- bluetooth -->
+    
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <!-- nfc -->
+    
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <!-- 震动 -->
+    
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- 指纹 -->
+    
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
-    <!-- 下面自己按需保留 -->
+    
 
-    <!-- browser history start -->
+    
     <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
     <uses-permission android:name="com.android.browser.permission.WRITE_HISTORY_BOOKMARKS" />
-    <!-- browser history end -->
+    
 
-    <!-- 清空应用缓存-->
+    
     <uses-permission
         android:name="android.permission.CLEAR_APP_CACHE"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
-    <!-- 同步设置 -->
+    
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
-    <!-- rss -->
+    
     <uses-permission android:name="android.permission.SUBSCRIBED_FEEDS_READ" />
     <uses-permission android:name="android.permission.SUBSCRIBED_FEEDS_WRITE" />
-    <!-- 日历 -->
+    
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <!-- 通讯录 -->
+    
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-    <!-- 系统日志 -->
+    
     <uses-permission
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
-    <!-- 重启应用 -->
+    
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
-    <!-- 时间/时区 -->
+    
     <uses-permission
         android:name="android.permission.SET_TIME"
         tools:ignore="ProtectedPermissions" />
     <uses-permission
         android:name="android.permission.SET_TIME_ZONE"
         tools:ignore="ProtectedPermissions" />
-    <!-- 墙纸 -->
+    
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
-    <!-- 红外线 -->
+    
     <uses-permission android:name="android.permission.TRANSMIT_IR" />
 
-    <!-- SIP服务 -->
+    
     <uses-permission android:name="android.permission.USE_SIP" />
-    <!-- 唤醒屏幕 -->
+    
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- float window -->
+    
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
-    <!-- boot -->
+    
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- system app start -->
+    
     <uses-permission
         android:name="android.permission.GET_INTENT_SENDER_INTENT"
         tools:ignore="ProtectedPermissions" />
@@ -326,14 +326,14 @@
     <uses-permission
         android:name="android.permission.DEVICE_POWER"
         tools:ignore="ProtectedPermissions" />
-    <!--    <uses-permission-->
-    <!--        android:name="android.permission.WRITE_APN_SETTINGS"-->
-    <!--        tools:ignore="ProtectedPermissions" />-->
+    
+    
+    
 
-    <!-- xdja -->
+    
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
-    <!-- xdja -->
+    
 
     <uses-permission
         android:name="android.permission.BIND_APPWIDGET"
@@ -344,8 +344,8 @@
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
-    <!-- system app end -->
-    <!-- not found -->
+    
+    
     <uses-permission android:name="android.permission.READ_INSTALL_SESSIONS" />
     <uses-permission android:name="android.permission.READ_OWNER_DATA" />
     <uses-permission android:name="android.permission.READ_CELL_BROADCASTS" />
@@ -359,20 +359,20 @@
     <uses-permission android:name="android.permission.CHANGE_WIMAX_STATE" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
-    <!-- xdja -->
+    
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
-    <!-- 安全接入 -->
+    
     <uses-permission android:name="android.permission.RECEIVE_MMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
-    <!-- xdja -->
+    
 
-    <!-- 通话记录 -->
+    
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
-    <!-- call phone -->
+    
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
@@ -410,10 +410,10 @@
         tools:ignore="ProtectedPermissions" />
 
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
-    <!--android11-->
+    
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
-    <!-- Android 15 (API 35) Permissions -->
+    
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_MEDIA_AURAL_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES_USER_SELECTED" />
@@ -453,7 +453,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO_USER_SELECTED" />
 
-    <!-- POST_NOTIFICATIONS and other permissions continue below -->
+    
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
@@ -493,7 +493,7 @@
             android:exported="false"
             android:process="@string/black_box_service_name" />
 
-        <!--file provider-->
+        
         <provider
             android:name=".fake.provider.FileProvider"
             android:authorities="${applicationId}.blackbox.FileProvider"

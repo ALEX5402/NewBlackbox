@@ -32,12 +32,7 @@ import java.util.*
 import kotlin.math.abs
 
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 22:21
- */
+
 class AppsFragment : Fragment() {
 
     var userID: Int = 0
@@ -85,33 +80,33 @@ class AppsFragment : Fragment() {
 
             viewBinding.recyclerView.adapter = mAdapter
             
-            // Enhanced RecyclerView configuration for better performance and crash prevention
+            
             val layoutManager = GridLayoutManager(requireContext(), 4)
             layoutManager.isItemPrefetchEnabled = true
             layoutManager.initialPrefetchItemCount = 8
             viewBinding.recyclerView.layoutManager = layoutManager
             
-            // Enable view cache for better scrolling performance
+            
             viewBinding.recyclerView.setItemViewCacheSize(20)
             viewBinding.recyclerView.setHasFixedSize(true)
             
-            // Add scroll listener for crash detection and prevention
+            
             viewBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     try {
                         super.onScrollStateChanged(recyclerView, newState)
                         when (newState) {
                             RecyclerView.SCROLL_STATE_IDLE -> {
-                                // Scrolling stopped, optimize memory
+                                
                                 MemoryManager.optimizeMemoryForRecyclerView()
                             }
                             RecyclerView.SCROLL_STATE_DRAGGING -> {
-                                // User is scrolling, ensure smooth performance
-                                // Note: Drawing cache is deprecated, using modern alternatives
+                                
+                                
                             }
                             RecyclerView.SCROLL_STATE_SETTLING -> {
-                                // Scrolling is settling, prepare for idle state
-                                // Note: Drawing cache is deprecated, using modern alternatives
+                                
+                                
                             }
                         }
                     } catch (e: Exception) {
@@ -122,11 +117,11 @@ class AppsFragment : Fragment() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     try {
                         super.onScrolled(recyclerView, dx, dy)
-                        // Monitor scroll performance
+                        
                         if (Math.abs(dy) > 100) {
-                            // Fast scrolling detected, optimize memory
                             
-                            // Check memory usage during fast scrolling
+                            
+                            
                             if (MemoryManager.isMemoryCritical()) {
                                 Log.w(TAG, "Memory critical during fast scrolling, forcing GC")
                                 MemoryManager.forceGarbageCollectionIfNeeded()
@@ -165,7 +160,7 @@ class AppsFragment : Fragment() {
             return viewBinding.root
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreateView: ${e.message}")
-            // Return a simple view to prevent crash
+            
             return View(requireContext())
         }
     }
@@ -183,11 +178,11 @@ class AppsFragment : Fragment() {
         try {
             super.onStart()
             
-            // Register callback to refresh app list when services become available
+            
             try {
                 BlackBoxCore.get().addServiceAvailableCallback {
                     Log.d(TAG, "Services became available, refreshing app list")
-                    // Refresh the app list when services are ready
+                    
                     viewModel.getInstalledAppsWithRetry(userID)
                 }
             } catch (e: Exception) {
@@ -200,9 +195,7 @@ class AppsFragment : Fragment() {
         }
     }
 
-    /**
-     * 拖拽优化
-     */
+    
     private fun interceptTouch() {
         try {
             val point = Point()
@@ -213,7 +206,7 @@ class AppsFragment : Fragment() {
                 try {
                     when (e.action) {
                         MotionEvent.ACTION_DOWN -> {
-                            // Reset scroll state
+                            
                             isScrolling = false
                             scrollStartTime = System.currentTimeMillis()
                             point.set(0, 0)
@@ -222,7 +215,7 @@ class AppsFragment : Fragment() {
                         MotionEvent.ACTION_UP -> {
                             val scrollDuration = System.currentTimeMillis() - scrollStartTime
                             
-                            // Only show popup if it wasn't a scroll gesture
+                            
                             if (!isScrolling && !isMove(point, e) && scrollDuration < 500) {
                                 try {
                                     popupMenu?.show()
@@ -242,13 +235,13 @@ class AppsFragment : Fragment() {
                                 point.y = e.rawY.toInt()
                             }
                             
-                            // Check if this is a scroll gesture
+                            
                             if (isMove(point, e)) {
                                 isScrolling = true
                                 popupMenu?.dismiss()
                             }
                             
-                            // Handle float button visibility
+                            
                             isDownAndUp(point, e)
                         }
                     }
@@ -298,7 +291,7 @@ class AppsFragment : Fragment() {
 
     private fun onItemMove(fromPosition: Int, toPosition: Int) {
         try {
-            // Validate positions to prevent crashes
+            
             val items = mAdapter.getItems()
             if (fromPosition < 0 || toPosition < 0 || 
                 fromPosition >= items.size || toPosition >= items.size) {
@@ -330,7 +323,7 @@ class AppsFragment : Fragment() {
                 mAdapter.notifyItemMoved(fromPosition, toPosition)
             } catch (e: Exception) {
                 Log.e(TAG, "Error notifying item moved: ${e.message}")
-                // Fallback to full refresh if move notification fails
+                
                 mAdapter.notifyDataSetChanged()
             }
         } catch (e: Exception) {
@@ -474,10 +467,7 @@ class AppsFragment : Fragment() {
         }
     }
 
-    /**
-     * 强行停止软件
-     * @param info AppInfo
-     */
+    
     private fun stopApk(info: AppInfo) {
         try {
             MaterialDialog(requireContext()).show {
@@ -498,10 +488,7 @@ class AppsFragment : Fragment() {
         }
     }
 
-    /**
-     * 清除软件数据
-     * @param info AppInfo
-     */
+    
     private fun clearApk(info: AppInfo) {
         try {
             MaterialDialog(requireContext()).show {

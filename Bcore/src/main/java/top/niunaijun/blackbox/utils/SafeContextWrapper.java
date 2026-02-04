@@ -7,10 +7,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import top.niunaijun.blackbox.BlackBoxCore;
 
-/**
- * A safe ContextWrapper that prevents NullPointerException when the base context is null
- * created by alex5402
- */
+
 public class SafeContextWrapper extends ContextWrapper {
     private static final String TAG = "SafeContextWrapper";
     
@@ -46,17 +43,17 @@ public class SafeContextWrapper extends ContextWrapper {
             Slog.w(TAG, "Error getting resources from base context: " + e.getMessage());
         }
         
-        // Fallback to host context resources
+        
         try {
             return fallbackContext.getResources();
         } catch (Exception e) {
             Slog.w(TAG, "Error getting fallback resources: " + e.getMessage());
-            // Return a minimal resources object to prevent crash
+            
             try {
                 return new Resources(null, null, null);
             } catch (Exception e2) {
                 Slog.w(TAG, "Error creating minimal resources: " + e2.getMessage());
-                // Last resort - return null but don't crash
+                
                 return null;
             }
         }
@@ -73,7 +70,7 @@ public class SafeContextWrapper extends ContextWrapper {
             Slog.w(TAG, "Error getting package manager from base context: " + e.getMessage());
         }
         
-        // Fallback to host context package manager
+        
         try {
             return fallbackContext.getPackageManager();
         } catch (Exception e) {

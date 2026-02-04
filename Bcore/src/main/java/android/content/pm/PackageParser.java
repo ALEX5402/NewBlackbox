@@ -90,24 +90,20 @@ public class PackageParser {
         public final int installLocation;
         public final VerifierInfo[] verifiers;
 
-        /** Names of any split APKs, ordered by parsed splitName */
+        
         public final String[] splitNames;
 
-        /**
-         * Path where this package was found on disk. For monolithic packages
-         * this is path to single base APK file; for cluster packages this is
-         * path to the cluster directory.
-         */
+        
         public final String codePath;
 
-        /** Path of base APK */
+        
         public final String baseCodePath;
-        /** Paths of any split APKs, ordered by parsed splitName */
+        
         public final String[] splitCodePaths;
 
-        /** Revision code of base APK */
+        
         public final int baseRevisionCode;
-        /** Revision codes of any split APKs, ordered by parsed splitName */
+        
         public final int[] splitRevisionCodes;
 
         public final boolean coreApp;
@@ -141,9 +137,7 @@ public class PackageParser {
         }
     }
 
-    /**
-     * For Android 5.0+
-     */
+    
     public PackageParser() {
         throw new RuntimeException("Stub!");
     }
@@ -180,49 +174,17 @@ public class PackageParser {
         throw new RuntimeException("Stub!");
     }
 
-    /**
-     * Parse only lightweight details about the package at the given location.
-     * Automatically detects if the package is a monolithic style (single APK
-     * file) or cluster style (directory of APKs).
-     * <p>
-     * This performs sanity checking on cluster style packages, such as
-     * requiring identical package name and version codes, a single base APK,
-     * and unique split names.
-     *
-     * @see PackageParser#parsePackage(File, int)
-     */
+    
     public static PackageLite parsePackageLite(final File packageFile, final int flags) throws PackageParserException {
         throw new RuntimeException("Stub!");
     }
 
-    /**
-     * Parse the package at the given location. Automatically detects if the
-     * package is a monolithic style (single APK file) or cluster style
-     * (directory of APKs).
-     * <p>
-     * This performs sanity checking on cluster style packages, such as
-     * requiring identical package name and version codes, a single base APK,
-     * and unique split names.
-     * <p>
-     * Note that this <em>does not</em> perform signature verification; that
-     * must be done separately in {@link #collectCertificates(Package, int)}.
-     *
-     * @see #parsePackageLite(File, int)
-     * @since Android 5.0+
-     */
+    
     public Package parsePackage(final File packageFile, final int flags) throws PackageParserException {
         throw new RuntimeException("Stub!");
     }
 
-    /**
-     *
-     * @param sourceFile
-     * @param destCodePath
-     * @param metrics
-     * @param flags
-     * @return
-     * @since Android 2.3+
-     */
+    
     public Package parsePackage(final File sourceFile, final String destCodePath, final DisplayMetrics metrics, final int flags) {
         throw new RuntimeException("Stub!");
     }
@@ -235,63 +197,45 @@ public class PackageParser {
         throw new RuntimeException("Stub!");
     }
 
-    /**
-     * Utility method that retrieves lightweight details about a single APK
-     * file, including package name, split name, and install location.
-     *
-     * @param apkFile path to a single APK
-     * @param flags optional parse flags, such as
-     *            {@link #PARSE_COLLECT_CERTIFICATES}
-     */
+    
     public static ApkLite parseApkLite(final File apkFile, final int flags) throws PackageParserException {
         throw new RuntimeException("Stub!");
     }
 
-    /**
-     * Representation of a full package parsed from APK files on disk. A package
-     * consists of a single base APK, and zero or more split APKs.
-     */
+    
     public final static class Package {
 
         public String packageName;
 
-        /** Names of any split APKs, ordered by parsed splitName */
+        
         public String[] splitNames;
 
-        // TODO: work towards making these paths invariant
+        
 
         public String volumeUuid;
 
-        /**
-         * Path where this package was found on disk. For monolithic packages
-         * this is path to single base APK file; for cluster packages this is
-         * path to the cluster directory.
-         */
+        
         public String codePath;
 
-        /** Path of base APK */
+        
         public String baseCodePath;
-        /** Paths of any split APKs, ordered by parsed splitName */
+        
         public String[] splitCodePaths;
 
-        /** Revision code of base APK */
+        
         public int baseRevisionCode;
-        /** Revision codes of any split APKs, ordered by parsed splitName */
+        
         public int[] splitRevisionCodes;
 
-        /** Flags of any split APKs; ordered by parsed splitName */
+        
         public int[] splitFlags;
 
-        /**
-         * Private flags of any split APKs; ordered by parsed splitName.
-         *
-         * {@hide}
-         */
+        
         public int[] splitPrivateFlags;
 
         public boolean baseHardwareAccelerated;
 
-        // For now we only support one application per package.
+        
         public ApplicationInfo applicationInfo = new ApplicationInfo();
 
         public final ArrayList<Permission> permissions = new ArrayList<Permission>(0);
@@ -317,92 +261,80 @@ public class PackageParser {
         public String mRealPackage = null;
         public ArrayList<String> mAdoptPermissions = null;
 
-        // We store the application meta-data independently to avoid multiple unwanted references
+        
         public Bundle mAppMetaData = null;
 
-        // The version code declared for this package.
+        
         public int mVersionCode;
 
-        // The version name declared for this package.
+        
         public String mVersionName;
 
-        // The shared user id that this package wants to use.
+        
         public String mSharedUserId;
 
-        // The shared user label that this package wants to use.
+        
         public int mSharedUserLabel;
 
-        // Signatures that were read from the package.
+        
         public Signature[] mSignatures;
         public SigningDetails mSigningDetails;
         public Certificate[][] mCertificates;
 
-        // For use by package manager service for quick lookup of
-        // preferred up order.
+        
+        
         public int mPreferredOrder = 0;
 
-        // For use by package manager to keep track of where it needs to do dexopt.
-//        public final ArraySet<String> mDexOptPerformed = new ArraySet<>(4);
+        
 
-        // For use by package manager to keep track of when a package was last used.
+
+        
         public long mLastPackageUsageTimeInMills;
 
-        // // User set enabled state.
-        // public int mSetEnabled = PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
-        //
-        // // Whether the package has been stopped.
-        // public boolean mSetStopped = false;
+        
+        
+        
+        
+        
 
-        // Additional data supplied by callers.
+        
         public Object mExtras;
 
-        // Applications hardware preferences
+        
         public ArrayList<ConfigurationInfo> configPreferences = null;
 
-        // Applications requested features
+        
         public ArrayList<FeatureInfo> reqFeatures = null;
 
-        // Applications requested feature groups
+        
         public ArrayList<FeatureGroupInfo> featureGroups = null;
 
         public int installLocation;
 
         public boolean coreApp;
 
-        /* An app that's required for all users and cannot be uninstalled for a user */
+        
         public boolean mRequiredForAllUsers;
 
-        /* The restricted account authenticator type that is used by this application */
+        
         public String mRestrictedAccountType;
 
-        /* The required account type without which this application will not function */
+        
         public String mRequiredAccountType;
 
-        /**
-         * Digest suitable for comparing whether this package's manifest is the
-         * same as another.
-         */
+        
         public ManifestDigest manifestDigest;
 
         public String mOverlayTarget;
         public int mOverlayPriority;
         public boolean mTrustedOverlay;
 
-        /**
-         * Data used to feed the KeySetManagerService
-         */
+        
         public ArraySet<PublicKey> mSigningKeys;
         public ArraySet<String> mUpgradeKeySets;
         public ArrayMap<String, ArraySet<PublicKey>> mKeySetMapping;
 
-        /**
-         * The install time abi override for this package, if any.
-         *
-         * TODO: This seems like a horrible place to put the abiOverride because
-         * this isn't something the packageParser parsers. However, this fits in with
-         * the rest of the PackageManager where package scanning randomly pushes
-         * and prods fields out of {@code this.applicationInfo}.
-         */
+        
         public String cpuAbiOverride;
 
         public Package(String packageName) {
@@ -413,10 +345,7 @@ public class PackageParser {
             throw new RuntimeException("Stub!");
         }
 
-        /**
-         * Filtered set of {@link #getAllCodePaths()} that excludes
-         * resource-only APKs.
-         */
+        
         public List<String> getAllCodePathsExcludingResourceOnly() {
             throw new RuntimeException("Stub!");
         }

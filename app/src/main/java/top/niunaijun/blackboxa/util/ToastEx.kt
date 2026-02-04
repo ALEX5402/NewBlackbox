@@ -5,12 +5,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import top.niunaijun.blackboxa.app.App
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/5/2 0:13
- */
+
 var toastImpl:Toast? = null
 
 fun Context.toast(msg:String){

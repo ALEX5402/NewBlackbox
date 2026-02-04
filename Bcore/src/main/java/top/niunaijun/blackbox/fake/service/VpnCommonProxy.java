@@ -12,9 +12,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.proxy.ProxyVpnService;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
-/**
- * Created by BlackBox on 2022/2/26.
- */
+
 public class VpnCommonProxy {
     @ProxyMethod("setVpnPackageAuthorization")
     public static class setVpnPackageAuthorization extends MethodHook {

@@ -37,6 +37,13 @@ class SettingFragment : PreferenceFragmentCompat() {
             vpnPreference
         }
 
+        invalidHideState {
+            val disableFlagSecurePreference: Preference = (findPreference("disable_flag_secure")!!)
+            val mDisableFlagSecure = AppManager.mBlackBoxLoader.disableFlagSecure()
+            disableFlagSecurePreference.setDefaultValue(mDisableFlagSecure)
+            disableFlagSecurePreference
+        }
+
         initSendLogs()
     }
 
@@ -70,6 +77,9 @@ class SettingFragment : PreferenceFragmentCompat() {
                 "use_vpn_network" -> {
                     AppManager.mBlackBoxLoader.invalidUseVpnNetwork(tmpHide)
                 }
+                "disable_flag_secure" -> {
+                    AppManager.mBlackBoxLoader.invalidDisableFlagSecure(tmpHide)
+                }
             }
 
             toast(R.string.restart_module)
@@ -79,7 +89,21 @@ class SettingFragment : PreferenceFragmentCompat() {
     private fun initSendLogs() {
         val sendLogsPreference: Preference? = findPreference("send_logs")
         sendLogsPreference?.setOnPreferenceClickListener {
-            BlackBoxCore.get().sendLogs("Manual Log Upload from Settings", true)
+            it.isEnabled = false
+            BlackBoxCore.get()
+                    .sendLogs(
+                            "Manual Log Upload from Settings",
+                            true,
+                            object : BlackBoxCore.LogSendListener {
+                                override fun onSuccess() {
+                                    activity?.runOnUiThread { sendLogsPreference.isEnabled = true }
+                                }
+
+                                override fun onFailure(error: String?) {
+                                    activity?.runOnUiThread { sendLogsPreference.isEnabled = true }
+                                }
+                            }
+                    )
             toast("Sending logs... (Check notifications for status)")
             true
         }

@@ -5,14 +5,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-/**
- * Created by BlackBox on 2022/3/21.
- */
+
 public class ReflectionClass {
     @SuppressWarnings("rawtypes")
     public static void print(String name) {
         try {
-            // print class name and super class name (if != object)
+            
             Class cl = Class.forName(name);
             Class supercl = cl.getSuperclass();
             Class[] interfaces = cl.getInterfaces();
@@ -21,7 +19,7 @@ public class ReflectionClass {
                 System.out.print(modifiers);
             }
 
-            // is class or interface
+            
             if (!cl.isInterface()) {
                 System.out.print(" class ");
             }
@@ -59,11 +57,7 @@ public class ReflectionClass {
         }
     }
 
-    /**
-     * Prints all constructors of a class
-     *
-     * @param cl a class
-     */
+    
     @SuppressWarnings("rawtypes")
     private static void printConstructors(Class cl) {
         Constructor[] constructors = cl.getDeclaredConstructors();
@@ -71,13 +65,13 @@ public class ReflectionClass {
         for (Constructor c : constructors) {
             String name = c.getName();
             System.out.print("    ");
-            // print modifiers.
+            
             String modifiers = Modifier.toString(c.getModifiers());
             if (modifiers.length() > 0) {
                 System.out.print(modifiers + " ");
             }
 
-            // print name and parameter types.
+            
             System.out.print(name.substring(name.lastIndexOf(".") + 1) + " (");
             Class[] paramTypes = c.getParameterTypes();
             for (int j = 0; j < paramTypes.length; j++) {
@@ -88,7 +82,7 @@ public class ReflectionClass {
             }
             System.out.print(")");
 
-            // print exceptions
+            
             Class[] exceptions = c.getExceptionTypes();
             if (exceptions.length > 0) {
                 System.out.print(" throws ");
@@ -104,11 +98,7 @@ public class ReflectionClass {
         }
     }
 
-    /**
-     * Prints all methods of a class
-     *
-     * @param cl a class
-     */
+    
     @SuppressWarnings("rawtypes")
     private static void printMethods(Class cl) {
         Method[] methods = cl.getDeclaredMethods();
@@ -117,7 +107,7 @@ public class ReflectionClass {
             String name = m.getName();
 
             System.out.print("    ");
-            // print modifiers, return type and method name
+            
             String modifiers = Modifier.toString(m.getModifiers());
             if (modifiers.length() > 0) {
                 System.out.print(modifiers + " ");
@@ -125,7 +115,7 @@ public class ReflectionClass {
             printType(retType);
             System.out.print(" " + name + "(");
 
-            // print parameter types
+            
             Class[] paramTypes = m.getParameterTypes();
             for (int j = 0; j < paramTypes.length; j++) {
                 if (j > 0) {
@@ -136,7 +126,7 @@ public class ReflectionClass {
 
             System.out.print(")");
 
-            // print exceptions
+            
             Class[] exceptions = m.getExceptionTypes();
             if (exceptions.length > 0) {
                 System.out.print(" throws ");
@@ -152,11 +142,7 @@ public class ReflectionClass {
         }
     }
 
-    /**
-     * Prints all fields of a class
-     *
-     * @param cl a class
-     */
+    
     @SuppressWarnings("rawtypes")
     private static void printFields(Class cl) {
         Field[] fields = cl.getDeclaredFields();
@@ -174,11 +160,7 @@ public class ReflectionClass {
         }
     }
 
-    /**
-     * Prints a type.
-     *
-     * @param type a type.
-     */
+    
     @SuppressWarnings("rawtypes")
     private static void printType(Class type) {
         String name = type.getName();
@@ -208,11 +190,7 @@ public class ReflectionClass {
         }
     }
 
-    /**
-     * Prints the extends chain for a class
-     *
-     * @param cl a class
-     */
+    
     @SuppressWarnings("rawtypes")
     public static void printExtendsChain(Class cl) {
         System.out.print("\n\nExtends chain:\n    ");

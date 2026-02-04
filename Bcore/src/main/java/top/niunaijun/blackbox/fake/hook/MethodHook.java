@@ -4,14 +4,7 @@ import java.lang.reflect.Method;
 
 import top.niunaijun.blackbox.BlackBoxCore;
 
-/**
- * updated by alex5402 on 3/30/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public abstract class MethodHook {
     protected String getMethodName() {
         return null;

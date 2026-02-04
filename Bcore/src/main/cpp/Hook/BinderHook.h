@@ -1,6 +1,6 @@
-//
-// updated by alex5402 on 4/25/21.
-//
+
+
+
 
 #ifndef BLACKBOX_BINDERHOOK_H
 #define BLACKBOX_BINDERHOOK_H
@@ -13,4 +13,4 @@ public:
     static void init(JNIEnv *env);
 };
 
-#endif //BLACKBOX_BINDERHOOK_H
+#endif 

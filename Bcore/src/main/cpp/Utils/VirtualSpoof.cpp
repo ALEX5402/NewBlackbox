@@ -5,14 +5,7 @@
 #include <dlfcn.h>
 #include "Dobby/dobby.h"
 
-/**
- * created by alex5402 on 4/9/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 #define LOG_TAG "VirtualSpoof"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
@@ -40,7 +33,7 @@ SpoofedProp spoofed_props[] = {
         {"ro.kernel.android.qemud", ""},
         {"ro.hardware.egl", "adreno"},
         {"ro.boot.qemu", "0"},
-    {nullptr, nullptr} // Sentinel
+    {nullptr, nullptr} 
 };
 
 
@@ -78,7 +71,7 @@ void install_property_get_hook() {
 
 }
 
-// Initialization function to ensure our hook is loaded
+
 __attribute__((constructor)) void init_virtual_spoof()
 {
     install_property_get_hook();

@@ -3,14 +3,7 @@ package top.niunaijun.blackbox.entity.pm;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * updated by alex5402 on 4/21/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class InstallOption implements Parcelable {
     public static final int FLAG_SYSTEM = 1;
     public static final int FLAG_STORAGE = 1 << 1;

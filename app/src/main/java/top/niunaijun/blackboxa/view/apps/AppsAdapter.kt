@@ -18,18 +18,13 @@ import android.graphics.Color
 import android.view.ViewTreeObserver
 import androidx.recyclerview.widget.RecyclerView
 
-/**
- *
- * @Description: 软件显示界面适配器
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 21:52
- */
+
 
 class AppsAdapter : RVHolderFactory() {
     
     companion object {
         private const val TAG = "AppsAdapter"
-        private const val MAX_ICON_SIZE = 96 // 48dp * 2 for high density
+        private const val MAX_ICON_SIZE = 96 
         private val DEFAULT_ICON_COLOR = Color.parseColor("#CCCCCC")
     }
 
@@ -38,7 +33,7 @@ class AppsAdapter : RVHolderFactory() {
             AppsVH(inflate(R.layout.item_app, parent))
         } catch (e: Exception) {
             Log.e(TAG, "Error creating ViewHolder: ${e.message}")
-            // Return a fallback ViewHolder to prevent crash
+            
             FallbackAppsVH(inflate(R.layout.item_app, parent))
         }
     }
@@ -50,10 +45,10 @@ class AppsAdapter : RVHolderFactory() {
 
         init {
             try {
-                // Optimize icon loading for better scrolling performance
+                
                 binding.icon.scaleType = ImageView.ScaleType.CENTER_CROP
                 
-                // Add view tree observer to optimize icon loading
+                
                 itemView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
                     override fun onPreDraw(): Boolean {
                         if (isAttached) {
@@ -69,20 +64,20 @@ class AppsAdapter : RVHolderFactory() {
 
         override fun setContent(item: AppInfo, isSelected: Boolean, payload: Any?) {
             try {
-                // Safely set the icon with optimized loading
+                
                 setIconSafely(item.icon, item.packageName)
                 
-                // Safely set the name
+                
                 binding.name.text = item.name ?: "Unknown App"
                 
-                // Handle XP module label
+                
                 if (item.isXpModule) {
                     binding.cornerLabel.visibility = View.VISIBLE
                 } else {
                     binding.cornerLabel.visibility = View.INVISIBLE
                 }
                 
-                // Mark as attached for optimization
+                
                 isAttached = true
                 
             } catch (e: Exception) {
@@ -94,12 +89,12 @@ class AppsAdapter : RVHolderFactory() {
         private fun setIconSafely(icon: Drawable?, packageName: String) {
             try {
                 if (icon != null) {
-                    // Optimize icon for memory efficiency
+                    
                     val optimizedIcon = optimizeIcon(icon)
                     binding.icon.setImageDrawable(optimizedIcon)
                     currentIcon = optimizedIcon
                 } else {
-                    // Set a default placeholder icon
+                    
                     binding.icon.setImageDrawable(createDefaultIcon())
                     currentIcon = null
                 }
@@ -112,11 +107,11 @@ class AppsAdapter : RVHolderFactory() {
 
         private fun optimizeIcon(icon: Drawable): Drawable {
             return try {
-                // If it's a BitmapDrawable, ensure it's not too large
+                
                 if (icon is BitmapDrawable) {
                     val bitmap = icon.bitmap
                     if (bitmap.width > MAX_ICON_SIZE || bitmap.height > MAX_ICON_SIZE) {
-                        // Create a scaled down version
+                        
                         val scaledBitmap = Bitmap.createScaledBitmap(
                             bitmap, MAX_ICON_SIZE, MAX_ICON_SIZE, true
                         )
@@ -153,13 +148,13 @@ class AppsAdapter : RVHolderFactory() {
         }
     }
 
-    // Fallback ViewHolder for emergency cases
+    
     class FallbackAppsVH(itemView: View) : RVHolder<AppInfo>(itemView) {
         val binding = ItemAppBinding.bind(itemView)
 
         override fun setContent(item: AppInfo, isSelected: Boolean, payload: Any?) {
             try {
-                // Set minimal content to prevent crash
+                
                 binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
                 binding.name.text = item.name ?: "Unknown App"
                 binding.cornerLabel.visibility = View.INVISIBLE

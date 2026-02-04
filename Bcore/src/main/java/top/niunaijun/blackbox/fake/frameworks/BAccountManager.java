@@ -12,9 +12,7 @@ import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.core.system.ServiceManager;
 import top.niunaijun.blackbox.core.system.accounts.IBAccountManagerService;
 
-/**
- * Created by BlackBox on 2022/3/3.
- */
+
 public class BAccountManager extends BlackManager<IBAccountManagerService> {
     private static final BAccountManager sBAccountManager = new BAccountManager();
 
@@ -269,7 +267,7 @@ public class BAccountManager extends BlackManager<IBAccountManagerService> {
         }
     }
 
-    /* Returns Map<String, Integer> from package name to visibility with all values stored for given account */
+    
     public Map getPackagesAndVisibilityForAccount(Account account) {
         try {
             return getService().getPackagesAndVisibilityForAccount(account, BActivityThread.getUserId());
@@ -304,11 +302,11 @@ public class BAccountManager extends BlackManager<IBAccountManagerService> {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        // AccountManager.VISIBILITY_NOT_VISIBLE
+        
         return 3;
     }
 
-    /* Type may be null returns Map <Account, Integer>*/
+    
     public Map getAccountsAndVisibilityForPackage(String packageName, String accountType) {
         try {
             return getService().getAccountsAndVisibilityForPackage(packageName, accountType, BActivityThread.getUserId());

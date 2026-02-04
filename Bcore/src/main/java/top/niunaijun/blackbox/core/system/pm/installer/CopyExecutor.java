@@ -10,15 +10,7 @@ import top.niunaijun.blackbox.entity.pm.InstallOption;
 import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.NativeUtils;
 
-/**
- * updated by alex5402 on 4/24/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- * 拷贝文件相关
- */
+
 public class CopyExecutor implements Executor {
 
     @Override
@@ -32,7 +24,7 @@ public class CopyExecutor implements Executor {
             return -1;
         }
         if (option.isFlag(InstallOption.FLAG_STORAGE)) {
-            // 外部安装
+            
             File origFile = new File(ps.pkg.baseCodePath);
             File newFile = BEnvironment.getBaseApkDir(ps.pkg.packageName);
             try {
@@ -45,14 +37,14 @@ public class CopyExecutor implements Executor {
                     FileUtils.copyFile(origFile, newFile);
                 }
                 newFile.setReadOnly();
-                // update baseCodePath
+                
                 ps.pkg.baseCodePath = newFile.getAbsolutePath();
             } catch (IOException e) {
                 e.printStackTrace();
                 return -1;
             }
         } else if (option.isFlag(InstallOption.FLAG_SYSTEM)) {
-            // 系统安装
+            
         }
         return 0;
     }

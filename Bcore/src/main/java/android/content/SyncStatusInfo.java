@@ -26,8 +26,8 @@ public class SyncStatusInfo implements Parcelable {
     public boolean pending;
     public boolean initialize;
     
-  // Warning: It is up to the external caller to ensure there are
-  // no race conditions when accessing this list
+  
+  
   private ArrayList<Long> periodicSyncTimes;
 
     private static final String TAG = "Sync";
@@ -129,8 +129,8 @@ public class SyncStatusInfo implements Parcelable {
     }
 
     public void setPeriodicSyncTime(int index, long when) {
-        // The list is initialized lazily when scheduling occurs so we need to make sure
-        // we initialize elements < index to zero (zero is ignore for scheduling purposes)
+        
+        
         ensurePeriodicSyncTimeSize(index);
         periodicSyncTimes.set(index, when);
     }

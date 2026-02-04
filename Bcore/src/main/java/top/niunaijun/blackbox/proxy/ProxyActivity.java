@@ -15,18 +15,11 @@ import top.niunaijun.blackbox.proxy.record.ProxyActivityRecord;
 import top.niunaijun.blackbox.proxy.record.ProxyPendingRecord;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * updated by alex5402 on 3/28/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ProxyActivity extends Activity {
     public static final String TAG = "ProxyActivity";
 
-    //因为HCallbackProxy已经hook了消息循环拦截了创建消息，所有一般情况下这里不会调用，可能是为了稳定性(消息循环hook失败就会走到这里)
+    
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +27,7 @@ public class ProxyActivity extends Activity {
         finish();
 
         HookManager.get().checkEnv(HCallbackProxy.class);
-//        HookManager.get().checkEnv(AppInstrumentation.class);
+
 
         ProxyActivityRecord record = ProxyActivityRecord.create(getIntent());
         if (record.mTarget != null) {

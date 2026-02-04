@@ -16,14 +16,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * updated by alex5402 on 4/2/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IAppOpsManagerProxy extends BinderInvocationStub {
     public IAppOpsManagerProxy() {
         super(BRServiceManager.get().getService(Context.APP_OPS_SERVICE));
@@ -52,8 +45,8 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
         
-        // For all check, note, and start operations, return MODE_ALLOWED directly
-        // without calling the system to avoid UID mismatch errors
+        
+        
         if (methodName.startsWith("check") || 
             methodName.startsWith("note") || 
             methodName.startsWith("start")) {
@@ -61,24 +54,24 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
             return AppOpsManager.MODE_ALLOWED;
         }
         
-        // For finish operations, just return null without calling system
+        
         if (methodName.startsWith("finish")) {
             Slog.d(TAG, "AppOps invoke: Bypassing system for " + methodName);
             return null;
         }
         
-        // For other operations, try to call system with error handling
+        
         try {
             MethodParameterUtils.replaceFirstAppPkg(args);
             MethodParameterUtils.replaceLastUid(args);
             return super.invoke(proxy, method, args);
         } catch (SecurityException e) {
-            // Handle SecurityException for UID/package mismatches
+            
             Slog.w(TAG, "AppOps invoke: SecurityException caught for " + methodName + ", allowing operation", e);
             return AppOpsManager.MODE_ALLOWED;
         } catch (Exception e) {
             Slog.e(TAG, "AppOps invoke: Error in method " + methodName, e);
-            // Return MODE_ALLOWED as fallback to prevent crashes
+            
             return AppOpsManager.MODE_ALLOWED;
         }
     }
@@ -100,7 +93,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckPackage extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // todo
+            
             return AppOpsManager.MODE_ALLOWED;
         }
     }
@@ -109,19 +102,19 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // Always return MODE_ALLOWED to bypass UID mismatch errors
-            // The system's checkOperation causes SecurityException when package/uid don't match
+            
+            
             Slog.d(TAG, "AppOps CheckOperation: Bypassing system check, allowing operation");
             return AppOpsManager.MODE_ALLOWED;
         }
     }
 
-    // Hook for checkOperationForDevice - this is called on Android 12+ and shown in stack trace
+    
     @ProxyMethod("checkOperationForDevice")
     public static class CheckOperationForDevice extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            
             Slog.d(TAG, "AppOps CheckOperationForDevice: Bypassing system check, allowing operation");
             return AppOpsManager.MODE_ALLOWED;
         }
@@ -131,7 +124,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class NoteOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            
             Slog.d(TAG, "AppOps NoteOperation: Bypassing system check, allowing operation");
             return AppOpsManager.MODE_ALLOWED;
         }
@@ -141,18 +134,18 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckOpNoThrow extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            
             Slog.d(TAG, "AppOps CheckOpNoThrow: Bypassing system check, allowing operation");
             return AppOpsManager.MODE_ALLOWED;
         }
     }
 
-    // Android 12+: startOp/startOpNoThrow gate long-running operations like recording
+    
     @ProxyMethod("startOp")
     public static class StartOp extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            
             Slog.d(TAG, "AppOps StartOp: Bypassing system check, allowing operation");
             return AppOpsManager.MODE_ALLOWED;
         }
@@ -162,13 +155,13 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class StartOpNoThrow extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            // Always return MODE_ALLOWED to bypass UID mismatch errors
+            
             Slog.d(TAG, "AppOps StartOpNoThrow: Bypassing system check, allowing operation");
             return AppOpsManager.MODE_ALLOWED;
         }
     }
 
-    // No-op finish so recording sessions don't error out
+    
     @ProxyMethod("finishOp")
     public static class FinishOp extends MethodHook {
         @Override
@@ -185,7 +178,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
         }
     }
 
-    // Specific handler for RECORD_AUDIO operations
+    
     @ProxyMethod("noteOp")
     public static class NoteOp extends MethodHook {
         @Override
@@ -203,7 +196,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
         }
     }
 
-    // Specific handler for RECORD_AUDIO operations with package name
+    
     @ProxyMethod("noteOpNoThrow")
     public static class NoteOpNoThrow extends MethodHook {
         @Override
@@ -223,7 +216,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
 
     private static boolean isMediaStorageOrAudioOp(String opPublicNameOrStr) {
         if (opPublicNameOrStr == null) return false;
-        // Accept both public names and OPSTR strings
+        
         String n = opPublicNameOrStr.toUpperCase();
         return n.contains("READ_MEDIA")
                 || n.contains("READ_EXTERNAL_STORAGE")
@@ -248,7 +241,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
 
     private static String getOpPublicName(int op) {
         try {
-            // AppOpsManager.opToPublicName was added in API 29
+            
             java.lang.reflect.Method m = AppOpsManager.class.getMethod("opToPublicName", int.class);
             Object name = m.invoke(null, op);
             return name != null ? name.toString() : null;

@@ -91,16 +91,9 @@ import top.niunaijun.blackbox.utils.compat.BuildCompat;
 import top.niunaijun.blackbox.fake.service.ISettingsProviderProxy;
 import top.niunaijun.blackbox.fake.service.FeatureFlagUtilsProxy;
 import top.niunaijun.blackbox.fake.service.WorkManagerProxy;
-// Removed IInputMethodManagerProxy - causes ClassCastException on Android 15
 
-/**
- * updated by alex5402 on 3/30/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
+
 public class HookManager {
     public static final String TAG = "HookManager";
 
@@ -169,7 +162,7 @@ public class HookManager {
         addInjector(new ISettingsSystemProxy());
         addInjector(new ISystemSensorManagerProxy());
         
-        // Xiaomi-specific proxies to prevent crashes on MIUI devices
+        
         addInjector(new IXiaomiAttributionSourceProxy());
         addInjector(new IXiaomiSettingsProxy());
         addInjector(new IXiaomiMiuiServicesProxy());
@@ -177,60 +170,56 @@ public class HookManager {
             addInjector(new IMediaRouterServiceProxy());
             addInjector(new IPowerManagerProxy());
             addInjector(new IContextHubServiceProxy());
-            // Removed IInputMethodManagerProxy - causes ClassCastException on Android 15 due to queryLocalInterface returning non-IInterface proxy
+            
             addInjector(new IVibratorServiceProxy());
             addInjector(new IPersistentDataBlockServiceProxy());
             addInjector(AppInstrumentation.get());
-            /*
-            * It takes time to test and enhance the compatibility of WifiManager
-            * (only tested in Android 10).
-            * commented by BlackBoxing at 2022/03/08
-            * */
+            
             addInjector(new IWifiManagerProxy());
             addInjector(new IWifiScannerProxy());
             addInjector(new ApkAssetsProxy());
             addInjector(new ResourcesManagerProxy());
-            // 12.0
+            
             if (BuildCompat.isS()) {
                 addInjector(new IActivityClientProxy(null));
                 addInjector(new IVpnManagerProxy());
             }
-            // 14.0 (Safe to try on S+, will skip if service missing)
+            
             if (BuildCompat.isS()) {
                 addInjector(new ISensitiveContentProtectionManagerProxy());
             }
-            // 11.0
+            
             if (BuildCompat.isR()) {
                 addInjector(new IPermissionManagerProxy());
             }
-            // 10.0
+            
             if (BuildCompat.isQ()) {
                 addInjector(new IActivityTaskManagerProxy());
             }
-            // 9.0
+            
             if (BuildCompat.isPie()) {
                 addInjector(new ISystemUpdateProxy());
             }
-            // 8.0
+            
             if (BuildCompat.isOreo()) {
                 addInjector(new IAutofillManagerProxy());
                 addInjector(new IDeviceIdentifiersPolicyProxy());
                 addInjector(new IStorageStatsManagerProxy());
             }
-            // 7.1
+            
             if (BuildCompat.isN_MR1()) {
                 addInjector(new IShortcutManagerProxy());
             }
-            // 7.0
+            
             if (BuildCompat.isN()) {
                 addInjector(new INetworkManagementServiceProxy());
             }
-            // 6.0
+            
             if (BuildCompat.isM()) {
                 addInjector(new IFingerprintManagerProxy());
                 addInjector(new IGraphicsStatsProxy());
             }
-            // 5.0
+            
             if (BuildCompat.isL()) {
                 addInjector(new IJobServiceProxy());
             }
@@ -267,22 +256,20 @@ public class HookManager {
                 value.injectHook();
             } catch (Exception e) {
                 Slog.d(TAG, "hook error: " + value);
-                // Enhanced error handling for critical hooks
+                
                 handleHookError(value, e);
             }
         }
     }
 
-    /**
-     * Enhanced error handling for hook failures
-     */
+    
     private void handleHookError(IInjectHook hook, Exception e) {
         String hookName = hook.getClass().getSimpleName();
         
-        // Log the error with more details
+        
         Slog.e(TAG, "Hook failed: " + hookName + " - " + e.getMessage(), e);
         
-        // Special handling for critical hooks that could cause crashes
+        
         if (hookName.contains("ActivityManager") || 
             hookName.contains("PackageManager") ||
             hookName.contains("WebView") ||
@@ -291,7 +278,7 @@ public class HookManager {
             Slog.w(TAG, "Critical hook failed: " + hookName + ", attempting recovery");
             
             try {
-                // Try to recover by re-initializing the hook
+                
                 if (hook.isBadEnv()) {
                     Slog.d(TAG, "Attempting to recover hook: " + hookName);
                     hook.injectHook();
@@ -302,9 +289,7 @@ public class HookManager {
         }
     }
 
-    /**
-     * Check if all critical hooks are properly installed
-     */
+    
     public boolean areCriticalHooksInstalled() {
         String[] criticalHooks = {
             "IActivityManagerProxy",
@@ -331,16 +316,14 @@ public class HookManager {
         return true;
     }
 
-    /**
-     * Force re-initialization of all hooks
-     */
+    
     public void reinitializeHooks() {
         Slog.d(TAG, "Reinitializing all hooks");
         
-        // Clear existing injectors
+        
         mInjectors.clear();
         
-        // Re-initialize
+        
         init();
         
         Slog.d(TAG, "Hook reinitialization completed");

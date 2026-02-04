@@ -2,9 +2,7 @@ package top.niunaijun.blackbox.core.system.am;
 
 import java.util.Objects;
 
-/**
- * Created by BlackBox on 2022/3/8.
- */
+
 public class PendingIntentRecord {
     public int uid;
     public String packageName;

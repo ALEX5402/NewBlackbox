@@ -16,14 +16,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * updated by alex5402 on 2022/2/14.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IAccountManagerProxy extends BinderInvocationStub {
     public static final String TAG = "IAccountManagerProxy";
 

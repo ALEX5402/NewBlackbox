@@ -8,10 +8,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * FeatureFlagUtils proxy to handle UID mismatch issues
- * when virtual apps try to access feature flags
- */
+
 public class FeatureFlagUtilsProxy extends ClassInvocationStub {
     public static final String TAG = "FeatureFlagUtilsProxy";
 
@@ -38,13 +35,13 @@ public class FeatureFlagUtilsProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Try to call the original method first
+                
                 return method.invoke(who, args);
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("Calling uid") && errorMsg.contains("doesn't match source uid")) {
                     Slog.w(TAG, "UID mismatch in FeatureFlagUtils.isEnabled, returning safe default: " + errorMsg);
-                    return true; // Return safe default for feature flags
+                    return true; 
                 }
                 throw e;
             }
@@ -56,13 +53,13 @@ public class FeatureFlagUtilsProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Try to call the original method first
+                
                 return method.invoke(who, args);
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("Calling uid") && errorMsg.contains("doesn't match source uid")) {
                     Slog.w(TAG, "UID mismatch in FeatureFlagUtils.getString, returning safe default: " + errorMsg);
-                    return "true"; // Return safe default for feature flags
+                    return "true"; 
                 }
                 throw e;
             }
@@ -74,13 +71,13 @@ public class FeatureFlagUtilsProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Try to call the original method first
+                
                 return method.invoke(who, args);
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("Calling uid") && errorMsg.contains("doesn't match source uid")) {
                     Slog.w(TAG, "UID mismatch in FeatureFlagUtils.getInt, returning safe default: " + errorMsg);
-                    return 1; // Return safe default for feature flags
+                    return 1; 
                 }
                 throw e;
             }
@@ -92,13 +89,13 @@ public class FeatureFlagUtilsProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Try to call the original method first
+                
                 return method.invoke(who, args);
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("Calling uid") && errorMsg.contains("doesn't match source uid")) {
                     Slog.w(TAG, "UID mismatch in FeatureFlagUtils.getLong, returning safe default: " + errorMsg);
-                    return 1L; // Return safe default for feature flags
+                    return 1L; 
                 }
                 throw e;
             }
@@ -110,13 +107,13 @@ public class FeatureFlagUtilsProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Try to call the original method first
+                
                 return method.invoke(who, args);
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("Calling uid") && errorMsg.contains("doesn't match source uid")) {
                     Slog.w(TAG, "UID mismatch in FeatureFlagUtils.getFloat, returning safe default: " + errorMsg);
-                    return 1.0f; // Return safe default for feature flags
+                    return 1.0f; 
                 }
                 throw e;
             }
@@ -128,13 +125,13 @@ public class FeatureFlagUtilsProxy extends ClassInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Try to call the original method first
+                
                 return method.invoke(who, args);
             } catch (Exception e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg != null && errorMsg.contains("Calling uid") && errorMsg.contains("doesn't match source uid")) {
                     Slog.w(TAG, "UID mismatch in FeatureFlagUtils.getBoolean, returning safe default: " + errorMsg);
-                    return true; // Return safe default for feature flags
+                    return true; 
                 }
                 throw e;
             }

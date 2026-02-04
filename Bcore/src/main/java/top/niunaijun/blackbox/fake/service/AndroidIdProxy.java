@@ -7,9 +7,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Android ID proxy to handle Android ID retrieval issues that cause problems with Google Play Store.
- */
+
 public class AndroidIdProxy extends ClassInvocationStub {
     public static final String TAG = "AndroidIdProxy";
 
@@ -58,7 +56,7 @@ public class AndroidIdProxy extends ClassInvocationStub {
                 Slog.d(TAG, "AndroidId: Handling getString call");
                 Object result = method.invoke(who, args);
                 
-                // Check if this is an Android ID related string
+                
                 if (args != null && args.length > 0 && args[0] instanceof String) {
                     String key = (String) args[0];
                     if (key.contains("android_id") || key.contains("ANDROID_ID") || 
@@ -85,7 +83,7 @@ public class AndroidIdProxy extends ClassInvocationStub {
                 Slog.d(TAG, "AndroidId: Handling getLong call");
                 Object result = method.invoke(who, args);
                 
-                // Check if this is an Android ID related long value
+                
                 if (args != null && args.length > 0 && args[0] instanceof String) {
                     String key = (String) args[0];
                     if (key.contains("android_id") || key.contains("ANDROID_ID") || 
@@ -112,7 +110,7 @@ public class AndroidIdProxy extends ClassInvocationStub {
                 Slog.d(TAG, "AndroidId: Handling get call");
                 Object result = method.invoke(who, args);
                 
-                // Check if this is an Android ID related get
+                
                 if (args != null && args.length > 0 && args[0] instanceof String) {
                     String key = (String) args[0];
                     if (key.contains("android_id") || key.contains("ANDROID_ID") || 
@@ -139,7 +137,7 @@ public class AndroidIdProxy extends ClassInvocationStub {
                 Slog.d(TAG, "AndroidId: Handling read call");
                 Object result = method.invoke(who, args);
                 
-                // Check if this is an Android ID related read
+                
                 if (args != null && args.length > 0 && args[0] instanceof String) {
                     String key = (String) args[0];
                     if (key.contains("android_id") || key.contains("ANDROID_ID") || 
@@ -158,9 +156,9 @@ public class AndroidIdProxy extends ClassInvocationStub {
         }
     }
 
-    // Helper methods to generate mock Android IDs
+    
     private static String generateMockAndroidId() {
-        // Generate a 16-character hex string that looks like a real Android ID
+        
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 16; i++) {
             sb.append(Integer.toHexString((int) (Math.random() * 16)));
@@ -171,7 +169,7 @@ public class AndroidIdProxy extends ClassInvocationStub {
     }
 
     private static Long generateMockAndroidIdLong() {
-        // Generate a long value that represents a valid Android ID
+        
         long mockId = (long) (Math.random() * Long.MAX_VALUE);
         Slog.d(TAG, "AndroidId: Generated mock Android ID long: " + mockId);
         return mockId;

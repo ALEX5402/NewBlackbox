@@ -31,12 +31,12 @@ public class BlackReflection {
     private static final Map<Class<?>, Object> sProxyCache = new HashMap<>();
     private static final Map<Class<?>, Object> sProxyWithExceptionCache = new HashMap<>();
 
-    // key caller
+    
     private static final WeakHashMap<Object, Map<Class<?>, Object>> sCallerProxyCache = new WeakHashMap<>();
 
-//    public static <T> T create(Class<T> clazz, final Object caller) {
-//        return create(clazz, caller, false);
-//    }
+
+
+
 
     public static <T> T create(Class<T> clazz, final Object caller, boolean withException) {
         try {
@@ -57,7 +57,7 @@ public class BlackReflection {
 
                         Object callerByWeak = isStatic ? null : weakCaller.get();
 
-                        // fidel
+                        
                         BField bField = method.getAnnotation(BField.class);
                         BFieldNotProcess bFieldNotProcess = method.getAnnotation(BFieldNotProcess.class);
                         if (bField != null || bFieldNotProcess != null) {
@@ -74,10 +74,10 @@ public class BlackReflection {
                             return call;
                         }
 
-                        // void
+                        
                         BFieldSetNotProcess bFieldSetNotProcess = method.getAnnotation(BFieldSetNotProcess.class);
                         if (bFieldSetNotProcess != null) {
-                            // startsWith "_set_"
+                            
                             name = name.substring("_set_".length());
                             Reflector on = Reflector.on(aClass).field(name);
                             if (isStatic) {
@@ -91,10 +91,10 @@ public class BlackReflection {
                             return 0;
                         }
 
-                        // check field
+                        
                         BFieldCheckNotProcess bFieldCheckNotProcess = method.getAnnotation(BFieldCheckNotProcess.class);
                         if (bFieldCheckNotProcess != null) {
-                            // startsWith "_check_"
+                            
                             name = name.substring("_check_".length());
                             try {
                                 Reflector on = Reflector.on(aClass).field(name);
@@ -106,10 +106,10 @@ public class BlackReflection {
 
                         Class<?>[] paramClass = getParamClass(method);
 
-                        // check method
+                        
                         BMethodCheckNotProcess bMethodCheckNotProcess = method.getAnnotation(BMethodCheckNotProcess.class);
                         if (bMethodCheckNotProcess != null) {
-                            // startsWith "_check_"
+                            
                             name = name.substring("_check_".length());
                             try {
                                 return Reflector.on(aClass).method(name, paramClass).getMethod();
@@ -118,7 +118,7 @@ public class BlackReflection {
                             }
                         }
 
-                        // method
+                        
                         BConstructor bConstructor = method.getAnnotation(BConstructor.class);
                         BConstructorNotProcess bConstructorNotProcess = method.getAnnotation(BConstructorNotProcess.class);
                         if (bConstructor != null || bConstructorNotProcess != null) {

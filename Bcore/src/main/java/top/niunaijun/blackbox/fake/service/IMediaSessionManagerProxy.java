@@ -11,14 +11,7 @@ import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 
-/**
- * updated by alex5402 on 4/8/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class IMediaSessionManagerProxy extends BinderInvocationStub {
 
     public IMediaSessionManagerProxy() {

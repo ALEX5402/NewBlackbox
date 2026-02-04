@@ -3,14 +3,7 @@ package top.niunaijun.blackbox.core.system.pm;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * updated by alex5402 on 4/27/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BPackageUserState implements Parcelable {
     public boolean installed;
     public boolean stopped;

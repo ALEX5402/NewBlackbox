@@ -6,10 +6,7 @@ import androidx.core.content.edit
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧ (`･ω･∥ 丶 つ０ しーＪ
- */
+
 open class AppSharedPreferenceDelegate<Data>(
         context: Context,
         private val default: Data,

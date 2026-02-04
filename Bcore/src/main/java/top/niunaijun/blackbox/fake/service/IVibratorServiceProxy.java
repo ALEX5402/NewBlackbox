@@ -12,9 +12,7 @@ import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
-/**
- * Created by BlackBox on 2022/3/7.
- */
+
 public class IVibratorServiceProxy extends BinderInvocationStub {
     private static String NAME;
     static {

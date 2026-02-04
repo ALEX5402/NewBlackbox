@@ -1,6 +1,6 @@
-//
-// updated by alex5402 on 2020/8/18.
-//
+
+
+
 
 #include <jni.h>
 #include <stdio.h>

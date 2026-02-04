@@ -5,12 +5,7 @@ import android.view.MotionEvent
 import com.imuxuan.floatingview.FloatingMagnetView
 import top.niunaijun.blackboxa.R
 
-/**
- *
- * @Description: rocker parent
- * @Author: kotlinMiku
- * @CreateDate: 2022/3/20 16:58
- */
+
 class EnFloatView(mContext: Context) : FloatingMagnetView(mContext) {
 
     private val TAG = "RockerManager"
@@ -31,7 +26,7 @@ class EnFloatView(mContext: Context) : FloatingMagnetView(mContext) {
             if (type == RockerView.EVENT_CLOCK && currentAngle != -1F) {
                 val realAngle = currentAngle
                 val realDistance = currentDistance * 0.001F
-                //拉满的话，大概就是一秒五米
+                
 
                 mListener?.invoke(realAngle, realDistance)
 

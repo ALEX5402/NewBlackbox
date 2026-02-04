@@ -10,9 +10,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * SQLiteDatabase proxy to handle database-related issues in sandboxed apps.
- */
+
 public class SQLiteDatabaseProxy extends ClassInvocationStub {
     public static final String TAG = "SQLiteDatabaseProxy";
 
@@ -22,12 +20,12 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
 
     @Override
     protected Object getWho() {
-        return null; // Not needed for class method hooks
+        return null; 
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // Hook SQLiteDatabase class methods directly
+        
     }
 
     @Override
@@ -35,7 +33,7 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
         return false;
     }
 
-    // Hook rawQuery to handle missing tables gracefully
+    
     @ProxyMethod("rawQuery")
     public static class RawQuery extends MethodHook {
         @Override
@@ -44,7 +42,7 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
                 String sql = (String) args[0];
                 if (sql != null && sql.contains("DurableJob")) {
                     Slog.w(TAG, "SQLiteDatabase: rawQuery called with DurableJob table, returning empty cursor");
-                    // Return an empty cursor instead of crashing
+                    
                     return null;
                 }
                 return method.invoke(who, args);
@@ -58,7 +56,7 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook query to handle missing tables gracefully
+    
     @ProxyMethod("query")
     public static class Query extends MethodHook {
         @Override
@@ -67,7 +65,7 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
                 String table = (String) args[0];
                 if (table != null && table.equals("DurableJob")) {
                     Slog.w(TAG, "SQLiteDatabase: query called on DurableJob table, returning empty cursor");
-                    // Return an empty cursor instead of crashing
+                    
                     return null;
                 }
                 return method.invoke(who, args);
@@ -81,7 +79,7 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook execSQL to handle missing tables gracefully
+    
     @ProxyMethod("execSQL")
     public static class ExecSQL extends MethodHook {
         @Override
@@ -90,7 +88,7 @@ public class SQLiteDatabaseProxy extends ClassInvocationStub {
                 String sql = (String) args[0];
                 if (sql != null && sql.contains("DurableJob")) {
                     Slog.w(TAG, "SQLiteDatabase: execSQL called with DurableJob table, ignoring");
-                    // Ignore DurableJob table operations
+                    
                     return null;
                 }
                 return method.invoke(who, args);

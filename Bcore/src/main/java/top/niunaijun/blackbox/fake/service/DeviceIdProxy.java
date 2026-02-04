@@ -7,9 +7,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Device ID proxy to handle GMS device ID retrieval issues.
- */
+
 public class DeviceIdProxy extends ClassInvocationStub {
     public static final String TAG = "DeviceIdProxy";
 
@@ -19,12 +17,12 @@ public class DeviceIdProxy extends ClassInvocationStub {
 
     @Override
     protected Object getWho() {
-        return null; // Not needed for class method hooks
+        return null; 
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // Hook device ID related class methods directly
+        
     }
 
     @Override
@@ -32,7 +30,7 @@ public class DeviceIdProxy extends ClassInvocationStub {
         return false;
     }
 
-    // Hook device ID getter methods to prevent NullPointerException
+    
     @ProxyMethod("getDeviceId")
     public static class GetDeviceId extends MethodHook {
         @Override
@@ -50,7 +48,7 @@ public class DeviceIdProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook device ID setter methods
+    
     @ProxyMethod("setDeviceId")
     public static class SetDeviceId extends MethodHook {
         @Override
@@ -68,7 +66,7 @@ public class DeviceIdProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook device ID validation methods
+    
     @ProxyMethod("isValidDeviceId")
     public static class IsValidDeviceId extends MethodHook {
         @Override
@@ -86,7 +84,7 @@ public class DeviceIdProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook device ID generation methods
+    
     @ProxyMethod("generateDeviceId")
     public static class GenerateDeviceId extends MethodHook {
         @Override
@@ -100,7 +98,7 @@ public class DeviceIdProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook device ID storage methods
+    
     @ProxyMethod("storeDeviceId")
     public static class StoreDeviceId extends MethodHook {
         @Override
@@ -118,7 +116,7 @@ public class DeviceIdProxy extends ClassInvocationStub {
         }
     }
 
-    // Hook device ID retrieval methods
+    
     @ProxyMethod("retrieveDeviceId")
     public static class RetrieveDeviceId extends MethodHook {
         @Override

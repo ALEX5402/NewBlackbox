@@ -7,9 +7,7 @@ import android.os.Parcelable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-/**
- * Created by BlackBox on 2022/3/3.
- */
+
 public class BAccount implements Parcelable {
     public Account account;
     public String password;

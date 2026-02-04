@@ -20,14 +20,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Md5Utils;
 
-/**
- * updated by alex5402 on 4/2/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static final String TAG = "ITelephonyManagerProxy";
 
@@ -55,8 +48,8 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class GetDeviceId extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-//                MethodParameterUtils.replaceFirstAppPkg(args);
-//                return method.invoke(who, args);
+
+
             return Md5Utils.md5(BlackBoxCore.getHostPkg());
         }
     }
@@ -65,8 +58,8 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class getImeiForSlot extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-//                MethodParameterUtils.replaceFirstAppPkg(args);
-//                return method.invoke(who, args);
+
+
             return Md5Utils.md5(BlackBoxCore.getHostPkg());
         }
     }
@@ -75,8 +68,8 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class GetMeidForSlot extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-//                MethodParameterUtils.replaceFirstAppPkg(args);
-//                return method.invoke(who, args);
+
+
             return Md5Utils.md5(BlackBoxCore.getHostPkg());
         }
     }
@@ -122,7 +115,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
             if (BLocationManager.isFakeLocationEnable()) {
                 BCell cell = BLocationManager.get().getCell(BActivityThread.getUserId(), BActivityThread.getAppPackageName());
                 if (cell != null) {
-                    // TODO Transfer BCell to CdmaCellLocation/GsmCellLocation
+                    
                     return null;
                 }
             }
@@ -136,7 +129,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             if (BLocationManager.isFakeLocationEnable()) {
                 List<BCell> cell = BLocationManager.get().getAllCell(BActivityThread.getUserId(), BActivityThread.getAppPackageName());
-                // TODO Transfer BCell to CdmaCellLocation/GsmCellLocation
+                
                 return cell;
             }
             try {
@@ -175,7 +168,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
             Log.d(TAG, "getNeighboringCellInfo");
             if (BLocationManager.isFakeLocationEnable()) {
                 List<BCell> cell = BLocationManager.get().getNeighboringCell(BActivityThread.getUserId(), BActivityThread.getAppPackageName());
-                // TODO Transfer BCell to CdmaCellLocation/GsmCellLocation
+                
                 return null;
             }
             return method.invoke(who, args);

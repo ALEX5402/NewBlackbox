@@ -17,14 +17,7 @@ import top.niunaijun.blackbox.fake.provider.FileProvider;
 import top.niunaijun.blackbox.proxy.ProxyManifest;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
-/**
- * updated by alex5402 on 4/10/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BStorageManagerService extends IBStorageManagerService.Stub implements ISystemService {
     private static final BStorageManagerService sService = new BStorageManagerService();
 

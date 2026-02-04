@@ -12,12 +12,7 @@ import top.niunaijun.blackboxa.app.App
 import top.niunaijun.blackboxa.app.rocker.RockerManager
 import top.niunaijun.blackboxa.biz.cache.AppSharedPreferenceDelegate
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/5/6 23:38
- */
+
 class BlackBoxLoader {
 
     private var mHideRoot by AppSharedPreferenceDelegate(App.getContext(), false)
@@ -25,8 +20,10 @@ class BlackBoxLoader {
     private var mDaemonEnable by AppSharedPreferenceDelegate(App.getContext(), false)
     private var mShowShortcutPermissionDialog by AppSharedPreferenceDelegate(App.getContext(), true)
 
-    // VPN network mode: true = use VPN, false = normal network
+    
     private var mUseVpnNetwork by AppSharedPreferenceDelegate(App.getContext(), false)
+
+    private var mDisableFlagSecure by AppSharedPreferenceDelegate(App.getContext(), false)
 
     fun hideRoot(): Boolean {
         return try {
@@ -42,6 +39,23 @@ class BlackBoxLoader {
             this.mHideRoot = hideRoot
         } catch (e: Exception) {
             Log.e(TAG, "Error setting hideRoot: ${e.message}")
+        }
+    }
+
+    fun disableFlagSecure(): Boolean {
+        return try {
+            mDisableFlagSecure
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting disableFlagSecure: ${e.message}")
+            false
+        }
+    }
+
+    fun invalidDisableFlagSecure(disable: Boolean) {
+        try {
+            this.mDisableFlagSecure = disable
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting disableFlagSecure: ${e.message}")
         }
     }
 
@@ -174,9 +188,9 @@ class BlackBoxLoader {
                                                 TAG,
                                                 "Storage permission needed for launching: $packageName"
                                         )
-                                        // Broadcast to request storage permission
-                                        // The main activity should listen for this and show
-                                        // permission dialog
+                                        
+                                        
+                                        
                                         val intent =
                                                 android.content.Intent(
                                                         "top.niunaijun.blackboxa.REQUEST_STORAGE_PERMISSION"
@@ -185,11 +199,11 @@ class BlackBoxLoader {
                                         intent.putExtra("user_id", userId)
                                         intent.setPackage(App.getContext().packageName)
                                         App.getContext().sendBroadcast(intent)
-                                        // Return false to NOT block the launch - the app will
-                                        // launch anyway
-                                        // but the user will be notified to grant permission
-                                        // Change to 'true' if you want to block launch until
-                                        // permission is granted
+                                        
+                                        
+                                        
+                                        
+                                        
                                         return false
                                     } catch (e: Exception) {
                                         Log.e(
@@ -248,6 +262,15 @@ class BlackBoxLoader {
                                     }
                                 }
 
+                                override fun isDisableFlagSecure(): Boolean {
+                                    return try {
+                                        mDisableFlagSecure
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "Error checking disableFlagSecure: ${e.message}")
+                                        false
+                                    }
+                                }
+
                                 override fun requestInstallPackage(
                                         file: File?,
                                         userId: Int
@@ -279,12 +302,12 @@ class BlackBoxLoader {
         try {
             BlackBoxCore.get().doCreate()
 
-            // Register callback to refresh app list when services become available
+            
             try {
                 BlackBoxCore.get().addServiceAvailableCallback {
                     Log.d(TAG, "Services became available, triggering app list refresh")
-                    // This will be called when services are ready
-                    // The UI components can listen for this and refresh their data
+                    
+                    
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error registering service available callback: ${e.message}")

@@ -16,58 +16,16 @@ import top.niunaijun.blackbox.fake.frameworks.BLocationManager
 import top.niunaijun.blackboxa.app.App
 import top.niunaijun.blackboxa.widget.EnFloatView
 
-/**
- * RockerManager - Advanced GPS Location Spoofing with Floating Joystick Control
- *
- * @Description: Provides a floating joystick/rocker control for real-time GPS location manipulation
- * ```
- *              in virtual apps. Allows users to move their fake GPS location by dragging a joystick.
- *
- * @Features
- * ```
- * :
- * - Floating joystick that appears on screen
- * - Real-time GPS coordinate updates
- * - Precise distance and angle control
- * - App-specific location spoofing
- * - Automatic activity lifecycle management
- *
- * @Usage:
- * 1. RockerManager automatically initializes when virtual apps start
- * 2. A floating joystick appears on the left side of the screen
- * 3. Drag the joystick to change GPS location:
- * ```
- *    - Distance: How far to move (in meters)
- *    - Angle: Direction to move (0-360 degrees)
- * ```
- * 4. Location updates happen in real-time as you move the joystick
- *
- * @Permissions Required:
- * - SYSTEM_ALERT_WINDOW: To show floating view over other apps
- * - ACCESS_FINE_LOCATION: To access GPS location services
- * - ACCESS_COARSE_LOCATION: For approximate location access
- *
- * @Requirements:
- * - Fake location must be enabled in BlackBox
- * - User must grant overlay and location permissions
- * - Virtual app must be running
- *
- * @Author: kotlinMiku
- * @CreateDate: 2022/3/19 19:37
- * @LastModified: 2024 - Enhanced with better error handling and permissions
- */
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧ (`･ω･∥ 丶 つ０ しーＪ
- */
+
+
 object RockerManager {
 
     private const val TAG = "RockerManager"
     private var isInitialized = false
 
-    // Earth radius constants for coordinate calculations
-    private const val Ea = 6378137.0 // Equator radius (meters)
-    private const val Eb = 6356725.0 // Polar radius (meters)
+    
+    private const val Ea = 6378137.0 
+    private const val Eb = 6356725.0 
 
     fun init(application: Application?, userId: Int) {
         try {
@@ -81,7 +39,7 @@ object RockerManager {
                 return
             }
 
-            // Check if required permissions are granted
+            
             if (!checkPermissions(application)) {
                 Log.w(TAG, "Required permissions not granted, RockerManager cannot initialize")
                 Log.w(TAG, "Please grant: ${getRequiredPermissions().joinToString(", ")}")
@@ -106,7 +64,7 @@ object RockerManager {
                 return
             }
 
-            // Register activity lifecycle callbacks for floating view management
+            
             application.registerActivityLifecycleCallbacks(
                     object : BaseActivityLifecycleCallback {
                         override fun onActivityStarted(activity: Activity) {
@@ -189,11 +147,11 @@ object RockerManager {
                     "Changing location - Distance: ${distance}m, Angle: ${angle}°, Current: ${location.latitude}, ${location.longitude}"
             )
 
-            // Calculate new coordinates based on joystick input
+            
             val dx = distance * sin(angle * Math.PI / 180.0)
             val dy = distance * cos(angle * Math.PI / 180.0)
 
-            // Use ellipsoid model for more accurate coordinate calculations
+            
             val ec = Eb + (Ea - Eb) * (90.0 - location.latitude) / 90.0
             val ed = ec * cos(location.latitude * Math.PI / 180)
 
@@ -202,7 +160,7 @@ object RockerManager {
 
             val newLocation = BLocation(newLat, newLng)
 
-            // Update the location
+            
             BLocationManager.get().setLocation(userId, packageName, newLocation)
 
             Log.d(TAG, "Location updated - New: ${newLat}, ${newLng}")
@@ -212,15 +170,15 @@ object RockerManager {
         }
     }
 
-    /** Check if RockerManager is currently initialized and active */
+    
     fun isActive(): Boolean {
         return isInitialized
     }
 
-    /** Check if required permissions are granted for RockerManager to work */
+    
     fun checkPermissions(context: Context): Boolean {
         return try {
-            // Check if overlay permission is granted (required for floating view)
+            
             val hasOverlayPermission = android.provider.Settings.canDrawOverlays(context)
             if (!hasOverlayPermission) {
                 Log.w(
@@ -230,7 +188,7 @@ object RockerManager {
                 return false
             }
 
-            // Check if location permissions are granted
+            
             val hasLocationPermission =
                     context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                             android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -247,7 +205,7 @@ object RockerManager {
         }
     }
 
-    /** Get a list of required permissions for RockerManager */
+    
     fun getRequiredPermissions(): List<String> {
         return listOf(
                 android.Manifest.permission.SYSTEM_ALERT_WINDOW,
@@ -256,7 +214,7 @@ object RockerManager {
         )
     }
 
-    /** Clean up resources (useful for testing or when disabling the feature) */
+    
     fun cleanup() {
         try {
             isInitialized = false

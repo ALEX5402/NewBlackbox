@@ -10,12 +10,7 @@ import top.niunaijun.blackboxa.bean.FakeLocationBean
 import top.niunaijun.blackboxa.databinding.ItemFakeBinding
 import top.niunaijun.blackboxa.util.getString
 
-/**
- *
- * @Description: 软件显示界面适配器
- * @Author: BlackBoxing
- * @CreateDate: 2022/3/14
- */
+
 
 class FakeLocationAdapter : RVHolderFactory() {
 

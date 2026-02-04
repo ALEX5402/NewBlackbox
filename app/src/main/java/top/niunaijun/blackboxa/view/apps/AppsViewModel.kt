@@ -6,12 +6,7 @@ import top.niunaijun.blackboxa.data.AppsRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
 import android.util.Log
 
-/**
- *
- * @Description:
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 22:36
- */
+
 class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
     val appsLiveData = MutableLiveData<List<AppInfo>>()
@@ -20,7 +15,7 @@ class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
     val launchLiveData = MutableLiveData<Boolean>()
 
-    //利用LiveData只更新最后一次的特性，用来保存app顺序
+    
     val updateSortLiveData = MutableLiveData<Boolean>()
 
     fun getInstalledApps(userId: Int) {
@@ -29,9 +24,7 @@ class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
         }
     }
     
-    /**
-     * Get installed apps with retry mechanism for when services are not ready
-     */
+    
     fun getInstalledAppsWithRetry(userId: Int, maxRetries: Int = 3) {
         var retryCount = 0
         
@@ -39,16 +32,16 @@ class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
             launchOnUI {
                 repo.getVmInstallList(userId, appsLiveData)
                 
-                // Check if we got any apps, if not and we haven't exceeded retries, try again
+                
                 val currentApps = appsLiveData.value
                 if ((currentApps == null || currentApps.isEmpty()) && retryCount < maxRetries) {
                     retryCount++
                     Log.d("AppsViewModel", "No apps loaded, retrying... (${retryCount}/${maxRetries})")
                     
-                    // Wait a bit before retrying
+                    
                     android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                         attemptLoad()
-                    }, 1000) // Wait 1 second before retry
+                    }, 1000) 
                 }
             }
         }

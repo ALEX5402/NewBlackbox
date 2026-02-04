@@ -6,9 +6,7 @@ import top.niunaijun.blackreflection.annotation.BClassName;
 import top.niunaijun.blackreflection.annotation.BField;
 import top.niunaijun.blackreflection.annotation.BStaticMethod;
 
-/**
- * Created by BlackBox on 2022/2/22.
- */
+
 @BClassName("android.app.ActivityClient")
 public interface ActivityClient {
     @BField

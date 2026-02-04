@@ -29,14 +29,7 @@ import top.niunaijun.blackbox.utils.FileUtils;
 
 import top.niunaijun.blackbox.core.system.JarManager;
 
-/**
- * updated by alex5402 on 4/22/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class BlackBoxSystem {
     private static BlackBoxSystem sBlackBoxSystem;
     private final List<ISystemService> mServices = new ArrayList<>();
@@ -84,14 +77,10 @@ public class BlackBoxSystem {
             } catch (PackageManager.NameNotFoundException ignored) {
             }
         }
-        // Initialize JAR environment using improved JarManager
+        
         JarManager.getInstance().initializeAsync();
         
-        // Test JAR manager functionality (can be removed in production)
-     /*   try {
-            JarManagerTest.testConfiguration();
-        } catch (Exception e) {
-            Log.w("BlackBoxSystem", "JAR manager test failed", e);
-        }*/
+        
+     
     }
 }

@@ -1,6 +1,6 @@
-//
-// updated by alex5402 on 5/5/21.
-//
+
+
+
 
 #include "RuntimeHook.h"
 #import "JniHook/JniHook.h"

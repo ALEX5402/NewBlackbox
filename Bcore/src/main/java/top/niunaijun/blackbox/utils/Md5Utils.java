@@ -1,8 +1,6 @@
 package top.niunaijun.blackbox.utils;
 
-/**
- * Created by admin on 2017/1/8.
- */
+
 
 import java.io.File;
 import java.io.FileInputStream;

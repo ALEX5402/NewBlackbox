@@ -7,12 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
-/**
- *
- * @Description: viewBinding 扩展类
- * @Author: wukaicheng
- * @CreateDate: 2021/4/29 21:23
- */
+
 
 inline fun <reified T : ViewBinding> Activity.inflate(): Lazy<T> = lazy {
     inflateBinding(layoutInflater)

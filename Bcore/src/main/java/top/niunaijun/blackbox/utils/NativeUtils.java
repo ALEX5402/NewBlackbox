@@ -15,14 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 
-/**
- * updated by alex5402 on 2/24/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class NativeUtils {
     public static final String TAG = "VirtualM";
 
@@ -71,10 +64,10 @@ public class NativeUtils {
 
             String libName = entryName.substring(entryName.lastIndexOf('/') + 1);
             Log.d(TAG, "verify so " + libName);
-//            File abiDir = new File(nativeLibDir, cpuArch);
-//            if (!abiDir.exists()) {
-//                abiDir.mkdirs();
-//            }
+
+
+
+
 
             File libFile = new File(nativeLibDir, libName);
             if (libFile.exists() && libFile.length() == entry.getSize()) {

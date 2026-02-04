@@ -1,6 +1,6 @@
-//
-// updated by alex5402 on 4/9/21.
-//
+
+
+
 
 #ifndef VIRTUALM_VMCORE_H
 #define VIRTUALM_VMCORE_H
@@ -20,4 +20,4 @@ public:
 };
 
 
-#endif //VIRTUALM_VMCORE_H
+#endif 

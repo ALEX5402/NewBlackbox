@@ -5,10 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import top.niunaijun.blackboxa.view.main.BlackBoxLoader
 
-/**
- * updated by alex5402 on 4/9/21.
- * * ∧＿∧ (`･ω･∥ 丶 つ０ しーＪ
- */
+
 object AppManager {
     private const val TAG = "AppManager"
 
@@ -19,7 +16,7 @@ object AppManager {
         } catch (e: Exception) {
             Log.e(TAG, "Error creating BlackBoxLoader: ${e.message}")
 
-            BlackBoxLoader() // Try again, but this might fail
+            BlackBoxLoader() 
         }
     }
 
@@ -29,7 +26,7 @@ object AppManager {
             mBlackBoxLoader.getBlackBoxCore()
         } catch (e: Exception) {
             Log.e(TAG, "Error getting BlackBoxCore: ${e.message}")
-            throw e // Re-throw as this is critical
+            throw e 
         }
     }
 
@@ -39,7 +36,7 @@ object AppManager {
             App.getContext().getSharedPreferences("UserRemark", Context.MODE_PRIVATE)
         } catch (e: Exception) {
             Log.e(TAG, "Error creating SharedPreferences: ${e.message}")
-            throw e // Re-throw as this is critical
+            throw e 
         }
     }
 
@@ -49,7 +46,7 @@ object AppManager {
             mBlackBoxLoader.addLifecycleCallback()
         } catch (e: Exception) {
             Log.e(TAG, "Error in doAttachBaseContext: ${e.message}")
-            // Don't re-throw as this might not be critical for app startup
+            
         }
     }
 
@@ -59,14 +56,14 @@ object AppManager {
             initThirdService(context)
         } catch (e: Exception) {
             Log.e(TAG, "Error in doOnCreate: ${e.message}")
-            // Don't re-throw as this might not be critical for app startup
+            
         }
     }
 
     private fun initThirdService(context: Context) {
         try {
-            // Initialize any third-party services here
-            // Currently empty, but with error handling for future additions
+            
+            
         } catch (e: Exception) {
             Log.e(TAG, "Error in initThirdService: ${e.message}")
         }

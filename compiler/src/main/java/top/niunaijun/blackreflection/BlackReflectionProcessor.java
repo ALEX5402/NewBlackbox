@@ -43,7 +43,7 @@ public class BlackReflectionProcessor extends AbstractProcessor {
     private Map<String, String> mRealMaps = new HashMap<>();
 
     private Messager mMessager;
-    private Elements mElementUtils; //元素相关的辅助类
+    private Elements mElementUtils; 
     private Filer mFiler;
 
     @Override
@@ -153,7 +153,7 @@ public class BlackReflectionProcessor extends AbstractProcessor {
 
         getReflectionProxy(packageName, className, info);
 
-        // 创建两个基本类
+        
         getReflectionInterfaceProxy(packageName, className + "Context",
                 className);
         getReflectionInterfaceProxy(packageName, className + "Static",
@@ -163,11 +163,11 @@ public class BlackReflectionProcessor extends AbstractProcessor {
 
     private static TypeMirror getClass(BClass annotation) {
         try {
-            annotation.value(); // this should throw
+            annotation.value(); 
         } catch (MirroredTypeException mte) {
             return mte.getTypeMirror();
         }
-        return null; // can this ever happen ??
+        return null; 
     }
 
     public BlackReflectionProxy getReflectionProxy(String packageName, String className, BlackReflectionInfo info) {

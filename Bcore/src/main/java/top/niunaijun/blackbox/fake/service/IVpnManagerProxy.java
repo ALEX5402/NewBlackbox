@@ -5,14 +5,7 @@ import black.android.os.BRServiceManager;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.ScanClass;
 
-/**
- * updated by alex5402 on 4/12/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 @ScanClass(VpnCommonProxy.class)
 public class IVpnManagerProxy extends BinderInvocationStub {
     public static final String TAG = "IVpnManagerProxy";

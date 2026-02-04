@@ -11,13 +11,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.fake.hook.ScanClass;
 
-/**
- * Created by Milk on 2021/4/26.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- */
+
 @ScanClass(IInputMethodManagerProxy.class)
 public class IInputMethodManagerProxy extends BinderInvocationStub {
     public static final String TAG = "IInputMethodManagerProxy";

@@ -12,9 +12,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * GMS proxy to handle GMS-specific issues like LevelDB locks, device ID problems, and authentication.
- */
+
 public class GmsProxy extends BinderInvocationStub {
     public static final String TAG = "GmsProxy";
 
@@ -56,17 +54,17 @@ public class GmsProxy extends BinderInvocationStub {
         return false;
     }
 
-    // Hook getService to handle package name validation
+    
     @ProxyMethod("getService")
     public static class GetService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                // Check if this is a package name validation issue
+                
                 if (args != null && args.length > 0) {
                     String callingPackage = (String) args[0];
                     if ("com.google.android.gms".equals(callingPackage)) {
-                        // Replace with the correct package name
+                        
                         args[0] = BlackBoxCore.getHostPkg();
                         Slog.d(TAG, "GmsProxy: Fixed calling package from com.google.android.gms to " + BlackBoxCore.getHostPkg());
                     }
@@ -74,13 +72,13 @@ public class GmsProxy extends BinderInvocationStub {
                 return method.invoke(who, args);
             } catch (Exception e) {
                 Slog.e(TAG, "GmsProxy: Error in getService", e);
-                // Return a mock service or null to prevent crashes
+                
                 return null;
             }
         }
     }
 
-    // Hook getServiceBroker to handle service broker issues
+    
     @ProxyMethod("getServiceBroker")
     public static class GetServiceBroker extends MethodHook {
         @Override
@@ -89,13 +87,13 @@ public class GmsProxy extends BinderInvocationStub {
                 return method.invoke(who, args);
             } catch (Exception e) {
                 Slog.e(TAG, "GmsProxy: Error in getServiceBroker", e);
-                // Return null to prevent crashes
+                
                 return null;
             }
         }
     }
 
-    // Hook authenticate to handle authentication issues
+    
     @ProxyMethod("authenticate")
     public static class Authenticate extends MethodHook {
         @Override
@@ -105,13 +103,13 @@ public class GmsProxy extends BinderInvocationStub {
                 return method.invoke(who, args);
             } catch (Exception e) {
                 Slog.w(TAG, "GmsProxy: Authentication error, returning success", e);
-                // Return a mock successful authentication result
+                
                 return createMockAuthResult();
             }
         }
     }
 
-    // Hook getAccount to handle account retrieval issues
+    
     @ProxyMethod("getAccount")
     public static class GetAccount extends MethodHook {
         @Override
@@ -126,7 +124,7 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    // Hook getToken to handle token retrieval issues
+    
     @ProxyMethod("getToken")
     public static class GetToken extends MethodHook {
         @Override
@@ -141,7 +139,7 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    // Hook invalidateToken to handle token invalidation
+    
     @ProxyMethod("invalidateToken")
     public static class InvalidateToken extends MethodHook {
         @Override
@@ -156,7 +154,7 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    // Hook clearToken to handle token clearing
+    
     @ProxyMethod("clearToken")
     public static class ClearToken extends MethodHook {
         @Override
@@ -171,10 +169,10 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    // Helper method to create a mock authentication result
+    
     private static Object createMockAuthResult() {
         try {
-            // Try to create a mock Bundle or similar object
+            
             Class<?> bundleClass = Class.forName("android.os.Bundle");
             return bundleClass.newInstance();
         } catch (Exception e) {

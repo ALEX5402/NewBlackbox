@@ -7,10 +7,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import top.niunaijun.blackbox.BlackBoxCore;
 
-/**
- * GlobalContextWrapper - A safe ContextWrapper that prevents null context crashes
- * This class is designed to be used as a replacement for all ContextWrapper instances
- */
+
 public class GlobalContextWrapper extends ContextWrapper {
     private static final String TAG = "GlobalContextWrapper";
     
@@ -50,17 +47,17 @@ public class GlobalContextWrapper extends ContextWrapper {
             Slog.w(TAG, "Error getting resources from base context: " + e.getMessage());
         }
         
-        // Fallback to host context resources
+        
         try {
             return fallbackContext.getResources();
         } catch (Exception e) {
             Slog.w(TAG, "Error getting fallback resources: " + e.getMessage());
-            // Return a minimal resources object to prevent crash
+            
             try {
                 return new Resources(null, null, null);
             } catch (Exception e2) {
                 Slog.w(TAG, "Error creating minimal resources: " + e2.getMessage());
-                // Last resort - return null but don't crash
+                
                 return null;
             }
         }
@@ -77,7 +74,7 @@ public class GlobalContextWrapper extends ContextWrapper {
             Slog.w(TAG, "Error getting package manager from base context: " + e.getMessage());
         }
         
-        // Fallback to host context package manager
+        
         try {
             return fallbackContext.getPackageManager();
         } catch (Exception e) {
@@ -156,9 +153,7 @@ public class GlobalContextWrapper extends ContextWrapper {
         return fallbackContext.getSystemService(name);
     }
     
-    /**
-     * Create a safe context wrapper for any context
-     */
+    
     public static Context createSafeContext(Context context, String packageName) {
         if (context == null) {
             return new GlobalContextWrapper(null, packageName);
@@ -169,7 +164,7 @@ public class GlobalContextWrapper extends ContextWrapper {
         }
         
         if (context instanceof ContextWrapper) {
-            // Check if the base context is null
+            
             try {
                 Context baseContext = ((ContextWrapper) context).getBaseContext();
                 if (baseContext == null) {
@@ -184,9 +179,7 @@ public class GlobalContextWrapper extends ContextWrapper {
         return new GlobalContextWrapper(context, packageName);
     }
     
-    /**
-     * Create a safe context wrapper for any context
-     */
+    
     public static Context createSafeContext(Context context) {
         String packageName = context != null ? context.getPackageName() : "unknown";
         return createSafeContext(context, packageName);

@@ -13,16 +13,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Utility class for JAR file operations
- * Provides enhanced functionality for JAR file handling
- */
+
 public class JarUtils {
     private static final String TAG = "JarUtils";
     
-    /**
-     * Copy file with progress tracking and error recovery
-     */
+    
     public static void copyFileWithProgress(InputStream input, File target, String fileName) throws IOException {
         if (input == null) {
             throw new IOException("Input stream is null");
@@ -32,7 +27,7 @@ public class JarUtils {
             throw new IOException("Target file is null");
         }
         
-        // Ensure target directory exists
+        
         File targetDir = target.getParentFile();
         if (targetDir != null && !targetDir.exists() && !targetDir.mkdirs()) {
             throw new IOException("Failed to create target directory: " + targetDir);
@@ -42,7 +37,7 @@ public class JarUtils {
         File tempFile = null;
         
         try {
-            // Create temporary file for atomic write
+            
             tempFile = File.createTempFile(target.getName(), ".tmp", targetDir);
             
             output = new FileOutputStream(tempFile);
@@ -56,7 +51,7 @@ public class JarUtils {
                 output.write(buffer, 0, bytesRead);
                 totalBytes += bytesRead;
                 
-                // Log progress every 100KB
+                
                 if (totalBytes % 102400 == 0 && System.currentTimeMillis() - lastLogTime > 1000) {
                     Log.d(TAG, "Copying " + fileName + ": " + (totalBytes / 1024) + "KB");
                     lastLogTime = System.currentTimeMillis();
@@ -67,7 +62,7 @@ public class JarUtils {
             output.close();
             output = null;
             
-            // Atomic move to final location
+            
             if (!tempFile.renameTo(target)) {
                 throw new IOException("Failed to move temporary file to target: " + target);
             }
@@ -75,7 +70,7 @@ public class JarUtils {
             Log.d(TAG, "Successfully copied " + fileName + " (" + totalBytes + " bytes)");
             
         } catch (IOException e) {
-            // Clean up on failure
+            
             if (tempFile != null && tempFile.exists()) {
                 if (!tempFile.delete()) {
                     Log.w(TAG, "Failed to delete temporary file: " + tempFile);
@@ -93,9 +88,7 @@ public class JarUtils {
         }
     }
     
-    /**
-     * Calculate SHA-256 hash of a file
-     */
+    
     public static String calculateFileHash(File file) {
         if (file == null || !file.exists()) {
             return null;
@@ -129,9 +122,7 @@ public class JarUtils {
         }
     }
     
-    /**
-     * Verify JAR file integrity
-     */
+    
     public static boolean verifyJarFile(File jarFile) {
         if (jarFile == null || !jarFile.exists()) {
             return false;
@@ -141,14 +132,14 @@ public class JarUtils {
             return false;
         }
         
-        // Try to open as ZIP to verify it's a valid JAR
+        
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(jarFile))) {
             ZipEntry entry;
             int entryCount = 0;
             
             while ((entry = zis.getNextEntry()) != null) {
                 entryCount++;
-                // Just read a few entries to verify it's valid
+                
                 if (entryCount > 10) {
                     break;
                 }
@@ -163,9 +154,7 @@ public class JarUtils {
         }
     }
     
-    /**
-     * Get JAR file information
-     */
+    
     public static String getJarInfo(File jarFile) {
         if (jarFile == null || !jarFile.exists()) {
             return "File not found";
@@ -188,9 +177,7 @@ public class JarUtils {
         return info.toString();
     }
     
-    /**
-     * Safe file deletion with retry
-     */
+    
     public static boolean safeDelete(File file) {
         if (file == null || !file.exists()) {
             return true;
@@ -205,7 +192,7 @@ public class JarUtils {
             retryCount++;
             if (retryCount < 3) {
                 try {
-                    Thread.sleep(100 * retryCount); // Exponential backoff
+                    Thread.sleep(100 * retryCount); 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -217,9 +204,7 @@ public class JarUtils {
         return false;
     }
     
-    /**
-     * Create directory with proper permissions
-     */
+    
     public static boolean createDirectory(File dir) {
         if (dir == null) {
             return false;
@@ -230,7 +215,7 @@ public class JarUtils {
         }
         
         if (dir.mkdirs()) {
-            // Set read/write permissions for owner
+            
             dir.setReadable(true, true);
             dir.setWritable(true, true);
             return true;
@@ -239,19 +224,17 @@ public class JarUtils {
         return false;
     }
     
-    /**
-     * Get optimal buffer size based on available memory
-     */
+    
     public static int getOptimalBufferSize() {
         Runtime runtime = Runtime.getRuntime();
         long maxMemory = runtime.maxMemory();
         
-        if (maxMemory > 512 * 1024 * 1024) { // > 512MB
-            return 32768; // 32KB
-        } else if (maxMemory > 256 * 1024 * 1024) { // > 256MB
-            return 16384; // 16KB
+        if (maxMemory > 512 * 1024 * 1024) { 
+            return 32768; 
+        } else if (maxMemory > 256 * 1024 * 1024) { 
+            return 16384; 
         } else {
-            return 8192; // 8KB
+            return 8192; 
         }
     }
 }

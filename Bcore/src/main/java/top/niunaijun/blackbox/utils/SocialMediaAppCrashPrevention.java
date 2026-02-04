@@ -17,39 +17,34 @@ import java.util.Map;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
 
-/**
- * Comprehensive crash prevention utility for social media apps
- * This class provides specialized handling for common crash scenarios in apps like Facebook, Instagram, etc.
- */
+
 public class SocialMediaAppCrashPrevention {
     private static final String TAG = "SocialMediaCrashPrevention";
     private static boolean sIsInitialized = false;
     
-    // Known social media app packages
+    
     private static final String[] SOCIAL_MEDIA_PACKAGES = {
-        "com.facebook.katana",           // Facebook
-        "com.facebook.orca",             // Facebook Messenger
-        "com.instagram.android",          // Instagram
-        "com.whatsapp",                  // WhatsApp
-        "org.telegram.messenger",        // Telegram
-        "com.twitter.android",           // Twitter/X
-        "com.zhiliaoapp.musically",      // TikTok
-        "com.snapchat.android",          // Snapchat
-        "com.google.android.youtube",    // YouTube
-        "com.linkedin.android",          // LinkedIn
-        "com.discord",                   // Discord
-        "com.reddit.frontpage",          // Reddit
-        "com.spotify.music",             // Spotify
-        "com.netflix.mediaclient",       // Netflix
-        "com.amazon.avod.thirdpartyclient" // Prime Video
+        "com.facebook.katana",           
+        "com.facebook.orca",             
+        "com.instagram.android",          
+        "com.whatsapp",                  
+        "org.telegram.messenger",        
+        "com.twitter.android",           
+        "com.zhiliaoapp.musically",      
+        "com.snapchat.android",          
+        "com.google.android.youtube",    
+        "com.linkedin.android",          
+        "com.discord",                   
+        "com.reddit.frontpage",          
+        "com.spotify.music",             
+        "com.netflix.mediaclient",       
+        "com.amazon.avod.thirdpartyclient" 
     };
     
-    // Crash prevention strategies
+    
     private static final Map<String, CrashPreventionStrategy> sCrashPreventionStrategies = new HashMap<>();
     
-    /**
-     * Initialize crash prevention for social media apps
-     */
+    
     public static void initialize() {
         if (sIsInitialized) {
             return;
@@ -58,19 +53,19 @@ public class SocialMediaAppCrashPrevention {
         try {
             Slog.d(TAG, "Initializing social media app crash prevention...");
             
-            // Install WebView crash prevention
+            
             installWebViewCrashPrevention();
             
-            // Install AttributionSource crash prevention
+            
             installAttributionSourceCrashPrevention();
             
-            // Install context crash prevention
+            
             installContextCrashPrevention();
             
-            // Install permission crash prevention
+            
             installPermissionCrashPrevention();
             
-            // Install media crash prevention
+            
             installMediaCrashPrevention();
             
             sIsInitialized = true;
@@ -81,9 +76,7 @@ public class SocialMediaAppCrashPrevention {
         }
     }
     
-    /**
-     * Check if the current app is a social media app
-     */
+    
     public static boolean isSocialMediaApp() {
         try {
             String currentPackage = BActivityThread.getAppPackageName();
@@ -98,15 +91,13 @@ public class SocialMediaAppCrashPrevention {
         return false;
     }
     
-    /**
-     * Install WebView crash prevention
-     */
+    
     private static void installWebViewCrashPrevention() {
         try {
-            // Hook WebView constructor to prevent data directory conflicts
+            
             hookWebViewConstructor();
             
-            // Hook WebViewDatabase to prevent initialization failures
+            
             hookWebViewDatabase();
             
             Slog.d(TAG, "WebView crash prevention installed");
@@ -115,28 +106,24 @@ public class SocialMediaAppCrashPrevention {
         }
     }
     
-    /**
-     * Hook WebView constructor to prevent crashes
-     */
+    
     private static void hookWebViewConstructor() {
         try {
-            // Create a custom WebView constructor hook
+            
             Constructor<WebView> originalConstructor = WebView.class.getDeclaredConstructor(Context.class);
             originalConstructor.setAccessible(true);
             
-            // This would be implemented with a proper hooking framework
+            
             Slog.d(TAG, "WebView constructor hook prepared");
         } catch (Exception e) {
             Slog.w(TAG, "Could not prepare WebView constructor hook: " + e.getMessage());
         }
     }
     
-    /**
-     * Hook WebViewDatabase to prevent crashes
-     */
+    
     private static void hookWebViewDatabase() {
         try {
-            // Ensure WebViewDatabase directory exists and is accessible
+            
             Context context = BlackBoxCore.getContext();
             if (context != null) {
                 String packageName = context.getPackageName();
@@ -149,7 +136,7 @@ public class SocialMediaAppCrashPrevention {
                     Slog.d(TAG, "Created WebView directory: " + webViewDir);
                 }
                 
-                // Set system properties for WebView
+                
                 System.setProperty("webview.data.dir", webViewDir);
                 System.setProperty("webview.cache.dir", webViewDir + "/cache");
                 System.setProperty("webview.cookies.dir", webViewDir + "/cookies");
@@ -159,28 +146,24 @@ public class SocialMediaAppCrashPrevention {
         }
     }
     
-    /**
-     * Install AttributionSource crash prevention
-     */
+    
     private static void installAttributionSourceCrashPrevention() {
         try {
-            // Use the existing AttributionSourceUtils
+            
             Slog.d(TAG, "AttributionSource crash prevention installed");
         } catch (Exception e) {
             Slog.w(TAG, "Failed to install AttributionSource crash prevention: " + e.getMessage());
         }
     }
     
-    /**
-     * Install context crash prevention
-     */
+    
     private static void installContextCrashPrevention() {
         try {
-            // Ensure context is never null
+            
             Context context = BlackBoxCore.getContext();
             if (context == null) {
                 Slog.w(TAG, "Host context is null, attempting to recover");
-                // Try to recover context
+                
                 recoverContext();
             }
             
@@ -190,39 +173,33 @@ public class SocialMediaAppCrashPrevention {
         }
     }
     
-    /**
-     * Install permission crash prevention
-     */
+    
     private static void installPermissionCrashPrevention() {
         try {
-            // Hook permission checks to prevent crashes
+            
             Slog.d(TAG, "Permission crash prevention installed");
         } catch (Exception e) {
             Slog.w(TAG, "Failed to install permission crash prevention: " + e.getMessage());
         }
     }
     
-    /**
-     * Install media crash prevention
-     */
+    
     private static void installMediaCrashPrevention() {
         try {
-            // Hook media-related operations to prevent crashes
+            
             Slog.d(TAG, "Media crash prevention installed");
         } catch (Exception e) {
             Slog.w(TAG, "Failed to install media crash prevention: " + e.getMessage());
         }
     }
     
-    /**
-     * Attempt to recover context if it's null
-     */
+    
     private static void recoverContext() {
         try {
-            // Try to get context from various sources
+            
             Context recoveredContext = null;
             
-            // Try to get context from ActivityThread
+            
             try {
                 Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
                 Method currentActivityThreadMethod = activityThreadClass.getDeclaredMethod("currentActivityThread");
@@ -238,8 +215,8 @@ public class SocialMediaAppCrashPrevention {
             
             if (recoveredContext != null) {
                 Slog.d(TAG, "Successfully recovered context");
-                // Set the recovered context
-                // This would require access to BlackBoxCore's context setter
+                
+                
             }
             
         } catch (Exception e) {
@@ -247,16 +224,14 @@ public class SocialMediaAppCrashPrevention {
         }
     }
     
-    /**
-     * Apply crash prevention for a specific app
-     */
+    
     public static void applyCrashPrevention(String packageName) {
         if (packageName == null) {
             return;
         }
         
         try {
-            // Check if this is a social media app
+            
             boolean isSocialMedia = false;
             for (String socialMediaPackage : SOCIAL_MEDIA_PACKAGES) {
                 if (socialMediaPackage.equals(packageName)) {
@@ -268,7 +243,7 @@ public class SocialMediaAppCrashPrevention {
             if (isSocialMedia) {
                 Slog.d(TAG, "Applying crash prevention for social media app: " + packageName);
                 
-                // Apply specific strategies for this app
+                
                 CrashPreventionStrategy strategy = sCrashPreventionStrategies.get(packageName);
                 if (strategy != null) {
                     strategy.apply();
@@ -280,16 +255,12 @@ public class SocialMediaAppCrashPrevention {
         }
     }
     
-    /**
-     * Crash prevention strategy interface
-     */
+    
     public interface CrashPreventionStrategy {
         void apply();
     }
     
-    /**
-     * Get crash prevention status
-     */
+    
     public static String getCrashPreventionStatus() {
         StringBuilder status = new StringBuilder();
         status.append("Social Media Crash Prevention Status:\n");

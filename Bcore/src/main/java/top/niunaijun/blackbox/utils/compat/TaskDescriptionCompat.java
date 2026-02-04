@@ -21,14 +21,14 @@ public class TaskDescriptionCompat {
             return td;
 
         label = getTaskDescriptionLabel(BlackBoxCore.getUserId(), getApplicationLabel());
-        // Skip icon loading to prevent resource loading errors
-        // Drawable drawable = getApplicationIcon();
-        // if (drawable == null)
-        //     return td;
+        
+        
+        
+        
 
-        // ActivityManager am = (ActivityManager) BlackBoxCore.getContext().getSystemService(Context.ACTIVITY_SERVICE);
-        // int iconSize = am.getLauncherLargeIconSize();
-        // icon = DrawableUtils.drawableToBitmap(drawable, iconSize, iconSize);
+        
+        
+        
         td = new ActivityManager.TaskDescription(label, null, td.getPrimaryColor());
         return td;
     }
@@ -48,7 +48,7 @@ public class TaskDescriptionCompat {
 
     private static Drawable getApplicationIcon() {
         try {
-            // Skip icon loading to prevent resource loading errors
+            
             return null;
         } catch (Exception ignore) {
             return null;

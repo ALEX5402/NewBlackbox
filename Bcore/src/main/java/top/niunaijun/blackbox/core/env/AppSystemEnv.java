@@ -9,14 +9,7 @@ import java.util.List;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
-/**
- * updated by alex5402 on 4/21/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class AppSystemEnv {
     private static final List<String> sSystemPackages = new ArrayList<>();
     private static final List<String> sSuPackages = new ArrayList<>();
@@ -34,17 +27,17 @@ public class AppSystemEnv {
         sSystemPackages.add("com.android.talkback");
         sSystemPackages.add("com.miui.gallery");
 
-        // google Gboard
+        
         sSystemPackages.add("com.google.android.inputmethod.latin");
-        // sSystemPackages.add(BlackBoxCore.getHostPkg());
+        
 
-        // 华为
+        
         sSystemPackages.add("com.huawei.webview");
 
-        // oppo
+        
         sSystemPackages.add("com.coloros.safecenter");
 
-        // su
+        
         sSuPackages.add("com.noshufou.android.su");
         sSuPackages.add("com.noshufou.android.su.elite");
         sSuPackages.add("eu.chainfire.supersu");
@@ -54,9 +47,9 @@ public class AppSystemEnv {
 
 
 
-        // sPreInstallPackages.add("com.huawei.hwid");
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < 29){
-            //解决Android 9三星浏览器闪退问题
+            
         }else{
 
         }

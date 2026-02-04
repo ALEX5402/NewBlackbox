@@ -1,18 +1,4 @@
-/*
- * Copyright (C) 2006 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 
 package top.niunaijun.blackbox.core.system.pm;
 
@@ -38,9 +24,7 @@ import java.util.Set;
 
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * {@hide}
- */
+
 public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Object> {
     final private static String TAG = "IntentResolver";
     final private static boolean DEBUG = false;
@@ -128,14 +112,14 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
 
     public ArrayList<F> findFilters(IntentFilter matching) {
         if (matching.countDataSchemes() == 1) {
-            // Fast case.
+            
             return collectFilters(mSchemeToFilter.get(matching.getDataScheme(0)), matching);
         } else if (matching.countDataTypes() != 0 && matching.countActions() == 1) {
-            // Another fast case.
+            
             return collectFilters(mTypedActionToFilter.get(matching.getAction(0)), matching);
         } else if (matching.countDataTypes() == 0 && matching.countDataSchemes() == 0
                 && matching.countActions() == 1) {
-            // Last fast case.
+            
             return collectFilters(mActionToFilter.get(matching.getAction(0)), matching);
         } else {
             ArrayList<F> res = null;
@@ -267,16 +251,12 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
 
     }
 
-    /**
-     * Returns an iterator allowing filters to be removed.
-     */
+    
     public Iterator<F> filterIterator() {
         return new IteratorWrapper(mFilters.iterator());
     }
 
-    /**
-     * Returns a read-only set of the filters.
-     */
+    
     public Set<F> filterSet() {
         return Collections.unmodifiableSet(mFilters);
     }
@@ -296,7 +276,7 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
                     listCut.get(i), resultList, userId);
         }
         filterResults(resultList);
-//        sortResults(resultList);
+
         return resultList;
     }
 
@@ -318,8 +298,8 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
         F[] thirdTypeCut = null;
         F[] schemeCut = null;
 
-        // If the intent includes a MIME type, then we want to collect all of
-        // the filters that match that MIME type.
+        
+        
         if (resolvedType != null) {
             int slashpos = resolvedType.indexOf('/');
             if (slashpos > 0) {
@@ -327,46 +307,46 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
                 if (!baseType.equals("*")) {
                     if (resolvedType.length() != slashpos+2
                             || resolvedType.charAt(slashpos+1) != '*') {
-                        // Not a wild card, so we can just look for all filters that
-                        // completely match or wildcards whose base type matches.
+                        
+                        
                         firstTypeCut = mTypeToFilter.get(resolvedType);
                         if (debug) Slog.v(TAG, "First type cut: " + Arrays.toString(firstTypeCut));
                         secondTypeCut = mWildTypeToFilter.get(baseType);
                         if (debug) Slog.v(TAG, "Second type cut: "
                                 + Arrays.toString(secondTypeCut));
                     } else {
-                        // We can match anything with our base type.
+                        
                         firstTypeCut = mBaseTypeToFilter.get(baseType);
                         if (debug) Slog.v(TAG, "First type cut: " + Arrays.toString(firstTypeCut));
                         secondTypeCut = mWildTypeToFilter.get(baseType);
                         if (debug) Slog.v(TAG, "Second type cut: "
                                 + Arrays.toString(secondTypeCut));
                     }
-                    // Any */* types always apply, but we only need to do this
-                    // if the intent type was not already */*.
+                    
+                    
                     thirdTypeCut = mWildTypeToFilter.get("*");
                     if (debug) Slog.v(TAG, "Third type cut: " + Arrays.toString(thirdTypeCut));
                 } else if (intent.getAction() != null) {
-                    // The intent specified any type ({@literal *}/*).  This
-                    // can be a whole heck of a lot of things, so as a first
-                    // cut let's use the action instead.
+                    
+                    
+                    
                     firstTypeCut = mTypedActionToFilter.get(intent.getAction());
                     if (debug) Slog.v(TAG, "Typed Action list: " + Arrays.toString(firstTypeCut));
                 }
             }
         }
 
-        // If the intent includes a data URI, then we want to collect all of
-        // the filters that match its scheme (we will further refine matches
-        // on the authority and path by directly matching each resulting filter).
+        
+        
+        
         if (scheme != null) {
             schemeCut = mSchemeToFilter.get(scheme);
             if (debug) Slog.v(TAG, "Scheme list: " + Arrays.toString(schemeCut));
         }
 
-        // If the intent does not specify any data -- either a MIME type or
-        // a URI -- then we will only be looking for matches against empty
-        // data.
+        
+        
+        
         if (resolvedType == null && scheme == null && intent.getAction() != null) {
             firstTypeCut = mActionToFilter.get(intent.getAction());
             if (debug) Slog.v(TAG, "Action list: " + Arrays.toString(firstTypeCut));
@@ -390,7 +370,7 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
                     scheme, schemeCut, finalList, userId);
         }
         filterResults(finalList);
-//        sortResults(finalList);
+
 
         if (debug) {
             Slog.v(TAG, "Final result list:");
@@ -401,29 +381,17 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
         return finalList;
     }
 
-    /**
-     * Control whether the given filter is allowed to go into the result
-     * list.  Mainly intended to prevent adding multiple filters for the
-     * same target object.
-     */
+    
     protected boolean allowFilterResult(F filter, List<R> dest) {
         return true;
     }
 
-    /**
-     * Returns whether the object associated with the given filter is
-     * "stopped", that is whether it should not be included in the result
-     * if the intent requests to excluded stopped objects.
-     */
+    
     protected boolean isFilterStopped(F filter, int userId) {
         return false;
     }
 
-    /**
-     * Returns whether this filter is owned by this package. This must be
-     * implemented to provide correct filtering of Intents that have
-     * specified a package name they are to be delivered to.
-     */
+    
     protected abstract boolean isPackageForFilter(String packageName, F filter);
 
     protected abstract F[] newArray(int size);
@@ -438,9 +406,7 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
         Collections.sort(results, mResolvePrioritySorter);
     }
 
-    /**
-     * Apply filtering to the results. This happens before the results are sorted.
-     */
+    
     protected void filterResults(List<R> results) {
     }
 
@@ -615,7 +581,7 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
         final Uri data = intent.getData();
         final String packageName = intent.getPackage();
 
-//        final boolean excludingStopped = intent.isExcludingStopped();
+
 
         final int N = src != null ? src.length : 0;
         boolean hasNonDefaults = false;
@@ -625,14 +591,14 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
             int match;
             if (debug) Slog.v(TAG, "Matching against filter " + filter);
 
-//            if (excludingStopped && isFilterStopped(filter, userId)) {
-//                if (debug) {
-//                    Slog.v(TAG, "  Filter's target is stopped; skipping");
-//                }
-//                continue;
-//            }
 
-            // Is delivery being limited to filters owned by a particular package?
+
+
+
+
+
+
+            
             if (packageName != null && !isPackageForFilter(packageName, filter)) {
                 if (debug) {
                     Slog.v(TAG, "  Filter is not from package " + packageName + "; skipping");
@@ -640,7 +606,7 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
                 continue;
             }
 
-            // Do we already have this one?
+            
             if (!allowFilterResult(filter, dest)) {
                 if (debug) {
                     Slog.v(TAG, "  Filter's target already added");
@@ -686,7 +652,7 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
         }
     }
 
-    // Sorts a List of IntentFilter objects into descending priority order.
+    
     @SuppressWarnings("rawtypes")
     private static final Comparator mResolvePrioritySorter = new Comparator() {
         public int compare(Object o1, Object o2) {
@@ -696,46 +662,24 @@ public abstract class IntentResolver<F extends BPackage.IntentInfo, R extends Ob
         }
     };
 
-    /**
-     * All filters that have been registered.
-     */
+    
     private final HashSet<F> mFilters = new HashSet<>();
 
-    /**
-     * All of the MIME types that have been registered, such as "image/jpeg",
-     * "image/*", or "{@literal *}/*".
-     */
+    
     private final ArrayMap<String, F[]> mTypeToFilter = new ArrayMap<String, F[]>();
 
-    /**
-     * The base names of all of all fully qualified MIME types that have been
-     * registered, such as "image" or "*".  Wild card MIME types such as
-     * "image/*" will not be here.
-     */
+    
     private final ArrayMap<String, F[]> mBaseTypeToFilter = new ArrayMap<String, F[]>();
 
-    /**
-     * The base names of all of the MIME types with a sub-type wildcard that
-     * have been registered.  For example, a filter with "image/*" will be
-     * included here as "image" but one with "image/jpeg" will not be
-     * included here.  This also includes the "*" for the "{@literal *}/*"
-     * MIME type.
-     */
+    
     private final ArrayMap<String, F[]> mWildTypeToFilter = new ArrayMap<String, F[]>();
 
-    /**
-     * All of the URI schemes (such as http) that have been registered.
-     */
+    
     private final ArrayMap<String, F[]> mSchemeToFilter = new ArrayMap<String, F[]>();
 
-    /**
-     * All of the actions that have been registered, but only those that did
-     * not specify data.
-     */
+    
     private final ArrayMap<String, F[]> mActionToFilter = new ArrayMap<String, F[]>();
 
-    /**
-     * All of the actions that have been registered and specified a MIME type.
-     */
+    
     private final ArrayMap<String, F[]> mTypedActionToFilter = new ArrayMap<String, F[]>();
 }

@@ -24,14 +24,7 @@ import top.niunaijun.blackbox.utils.compat.StartActivityCompat;
 
 import static android.content.pm.PackageManager.GET_META_DATA;
 
-/**
- * updated by alex5402 on 4/21/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class ActivityManagerCommonProxy {
     public static final String TAG = "CommonStub";
 
@@ -43,15 +36,15 @@ public class ActivityManagerCommonProxy {
             Intent intent = getIntent(args);
             Slog.d(TAG, "Hook in : " + intent);
             assert intent != null;
-            // Allow PermissionController to run so apps receive onRequestPermissionsResult
-            // (granting is still handled by our Package/AppOps hooks).
+            
+            
             if (intent.getParcelableExtra("_B_|_target_") != null) {
                 return method.invoke(who, args);
             }
             if (ComponentUtils.isRequestInstall(intent)) {
                 File file = FileProviderHandler.convertFile(BActivityThread.getApplication(), intent.getData());
                 
-                // Check if this is an attempt to install BlackBox app
+                
                 if (file != null && file.exists()) {
                     try {
                         PackageInfo packageInfo = BlackBoxCore.getPackageManager().getPackageArchiveInfo(file.getAbsolutePath(), 0);
@@ -60,7 +53,7 @@ public class ActivityManagerCommonProxy {
                             String hostPackageName = BlackBoxCore.getHostPkg();
                             if (packageName.equals(hostPackageName)) {
                                 Slog.w(TAG, "Blocked attempt to install BlackBox app from within BlackBox: " + packageName);
-                                // Return success but don't actually install
+                                
                                 return 0;
                             }
                         }
@@ -145,7 +138,7 @@ public class ActivityManagerCommonProxy {
             String[] resolvedTypes = (String[]) args[index++];
             IBinder resultTo = (IBinder) args[index++];
             Bundle options = (Bundle) args[index];
-            // todo ??
+            
             if (!ComponentUtils.isSelf(intents)) {
                 return method.invoke(who, args);
             }

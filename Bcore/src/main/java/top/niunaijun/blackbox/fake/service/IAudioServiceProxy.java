@@ -14,9 +14,7 @@ import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Reflector;
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * Audio service proxy to avoid focus/mute related issues in virtualized apps.
- */
+
 public class IAudioServiceProxy extends BinderInvocationStub {
     public static final String TAG = "AudioServiceProxy";
 
@@ -33,22 +31,22 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
         
         try {
-            // Try multiple reflection paths for different Android versions
+            
             Object iface = null;
             
-            // Android 16+ path
+            
             try {
                 iface = Reflector.on("android.media.IAudioService$Stub").call("asInterface", binder);
             } catch (Exception e1) {
                 Slog.d(TAG, "Failed Android 16+ path, trying alternative: " + e1.getMessage());
                 
-                // Alternative path for older versions
+                
                 try {
                     iface = Reflector.on("android.media.IAudioService").call("asInterface", binder);
                 } catch (Exception e2) {
                     Slog.d(TAG, "Failed alternative path: " + e2.getMessage());
                     
-                    // Last resort: try direct interface casting
+                    
                     try {
                         Class<?> stubClass = Class.forName("android.media.IAudioService$Stub");
                         Method asInterfaceMethod = stubClass.getMethod("asInterface", IBinder.class);
@@ -84,7 +82,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         return false;
     }
 
-    // Always allow microphone to be unmuted in the virtual app
+    
     @ProxyMethod("isMicrophoneMuted")
     public static class IsMicrophoneMuted extends MethodHook {
         @Override
@@ -94,21 +92,21 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Ignore attempts to force microphone mute via AudioService
+    
     @ProxyMethod("setMicrophoneMute")
     public static class SetMicrophoneMute extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             Slog.d(TAG, "AudioService: setMicrophoneMute called, forcing unmute");
-            // Force microphone to be unmuted
+            
             if (args != null && args.length > 0) {
-                args[0] = false; // Force unmute
+                args[0] = false; 
             }
             return method.invoke(who, args);
         }
     }
 
-    // Allow audio recording operations
+    
     @ProxyMethod("startRecording")
     public static class StartRecording extends MethodHook {
         @Override
@@ -118,7 +116,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio recording operations
+    
     @ProxyMethod("stopRecording")
     public static class StopRecording extends MethodHook {
         @Override
@@ -128,7 +126,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio recording operations
+    
     @ProxyMethod("isRecordingActive")
     public static class IsRecordingActive extends MethodHook {
         @Override
@@ -138,7 +136,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio recording operations
+    
     @ProxyMethod("getRecordingState")
     public static class GetRecordingState extends MethodHook {
         @Override
@@ -148,7 +146,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow microphone access
+    
     @ProxyMethod("isMicrophoneMutedForUser")
     public static class IsMicrophoneMutedForUser extends MethodHook {
         @Override
@@ -158,21 +156,21 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow microphone access
+    
     @ProxyMethod("setMicrophoneMuteForUser")
     public static class SetMicrophoneMuteForUser extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             Slog.d(TAG, "AudioService: setMicrophoneMuteForUser called, forcing unmute");
-            // Force microphone to be unmuted
+            
             if (args != null && args.length > 1) {
-                args[1] = false; // Force unmute
+                args[1] = false; 
             }
             return method.invoke(who, args);
         }
     }
 
-    // Allow audio recording state queries
+    
     @ProxyMethod("getRecordingStateForUser")
     public static class GetRecordingStateForUser extends MethodHook {
         @Override
@@ -182,7 +180,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio focus requests
+    
     @ProxyMethod("requestAudioFocus")
     public static class RequestAudioFocus extends MethodHook {
         @Override
@@ -192,7 +190,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio focus client registration
+    
     @ProxyMethod("registerAudioFocusClient")
     public static class RegisterAudioFocusClient extends MethodHook {
         @Override
@@ -202,7 +200,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio focus client unregistration
+    
     @ProxyMethod("unregisterAudioFocusClient")
     public static class UnregisterAudioFocusClient extends MethodHook {
         @Override
@@ -212,7 +210,7 @@ public class IAudioServiceProxy extends BinderInvocationStub {
         }
     }
 
-    // Allow audio focus abandonment
+    
     @ProxyMethod("abandonAudioFocus")
     public static class AbandonAudioFocus extends MethodHook {
         @Override

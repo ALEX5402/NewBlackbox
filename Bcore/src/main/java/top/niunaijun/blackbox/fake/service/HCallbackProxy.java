@@ -37,14 +37,7 @@ import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
 
-/**
- * updated by alex5402 on 3/31/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
+
 public class HCallbackProxy implements IInjectHook, Handler.Callback {
     public static final String TAG = "HCallbackStub";
     private Handler.Callback mOtherCallback;
@@ -126,10 +119,10 @@ public class HCallbackProxy implements IInjectHook, Handler.Callback {
     private boolean handleLaunchActivity(Object client) {
         Object r;
         if (BuildCompat.isPie()) {
-            // ClientTransaction
+            
             r = getLaunchActivityItem(client);
         } else {
-            // ActivityClientRecord
+            
             r = client;
         }
         if (r == null)
@@ -169,7 +162,7 @@ public class HCallbackProxy implements IInjectHook, Handler.Callback {
                 }
                 return true;
             }
-            // bind
+            
             if (!BActivityThread.currentActivityThread().isInit()) {
                 BActivityThread.currentActivityThread().bindApplication(activityInfo.packageName,
                         activityInfo.processName);
@@ -179,7 +172,7 @@ public class HCallbackProxy implements IInjectHook, Handler.Callback {
             int taskId = BRIActivityManager.get(BRActivityManagerNative.get().getDefault()).getTaskForActivity(token, false);
             BlackBoxCore.getBActivityManager().onActivityCreated(taskId, token, stubRecord.mActivityRecord);
 
-            if(BuildCompat.isTiramisu()){//处理跟isPie一样流程
+            if(BuildCompat.isTiramisu()){
                 LaunchActivityItemContext launchActivityItemContext = BRLaunchActivityItem.get(r);
                 launchActivityItemContext._set_mIntent(stubRecord.mTarget);
                 launchActivityItemContext._set_mInfo(activityInfo);

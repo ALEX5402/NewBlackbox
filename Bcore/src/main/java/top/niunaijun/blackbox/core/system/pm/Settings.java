@@ -24,15 +24,8 @@ import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
 
-/**
- * updated by alex5402 on 4/13/21.
- * * ∧＿∧
- * (`･ω･∥
- * 丶　つ０
- * しーＪ
- * 
- */
-/*public*/ class Settings {
+
+ class Settings {
     public static final String TAG = "Settings";
 
     final ArrayMap<String, BPackageSettings> mPackages = new ArrayMap<>();
@@ -87,15 +80,15 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
             Slog.d(TAG, p.pkg.packageName + " sharedUserId = " + sharedUserId + ", setAppId = " + p.appId);
         }
         if (p.appId == 0) {
-            // Assign new user ID
+            
             p.appId = acquireAndRegisterNewAppIdLPw(p);
         }
         if (p.appId < 0) {
             createdNew = false;
-//            PackageManagerService.reportSettingsProblem(Log.WARN,
-//                    "Package " + p.name + " could not be assigned a valid UID");
-//            throw new PackageManagerException(INSTALL_FAILED_INSUFFICIENT_STORAGE,
-//                    "Package " + p.name + " could not be assigned a valid UID");
+
+
+
+
         } else {
             createdNew = true;
         }
@@ -105,7 +98,7 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
     }
 
     private int acquireAndRegisterNewAppIdLPw(BPackageSettings obj) {
-        // Let's be stupidly inefficient for now...
+        
         Integer integer = mAppIds.get(obj.pkg.packageName);
         if (integer != null)
             return integer;
@@ -148,7 +141,7 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
         try {
             byte[] uidBytes = FileUtils.toByteArray(BEnvironment.getUidConf());
             if (uidBytes == null || uidBytes.length == 0) {
-                // No data to load, start fresh
+                
                 return;
             }
             
@@ -162,15 +155,15 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
                 mAppIds.putAll(hashMap);
             }
         } catch (Exception e) {
-            // If loading fails, clear the corrupted data and start fresh
+            
             try {
-                // Delete the corrupted file
+                
                 BEnvironment.getUidConf().delete();
             } catch (Exception deleteException) {
-                // Ignore delete errors
+                
             }
             
-            // Reset to default values
+            
             mCurrUid = 0;
             synchronized (mAppIds) {
                 mAppIds.clear();
@@ -216,7 +209,7 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
                 PackageInfo packageInfo = BlackBoxCore.getPackageManager().getPackageInfo(packageName, PackageManager.GET_META_DATA);
                 String currPackageSourcePath = packageInfo.applicationInfo.sourceDir;
                 if (!currPackageSourcePath.equals(bPackageSettings.pkg.baseCodePath)) {
-                    // update baseCodePath And Re install
+                    
                     BProcessManagerService.get().killAllByPackageName(bPackageSettings.pkg.packageName);
                     BPackageSettings newPkg = reInstallBySystem(packageInfo, bPackageSettings.installOption);
                     bPackageSettings.pkg = newPkg.pkg;
@@ -229,7 +222,7 @@ import top.niunaijun.blackbox.utils.compat.PackageParserCompat;
             Slog.d(TAG, "loaded Package: " + packageName);
         } catch (Throwable e) {
             e.printStackTrace();
-            // bad package
+            
             FileUtils.deleteDir(app);
             removePackage(packageName);
             BProcessManagerService.get().killAllByPackageName(packageName);

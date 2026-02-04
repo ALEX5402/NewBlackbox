@@ -7,4 +7,4 @@
 bool disable_hidden_api(JNIEnv*);
 bool disable_resource_loading();
 
-#endif //BLACKBOX2_HIDDEN_API_H
+#endif 

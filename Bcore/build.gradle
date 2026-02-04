@@ -16,12 +16,10 @@ android {
     }
     defaultConfig {
         minSdkVersion rootProject.ext.minSdk
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
 
         consumerProguardFiles "consumer-rules.pro"
         ndk {
-            // 设置支持的SO库架构
+            
             abiFilters 'arm64-v8a' , 'armeabi-v7a'
         }
     }
@@ -41,11 +39,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     
-    // Enable incremental annotation processing for faster builds
+    
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:-deprecation" << "-Xlint:-unchecked" << "-Xlint:-rawtypes"
         options.fork = true
@@ -89,8 +87,8 @@ dependencies {
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
 
     implementation 'com.github.tiann:FreeReflection:3.2.2'
-//    implementation "com.github.CodingGay.BlackReflection:core:$rootProject.ext.blackReflection"
 
 
-    // Pine dependency removed
+
+    
 }

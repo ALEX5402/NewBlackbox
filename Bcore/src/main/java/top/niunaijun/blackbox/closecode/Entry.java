@@ -47,7 +47,7 @@ public class Entry {
                     }
                 }
             }
-            // You can override other callbacks as needed
+            
         });
         top.niunaijun.blackbox.utils.Slog.d(TAG, "Custom closed code initialized!");
     }

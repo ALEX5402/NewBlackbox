@@ -8,9 +8,7 @@ import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
-/**
- * Created by BlackBox on 2022/2/26.
- */
+
 public class IPhoneSubInfoProxy extends ClassInvocationStub {
     public static final String TAG = "IPhoneSubInfoProxy";
 

@@ -5,25 +5,21 @@ import android.text.TextUtils;
 
 import top.niunaijun.blackbox.utils.Slog;
 
-/**
- * created by alex5402 to fix crash on xiaomi's MEME Ui
- * Utility class to detect Xiaomi devices and provide device-specific information
- * This helps the Xiaomi proxies apply the correct fixes for different MIUI versions
- */
+
 public class XiaomiDeviceDetector {
     private static final String TAG = "XiaomiDeviceDetector";
     
-    // Xiaomi device manufacturers
+    
     private static final String[] XIAOMI_MANUFACTURERS = {
         "Xiaomi", "Redmi", "POCO", "Black Shark", "Mi"
     };
     
-    // MIUI version patterns
+    
     private static final String[] MIUI_VERSION_PATTERNS = {
         "MIUI", "HyperOS", "MIUI Global", "MIUI China"
     };
     
-    // Known Xiaomi device models
+    
     private static final String[] XIAOMI_MODELS = {
         "Mi ", "Redmi ", "POCO ", "Black Shark ", "Xiaomi "
     };
@@ -33,16 +29,14 @@ public class XiaomiDeviceDetector {
     private static String sDeviceModel = null;
     private static int sAndroidVersion = 0;
     
-    /**
-     * Check if the current device is a Xiaomi device
-     */
+    
     public static boolean isXiaomiDevice() {
         if (sIsXiaomiDevice) {
             return true;
         }
         
         try {
-            // Check manufacturer
+            
             String manufacturer = Build.MANUFACTURER;
             if (isXiaomiManufacturer(manufacturer)) {
                 sIsXiaomiDevice = true;
@@ -50,7 +44,7 @@ public class XiaomiDeviceDetector {
                 return true;
             }
             
-            // Check brand
+            
             String brand = Build.BRAND;
             if (isXiaomiManufacturer(brand)) {
                 sIsXiaomiDevice = true;
@@ -58,7 +52,7 @@ public class XiaomiDeviceDetector {
                 return true;
             }
             
-            // Check model
+            
             String model = Build.MODEL;
             if (isXiaomiModel(model)) {
                 sIsXiaomiDevice = true;
@@ -66,7 +60,7 @@ public class XiaomiDeviceDetector {
                 return true;
             }
             
-            // Check product
+            
             String product = Build.PRODUCT;
             if (isXiaomiModel(product)) {
                 sIsXiaomiDevice = true;
@@ -74,7 +68,7 @@ public class XiaomiDeviceDetector {
                 return true;
             }
             
-            // Check device
+            
             String device = Build.DEVICE;
             if (isXiaomiModel(device)) {
                 sIsXiaomiDevice = true;
@@ -82,7 +76,7 @@ public class XiaomiDeviceDetector {
                 return true;
             }
             
-            // Check fingerprint
+            
             String fingerprint = Build.FINGERPRINT;
             if (isXiaomiFingerprint(fingerprint)) {
                 sIsXiaomiDevice = true;
@@ -90,7 +84,7 @@ public class XiaomiDeviceDetector {
                 return true;
             }
             
-            // Check system properties
+            
             if (checkXiaomiSystemProperties()) {
                 sIsXiaomiDevice = true;
                 Slog.d(TAG, "Detected Xiaomi device by system properties");
@@ -105,9 +99,7 @@ public class XiaomiDeviceDetector {
         return false;
     }
     
-    /**
-     * Get MIUI version if available
-     */
+    
     public static String getMiuiVersion() {
         if (sMiuiVersion != null) {
             return sMiuiVersion;
@@ -118,21 +110,21 @@ public class XiaomiDeviceDetector {
         }
         
         try {
-            // Try to get MIUI version from system properties
+            
             sMiuiVersion = getSystemProperty("ro.miui.ui.version.name");
             if (!TextUtils.isEmpty(sMiuiVersion)) {
                 Slog.d(TAG, "Detected MIUI version: " + sMiuiVersion);
                 return sMiuiVersion;
             }
             
-            // Try alternative property
+            
             sMiuiVersion = getSystemProperty("ro.miui.version.code");
             if (!TextUtils.isEmpty(sMiuiVersion)) {
                 Slog.d(TAG, "Detected MIUI version code: " + sMiuiVersion);
                 return sMiuiVersion;
             }
             
-            // Try build description
+            
             String buildDesc = Build.DISPLAY;
             if (!TextUtils.isEmpty(buildDesc) && containsMiuiVersion(buildDesc)) {
                 sMiuiVersion = extractMiuiVersion(buildDesc);
@@ -148,9 +140,7 @@ public class XiaomiDeviceDetector {
         return sMiuiVersion;
     }
     
-    /**
-     * Get device model
-     */
+    
     public static String getDeviceModel() {
         if (sDeviceModel != null) {
             return sDeviceModel;
@@ -160,9 +150,7 @@ public class XiaomiDeviceDetector {
         return sDeviceModel;
     }
     
-    /**
-     * Get Android version
-     */
+    
     public static int getAndroidVersion() {
         if (sAndroidVersion > 0) {
             return sAndroidVersion;
@@ -172,9 +160,7 @@ public class XiaomiDeviceDetector {
         return sAndroidVersion;
     }
     
-    /**
-     * Check if device is running MIUI 12 or higher
-     */
+    
     public static boolean isMiui12OrHigher() {
         if (!isXiaomiDevice()) {
             return false;
@@ -186,7 +172,7 @@ public class XiaomiDeviceDetector {
         }
         
         try {
-            // Extract version number from MIUI version string
+            
             String versionNumber = extractVersionNumber(miuiVersion);
             if (!TextUtils.isEmpty(versionNumber)) {
                 int version = Integer.parseInt(versionNumber);
@@ -199,9 +185,7 @@ public class XiaomiDeviceDetector {
         return false;
     }
     
-    /**
-     * Check if device is running MIUI 13 or higher
-     */
+    
     public static boolean isMiui13OrHigher() {
         if (!isXiaomiDevice()) {
             return false;
@@ -213,7 +197,7 @@ public class XiaomiDeviceDetector {
         }
         
         try {
-            // Extract version number from MIUI version string
+            
             String versionNumber = extractVersionNumber(miuiVersion);
             if (!TextUtils.isEmpty(versionNumber)) {
                 int version = Integer.parseInt(versionNumber);
@@ -226,9 +210,7 @@ public class XiaomiDeviceDetector {
         return false;
     }
     
-    /**
-     * Check if device is running HyperOS (MIUI 15+)
-     */
+    
     public static boolean isHyperOS() {
         if (!isXiaomiDevice()) {
             return false;
@@ -242,9 +224,7 @@ public class XiaomiDeviceDetector {
         return miuiVersion.contains("HyperOS") || miuiVersion.contains("OS1.");
     }
     
-    /**
-     * Get device-specific information for debugging
-     */
+    
     public static String getDeviceInfo() {
         StringBuilder info = new StringBuilder();
         info.append("Device: ").append(Build.MANUFACTURER).append(" ").append(Build.MODEL).append("\n");
@@ -261,7 +241,7 @@ public class XiaomiDeviceDetector {
         return info.toString();
     }
     
-    // Private helper methods
+    
     
     private static boolean isXiaomiManufacturer(String manufacturer) {
         if (TextUtils.isEmpty(manufacturer)) {
@@ -308,7 +288,7 @@ public class XiaomiDeviceDetector {
     
     private static boolean checkXiaomiSystemProperties() {
         try {
-            // Check for MIUI-specific system properties
+            
             String miuiProperty = getSystemProperty("ro.miui.ui.version.name");
             if (!TextUtils.isEmpty(miuiProperty)) {
                 return true;
@@ -351,7 +331,7 @@ public class XiaomiDeviceDetector {
             return null;
         }
         
-        // Try to extract version like "MIUI 14.0.1" or "HyperOS 1.0.0"
+        
         String[] parts = text.split(" ");
         for (int i = 0; i < parts.length - 1; i++) {
             if (parts[i].equalsIgnoreCase("MIUI") || parts[i].equalsIgnoreCase("HyperOS")) {
@@ -367,7 +347,7 @@ public class XiaomiDeviceDetector {
             return null;
         }
         
-        // Extract version number like "14" from "MIUI 14.0.1"
+        
         String[] parts = miuiVersion.split(" ");
         if (parts.length > 1) {
             String versionPart = parts[1];
@@ -382,7 +362,7 @@ public class XiaomiDeviceDetector {
     
     private static String getSystemProperty(String key) {
         try {
-            // Use reflection to access SystemProperties
+            
             Class<?> systemPropertiesClass = Class.forName("android.os.SystemProperties");
             java.lang.reflect.Method getMethod = systemPropertiesClass.getMethod("get", String.class);
             return (String) getMethod.invoke(null, key);
