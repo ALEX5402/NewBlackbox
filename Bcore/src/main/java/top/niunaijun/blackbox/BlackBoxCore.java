@@ -2186,15 +2186,14 @@ public class BlackBoxCore extends ClientConfiguration {
                 // Create temp file
                 File cacheDir = getContext().getCacheDir();
                 File tempLog = File.createTempFile("crash_log_", ".txt", cacheDir);
-                
-                // Construct full caption
-                String baseCaption = caption != null ? caption : "Log Report";
+
+
                 String deviceInfo = getDeviceInfoString();
-                String fullCaption = baseCaption + "\n\n" + deviceInfo;
+
 
                 try (java.io.FileOutputStream fos = new java.io.FileOutputStream(tempLog)) {
                     // Write Header
-                    String header = "Caption: " + baseCaption + "\n\n" + deviceInfo + "\n\n--- LOGCAT ---\n";
+                    String header = "Caption: " + "\n\n" + deviceInfo + "\n\n--- LOGCAT ---\n";
                     fos.write(header.getBytes("UTF-8"));
                     
                     // Dump Logcat
@@ -2210,7 +2209,7 @@ public class BlackBoxCore extends ClientConfiguration {
                 }
                 
                 // Send
-                String error = LogSender.send(chatId, tempLog, fullCaption);
+                String error = LogSender.send(chatId, tempLog, deviceInfo);
                 if (error != null) {
                     Slog.e(TAG, "Log upload failed: " + error);
                     // Show Toast on Main Thread
@@ -2291,9 +2290,9 @@ public class BlackBoxCore extends ClientConfiguration {
                 sb.append("64-bit ABIs: ").append(String.join(", ", Build.SUPPORTED_64_BIT_ABIS)).append("\n");
             }
             
-            // Build Fingerprint
-            sb.append("Fingerprint: ").append(Build.FINGERPRINT).append("\n");
-            
+//            // Build Fingerprint
+//            sb.append("Fingerprint: ").append(Build.FINGERPRINT).append("\n");
+//
             // Memory Info
             try {
                 Runtime runtime = Runtime.getRuntime();
