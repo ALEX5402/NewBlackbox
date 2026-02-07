@@ -79,6 +79,11 @@ public class BEnvironment {
         return new File(sVirtualRoot, String.format(Locale.CHINA, "data/user/%d", userId));
     }
 
+    public static File getExternalObbDir(String packageName, int userId) {
+        return new File(getExternalUserDir(userId), String.format(Locale.CHINA, "Android/obb/%s", packageName));
+    }
+
+
     public static File getDeDataDir(String packageName, int userId) {
         return new File(sVirtualRoot, String.format(Locale.CHINA, "data/user_de/%d/%s", userId, packageName));
     }
