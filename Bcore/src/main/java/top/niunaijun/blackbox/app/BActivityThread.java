@@ -30,7 +30,6 @@ import android.os.RemoteException;
 import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.WebView;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -76,6 +75,7 @@ import top.niunaijun.blackbox.fake.delegate.ContentProviderDelegate;
 
 import top.niunaijun.blackbox.fake.hook.HookManager;
 import top.niunaijun.blackbox.fake.service.HCallbackProxy;
+import top.niunaijun.blackbox.fake.service.WebViewProxy;
 import top.niunaijun.blackbox.utils.Reflector;
 import top.niunaijun.blackbox.utils.SafeContextWrapper;
 import top.niunaijun.blackbox.utils.GlobalContextWrapper;
@@ -388,9 +388,7 @@ public class BActivityThread extends IBActivityThread.Stub {
                 StrictModeCompat.disableDeathOnFileUriExposure();
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            WebView.setDataDirectorySuffix(getUserId() + ":" + packageName + ":" + processName);
-        }
+        WebViewProxy.ensureDataDirectorySuffix(packageName, processName);
 
         VirtualRuntime.setupRuntime(processName, applicationInfo);
 
