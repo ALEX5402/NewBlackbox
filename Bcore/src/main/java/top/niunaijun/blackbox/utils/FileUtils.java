@@ -98,12 +98,12 @@ public class FileUtils {
         }
 
         File file = new File(path);
-        String cmd = "chmod ";
-        if (file.isDirectory()) {
-            cmd += " -R ";
-        }
         String cmode = String.format("%o", mode);
-        Runtime.getRuntime().exec(cmd + cmode + " " + path).waitFor();
+        if (file.isDirectory()) {
+            Runtime.getRuntime().exec(new String[]{"chmod", "-R", cmode, path}).waitFor();
+        } else {
+            Runtime.getRuntime().exec(new String[]{"chmod", cmode, path}).waitFor();
+        }
     }
 
     public static void createSymlink(String oldPath, String newPath) throws Exception {
@@ -115,7 +115,7 @@ public class FileUtils {
                 
             }
         }
-        Runtime.getRuntime().exec("ln -s " + oldPath + " " + newPath).waitFor();
+        Runtime.getRuntime().exec(new String[]{"ln", "-s", oldPath, newPath}).waitFor();
     }
 
     public static boolean isSymlink(File file) throws IOException {
@@ -171,8 +171,10 @@ public class FileUtils {
             }
             if (!link) {
                 String[] children = dir.list();
-                for (String file : children) {
-                    count += deleteDir(new File(dir, file));
+                if (children != null) {
+                    for (String file : children) {
+                        count += deleteDir(new File(dir, file));
+                    }
                 }
             }
         }

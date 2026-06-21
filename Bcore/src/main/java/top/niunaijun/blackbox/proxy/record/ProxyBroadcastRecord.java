@@ -18,6 +18,9 @@ public class ProxyBroadcastRecord {
     }
 
     public static ProxyBroadcastRecord create(Intent intent) {
+        if (intent == null) {
+            return new ProxyBroadcastRecord(null, 0);
+        }
         Intent target = intent.getParcelableExtra("_B_|_target_");
         int userId = intent.getIntExtra("_B_|_user_id_", 0);
         return new ProxyBroadcastRecord(target, userId);

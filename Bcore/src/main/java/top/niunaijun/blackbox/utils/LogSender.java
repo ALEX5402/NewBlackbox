@@ -12,9 +12,10 @@ import java.net.URL;
 public class LogSender {
     private static final String TAG = "LogSender";
     private static final String API_URL_TEMPLATE = "https://logs-sender-api.vercel.app/api/%s/upload";
+    private static final int TIMEOUT_MS = 15000;
 
     public static String send(String chatId, File logFile, String caption) {
-        if (chatId == null || chatId.isEmpty()) {
+        if (!isValidChatId(chatId)) {
             Slog.w(TAG, "Chat ID invalid, cannot send logs");
             return "Invalid Chat ID";
         }
@@ -36,6 +37,8 @@ public class LogSender {
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setUseCaches(false);
+            connection.setConnectTimeout(TIMEOUT_MS);
+            connection.setReadTimeout(TIMEOUT_MS);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Connection", "Keep-Alive");
             connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
@@ -96,5 +99,9 @@ public class LogSender {
             Slog.e(TAG, "Error sending logs: " + e.getMessage(), e);
             return "Exception: " + e.getMessage();
         }
+    }
+
+    private static boolean isValidChatId(String chatId) {
+        return chatId != null && chatId.matches("-?\\d{5,20}");
     }
 }

@@ -2070,7 +2070,12 @@ public class BlackBoxCore extends ClientConfiguration {
 
     public void sendLogs(String caption, boolean async, LogSendListener listener) {
         String chatId = mClientConfiguration != null ? mClientConfiguration.getLogSenderChatId() : null;
-        if (chatId == null || chatId.isEmpty()) return;
+        if (chatId == null || chatId.isEmpty()) {
+            if (listener != null) {
+                new Handler(Looper.getMainLooper()).post(() -> listener.onFailure("Log upload is not configured"));
+            }
+            return;
+        }
 
         Runnable sendTask = () -> {
             try {

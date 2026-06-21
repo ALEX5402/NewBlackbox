@@ -4,7 +4,9 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
+import android.os.Process;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,9 +27,14 @@ public class ProxyContentProvider extends ContentProvider {
     @Override
     public Bundle call(@NonNull String method, @Nullable String arg, @Nullable Bundle extras) {
         if (method.equals("_Black_|_init_process_")) {
-            assert extras != null;
+            if (Binder.getCallingUid() != Process.myUid() || extras == null) {
+                return null;
+            }
             extras.setClassLoader(AppConfig.class.getClassLoader());
             AppConfig appConfig = extras.getParcelable(AppConfig.KEY);
+            if (appConfig == null) {
+                return null;
+            }
             BlackBoxCore.currentActivityThread().initProcess(appConfig);
 
             Bundle bundle = new Bundle();

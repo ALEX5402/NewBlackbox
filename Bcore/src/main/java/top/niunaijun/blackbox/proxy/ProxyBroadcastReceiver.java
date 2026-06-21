@@ -15,6 +15,9 @@ public class ProxyBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent == null) {
+            return;
+        }
         intent.setExtrasClassLoader(context.getClassLoader());
         ProxyBroadcastRecord record = ProxyBroadcastRecord.create(intent);
         if (record.mIntent == null) {

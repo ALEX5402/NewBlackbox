@@ -486,7 +486,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AURAL_USER_SELECTED" />
 
     <application
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="false">
         <provider
             android:name="top.niunaijun.blackbox.core.system.SystemCallProvider"
             android:authorities="${applicationId}.blackbox.SystemCallProvider"
@@ -507,7 +507,7 @@
         <receiver
             android:name=".proxy.ProxyBroadcastReceiver"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:process="@string/black_box_service_name">
             <intent-filter>
                 <action android:name="${applicationId}.stub_receiver" />
@@ -529,6 +529,7 @@
         <activity
             android:name=".app.LauncherActivity"
             android:excludeFromRecents="true"
+            android:exported="false"
             android:theme="@style/LauncherTheme" />
 
         <service
@@ -549,7 +550,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P0"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p0"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -557,7 +558,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P1"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p1"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -565,7 +566,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P2"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p2"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -573,7 +574,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P3"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p3"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -581,7 +582,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P4"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p4"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -589,7 +590,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P5"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p5"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -597,7 +598,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P6"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p6"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -605,7 +606,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P7"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p7"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -613,7 +614,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P8"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p8"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -621,7 +622,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P9"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p9"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -629,7 +630,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P10"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p10"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -637,7 +638,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P11"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p11"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -645,7 +646,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P12"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p12"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -653,7 +654,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P13"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p13"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -661,7 +662,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P14"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p14"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -669,7 +670,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P15"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p15"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -677,7 +678,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P16"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p16"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -685,7 +686,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P17"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p17"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -693,7 +694,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P18"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p18"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -701,7 +702,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P19"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p19"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -709,7 +710,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P20"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p20"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -717,7 +718,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P21"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p21"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -725,7 +726,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P22"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p22"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -733,7 +734,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P23"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p23"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -741,7 +742,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P24"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p24"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -749,7 +750,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P25"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p25"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -757,7 +758,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P26"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p26"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -765,7 +766,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P27"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p27"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -773,7 +774,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P28"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p28"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -781,7 +782,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P29"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p29"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -789,7 +790,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P30"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p30"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -797,7 +798,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P31"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p31"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -805,7 +806,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P32"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p32"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -813,7 +814,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P33"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p33"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -821,7 +822,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P34"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p34"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -829,7 +830,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P35"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p35"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -837,7 +838,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P36"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p36"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -845,7 +846,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P37"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p37"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -853,7 +854,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P38"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p38"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -861,7 +862,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P39"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p39"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -869,7 +870,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P40"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p40"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -877,7 +878,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P41"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p41"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -885,7 +886,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P42"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p42"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -893,7 +894,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P43"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p43"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -901,7 +902,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P44"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p44"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -909,7 +910,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P45"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p45"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -917,7 +918,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P46"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p46"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -925,7 +926,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P47"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p47"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -933,7 +934,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P48"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p48"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -941,7 +942,7 @@
         <activity
             android:name=".proxy.ProxyActivity$P49"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p49"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -951,7 +952,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P0"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p0"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -959,7 +960,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P1"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p1"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -967,7 +968,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P2"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p2"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -975,7 +976,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P3"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p3"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -983,7 +984,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P4"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p4"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -991,7 +992,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P5"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p5"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -999,7 +1000,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P6"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p6"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1007,7 +1008,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P7"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p7"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1015,7 +1016,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P8"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p8"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1023,7 +1024,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P9"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p9"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1031,7 +1032,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P10"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p10"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1039,7 +1040,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P11"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p11"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1047,7 +1048,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P12"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p12"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1055,7 +1056,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P13"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p13"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1063,7 +1064,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P14"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p14"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1071,7 +1072,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P15"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p15"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1079,7 +1080,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P16"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p16"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1087,7 +1088,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P17"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p17"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1095,7 +1096,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P18"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p18"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1103,7 +1104,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P19"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p19"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1111,7 +1112,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P20"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p20"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1119,7 +1120,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P21"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p21"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1127,7 +1128,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P22"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p22"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1135,7 +1136,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P23"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p23"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1143,7 +1144,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P24"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p24"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1151,7 +1152,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P25"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p25"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1159,7 +1160,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P26"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p26"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1167,7 +1168,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P27"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p27"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1175,7 +1176,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P28"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p28"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1183,7 +1184,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P29"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p29"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1191,7 +1192,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P30"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p30"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1199,7 +1200,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P31"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p31"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1207,7 +1208,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P32"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p32"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1215,7 +1216,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P33"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p33"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1223,7 +1224,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P34"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p34"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1231,7 +1232,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P35"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p35"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1239,7 +1240,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P36"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p36"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1247,7 +1248,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P37"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p37"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1255,7 +1256,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P38"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p38"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1263,7 +1264,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P39"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p39"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1271,7 +1272,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P40"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p40"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1279,7 +1280,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P41"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p41"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1287,7 +1288,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P42"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p42"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1295,7 +1296,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P43"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p43"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1303,7 +1304,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P44"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p44"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1311,7 +1312,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P45"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p45"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1319,7 +1320,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P46"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p46"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1327,7 +1328,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P47"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p47"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1335,7 +1336,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P48"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p48"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1343,7 +1344,7 @@
         <activity
             android:name=".proxy.TransparentProxyActivity$P49"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-            android:exported="true"
+            android:exported="false"
             android:process=":p49"
             android:supportsPictureInPicture="true"
             android:taskAffinity="top.niunaijun.blackbox.task_affinity"
@@ -1352,706 +1353,706 @@
 
         <activity
             android:name=".proxy.ProxyPendingActivity$P0"
-            android:exported="true"
+            android:exported="false"
             android:process=":p0"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P1"
-            android:exported="true"
+            android:exported="false"
             android:process=":p1"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P2"
-            android:exported="true"
+            android:exported="false"
             android:process=":p2"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P3"
-            android:exported="true"
+            android:exported="false"
             android:process=":p3"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P4"
-            android:exported="true"
+            android:exported="false"
             android:process=":p4"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P5"
-            android:exported="true"
+            android:exported="false"
             android:process=":p5"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P6"
-            android:exported="true"
+            android:exported="false"
             android:process=":p6"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P7"
-            android:exported="true"
+            android:exported="false"
             android:process=":p7"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P8"
-            android:exported="true"
+            android:exported="false"
             android:process=":p8"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P9"
-            android:exported="true"
+            android:exported="false"
             android:process=":p9"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P10"
-            android:exported="true"
+            android:exported="false"
             android:process=":p10"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P11"
-            android:exported="true"
+            android:exported="false"
             android:process=":p11"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P12"
-            android:exported="true"
+            android:exported="false"
             android:process=":p12"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P13"
-            android:exported="true"
+            android:exported="false"
             android:process=":p13"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P14"
-            android:exported="true"
+            android:exported="false"
             android:process=":p14"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P15"
-            android:exported="true"
+            android:exported="false"
             android:process=":p15"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P16"
-            android:exported="true"
+            android:exported="false"
             android:process=":p16"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P17"
-            android:exported="true"
+            android:exported="false"
             android:process=":p17"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P18"
-            android:exported="true"
+            android:exported="false"
             android:process=":p18"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P19"
-            android:exported="true"
+            android:exported="false"
             android:process=":p19"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P20"
-            android:exported="true"
+            android:exported="false"
             android:process=":p20"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P21"
-            android:exported="true"
+            android:exported="false"
             android:process=":p21"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P22"
-            android:exported="true"
+            android:exported="false"
             android:process=":p22"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P23"
-            android:exported="true"
+            android:exported="false"
             android:process=":p23"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P24"
-            android:exported="true"
+            android:exported="false"
             android:process=":p24"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P25"
-            android:exported="true"
+            android:exported="false"
             android:process=":p25"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P26"
-            android:exported="true"
+            android:exported="false"
             android:process=":p26"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P27"
-            android:exported="true"
+            android:exported="false"
             android:process=":p27"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P28"
-            android:exported="true"
+            android:exported="false"
             android:process=":p28"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P29"
-            android:exported="true"
+            android:exported="false"
             android:process=":p29"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P30"
-            android:exported="true"
+            android:exported="false"
             android:process=":p30"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P31"
-            android:exported="true"
+            android:exported="false"
             android:process=":p31"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P32"
-            android:exported="true"
+            android:exported="false"
             android:process=":p32"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P33"
-            android:exported="true"
+            android:exported="false"
             android:process=":p33"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P34"
-            android:exported="true"
+            android:exported="false"
             android:process=":p34"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P35"
-            android:exported="true"
+            android:exported="false"
             android:process=":p35"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P36"
-            android:exported="true"
+            android:exported="false"
             android:process=":p36"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P37"
-            android:exported="true"
+            android:exported="false"
             android:process=":p37"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P38"
-            android:exported="true"
+            android:exported="false"
             android:process=":p38"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P39"
-            android:exported="true"
+            android:exported="false"
             android:process=":p39"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P40"
-            android:exported="true"
+            android:exported="false"
             android:process=":p40"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P41"
-            android:exported="true"
+            android:exported="false"
             android:process=":p41"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P42"
-            android:exported="true"
+            android:exported="false"
             android:process=":p42"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P43"
-            android:exported="true"
+            android:exported="false"
             android:process=":p43"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P44"
-            android:exported="true"
+            android:exported="false"
             android:process=":p44"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P45"
-            android:exported="true"
+            android:exported="false"
             android:process=":p45"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P46"
-            android:exported="true"
+            android:exported="false"
             android:process=":p46"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P47"
-            android:exported="true"
+            android:exported="false"
             android:process=":p47"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P48"
-            android:exported="true"
+            android:exported="false"
             android:process=":p48"
             android:theme="@android:style/Theme.Translucent" />
         <activity
             android:name=".proxy.ProxyPendingActivity$P49"
-            android:exported="true"
+            android:exported="false"
             android:process=":p48"
             android:theme="@android:style/Theme.Translucent" />
 
         <service
             android:name=".proxy.ProxyService$P0"
-            android:exported="true"
+            android:exported="false"
             android:process=":p0" />
         <service
             android:name=".proxy.ProxyService$P1"
-            android:exported="true"
+            android:exported="false"
             android:process=":p1" />
         <service
             android:name=".proxy.ProxyService$P2"
-            android:exported="true"
+            android:exported="false"
             android:process=":p2" />
         <service
             android:name=".proxy.ProxyService$P3"
-            android:exported="true"
+            android:exported="false"
             android:process=":p3" />
         <service
             android:name=".proxy.ProxyService$P4"
-            android:exported="true"
+            android:exported="false"
             android:process=":p4" />
         <service
             android:name=".proxy.ProxyService$P5"
-            android:exported="true"
+            android:exported="false"
             android:process=":p5" />
         <service
             android:name=".proxy.ProxyService$P6"
-            android:exported="true"
+            android:exported="false"
             android:process=":p6" />
         <service
             android:name=".proxy.ProxyService$P7"
-            android:exported="true"
+            android:exported="false"
             android:process=":p7" />
         <service
             android:name=".proxy.ProxyService$P8"
-            android:exported="true"
+            android:exported="false"
             android:process=":p8" />
         <service
             android:name=".proxy.ProxyService$P9"
-            android:exported="true"
+            android:exported="false"
             android:process=":p9" />
         <service
             android:name=".proxy.ProxyService$P10"
-            android:exported="true"
+            android:exported="false"
             android:process=":p10" />
         <service
             android:name=".proxy.ProxyService$P11"
-            android:exported="true"
+            android:exported="false"
             android:process=":p11" />
         <service
             android:name=".proxy.ProxyService$P12"
-            android:exported="true"
+            android:exported="false"
             android:process=":p12" />
         <service
             android:name=".proxy.ProxyService$P13"
-            android:exported="true"
+            android:exported="false"
             android:process=":p13" />
         <service
             android:name=".proxy.ProxyService$P14"
-            android:exported="true"
+            android:exported="false"
             android:process=":p14" />
         <service
             android:name=".proxy.ProxyService$P15"
-            android:exported="true"
+            android:exported="false"
             android:process=":p15" />
         <service
             android:name=".proxy.ProxyService$P16"
-            android:exported="true"
+            android:exported="false"
             android:process=":p16" />
         <service
             android:name=".proxy.ProxyService$P17"
-            android:exported="true"
+            android:exported="false"
             android:process=":p17" />
         <service
             android:name=".proxy.ProxyService$P18"
-            android:exported="true"
+            android:exported="false"
             android:process=":p18" />
         <service
             android:name=".proxy.ProxyService$P19"
-            android:exported="true"
+            android:exported="false"
             android:process=":p19" />
         <service
             android:name=".proxy.ProxyService$P20"
-            android:exported="true"
+            android:exported="false"
             android:process=":p20" />
         <service
             android:name=".proxy.ProxyService$P21"
-            android:exported="true"
+            android:exported="false"
             android:process=":p21" />
         <service
             android:name=".proxy.ProxyService$P22"
-            android:exported="true"
+            android:exported="false"
             android:process=":p22" />
         <service
             android:name=".proxy.ProxyService$P23"
-            android:exported="true"
+            android:exported="false"
             android:process=":p23" />
         <service
             android:name=".proxy.ProxyService$P24"
-            android:exported="true"
+            android:exported="false"
             android:process=":p24" />
         <service
             android:name=".proxy.ProxyService$P25"
-            android:exported="true"
+            android:exported="false"
             android:process=":p25" />
         <service
             android:name=".proxy.ProxyService$P26"
-            android:exported="true"
+            android:exported="false"
             android:process=":p26" />
         <service
             android:name=".proxy.ProxyService$P27"
-            android:exported="true"
+            android:exported="false"
             android:process=":p27" />
         <service
             android:name=".proxy.ProxyService$P28"
-            android:exported="true"
+            android:exported="false"
             android:process=":p28" />
         <service
             android:name=".proxy.ProxyService$P29"
-            android:exported="true"
+            android:exported="false"
             android:process=":p29" />
         <service
             android:name=".proxy.ProxyService$P30"
-            android:exported="true"
+            android:exported="false"
             android:process=":p30" />
         <service
             android:name=".proxy.ProxyService$P31"
-            android:exported="true"
+            android:exported="false"
             android:process=":p31" />
         <service
             android:name=".proxy.ProxyService$P32"
-            android:exported="true"
+            android:exported="false"
             android:process=":p32" />
         <service
             android:name=".proxy.ProxyService$P33"
-            android:exported="true"
+            android:exported="false"
             android:process=":p33" />
         <service
             android:name=".proxy.ProxyService$P34"
-            android:exported="true"
+            android:exported="false"
             android:process=":p34" />
         <service
             android:name=".proxy.ProxyService$P35"
-            android:exported="true"
+            android:exported="false"
             android:process=":p35" />
         <service
             android:name=".proxy.ProxyService$P36"
-            android:exported="true"
+            android:exported="false"
             android:process=":p36" />
         <service
             android:name=".proxy.ProxyService$P37"
-            android:exported="true"
+            android:exported="false"
             android:process=":p37" />
         <service
             android:name=".proxy.ProxyService$P38"
-            android:exported="true"
+            android:exported="false"
             android:process=":p38" />
         <service
             android:name=".proxy.ProxyService$P39"
-            android:exported="true"
+            android:exported="false"
             android:process=":p39" />
         <service
             android:name=".proxy.ProxyService$P40"
-            android:exported="true"
+            android:exported="false"
             android:process=":p40" />
         <service
             android:name=".proxy.ProxyService$P41"
-            android:exported="true"
+            android:exported="false"
             android:process=":p41" />
         <service
             android:name=".proxy.ProxyService$P42"
-            android:exported="true"
+            android:exported="false"
             android:process=":p42" />
         <service
             android:name=".proxy.ProxyService$P43"
-            android:exported="true"
+            android:exported="false"
             android:process=":p43" />
         <service
             android:name=".proxy.ProxyService$P44"
-            android:exported="true"
+            android:exported="false"
             android:process=":p44" />
         <service
             android:name=".proxy.ProxyService$P45"
-            android:exported="true"
+            android:exported="false"
             android:process=":p45" />
         <service
             android:name=".proxy.ProxyService$P46"
-            android:exported="true"
+            android:exported="false"
             android:process=":p46" />
         <service
             android:name=".proxy.ProxyService$P47"
-            android:exported="true"
+            android:exported="false"
             android:process=":p47" />
         <service
             android:name=".proxy.ProxyService$P48"
-            android:exported="true"
+            android:exported="false"
             android:process=":p48" />
         <service
             android:name=".proxy.ProxyService$P49"
-            android:exported="true"
+            android:exported="false"
             android:process=":p49" />
 
 
         <provider
             android:name=".proxy.ProxyContentProvider$P0"
             android:authorities="${applicationId}.proxy_content_provider_0"
-            android:exported="true"
+            android:exported="false"
             android:process=":p0" />
         <provider
             android:name=".proxy.ProxyContentProvider$P1"
             android:authorities="${applicationId}.proxy_content_provider_1"
-            android:exported="true"
+            android:exported="false"
             android:process=":p1" />
         <provider
             android:name=".proxy.ProxyContentProvider$P2"
             android:authorities="${applicationId}.proxy_content_provider_2"
-            android:exported="true"
+            android:exported="false"
             android:process=":p2" />
         <provider
             android:name=".proxy.ProxyContentProvider$P3"
             android:authorities="${applicationId}.proxy_content_provider_3"
-            android:exported="true"
+            android:exported="false"
             android:process=":p3" />
         <provider
             android:name=".proxy.ProxyContentProvider$P4"
             android:authorities="${applicationId}.proxy_content_provider_4"
-            android:exported="true"
+            android:exported="false"
             android:process=":p4" />
         <provider
             android:name=".proxy.ProxyContentProvider$P5"
             android:authorities="${applicationId}.proxy_content_provider_5"
-            android:exported="true"
+            android:exported="false"
             android:process=":p5" />
         <provider
             android:name=".proxy.ProxyContentProvider$P6"
             android:authorities="${applicationId}.proxy_content_provider_6"
-            android:exported="true"
+            android:exported="false"
             android:process=":p6" />
         <provider
             android:name=".proxy.ProxyContentProvider$P7"
             android:authorities="${applicationId}.proxy_content_provider_7"
-            android:exported="true"
+            android:exported="false"
             android:process=":p7" />
         <provider
             android:name=".proxy.ProxyContentProvider$P8"
             android:authorities="${applicationId}.proxy_content_provider_8"
-            android:exported="true"
+            android:exported="false"
             android:process=":p8" />
         <provider
             android:name=".proxy.ProxyContentProvider$P9"
             android:authorities="${applicationId}.proxy_content_provider_9"
-            android:exported="true"
+            android:exported="false"
             android:process=":p9" />
         <provider
             android:name=".proxy.ProxyContentProvider$P10"
             android:authorities="${applicationId}.proxy_content_provider_10"
-            android:exported="true"
+            android:exported="false"
             android:process=":p10" />
         <provider
             android:name=".proxy.ProxyContentProvider$P11"
             android:authorities="${applicationId}.proxy_content_provider_11"
-            android:exported="true"
+            android:exported="false"
             android:process=":p11" />
         <provider
             android:name=".proxy.ProxyContentProvider$P12"
             android:authorities="${applicationId}.proxy_content_provider_12"
-            android:exported="true"
+            android:exported="false"
             android:process=":p12" />
         <provider
             android:name=".proxy.ProxyContentProvider$P13"
             android:authorities="${applicationId}.proxy_content_provider_13"
-            android:exported="true"
+            android:exported="false"
             android:process=":p13" />
         <provider
             android:name=".proxy.ProxyContentProvider$P14"
             android:authorities="${applicationId}.proxy_content_provider_14"
-            android:exported="true"
+            android:exported="false"
             android:process=":p14" />
         <provider
             android:name=".proxy.ProxyContentProvider$P15"
             android:authorities="${applicationId}.proxy_content_provider_15"
-            android:exported="true"
+            android:exported="false"
             android:process=":p15" />
         <provider
             android:name=".proxy.ProxyContentProvider$P16"
             android:authorities="${applicationId}.proxy_content_provider_16"
-            android:exported="true"
+            android:exported="false"
             android:process=":p16" />
         <provider
             android:name=".proxy.ProxyContentProvider$P17"
             android:authorities="${applicationId}.proxy_content_provider_17"
-            android:exported="true"
+            android:exported="false"
             android:process=":p17" />
         <provider
             android:name=".proxy.ProxyContentProvider$P18"
             android:authorities="${applicationId}.proxy_content_provider_18"
-            android:exported="true"
+            android:exported="false"
             android:process=":p18" />
         <provider
             android:name=".proxy.ProxyContentProvider$P19"
             android:authorities="${applicationId}.proxy_content_provider_19"
-            android:exported="true"
+            android:exported="false"
             android:process=":p19" />
         <provider
             android:name=".proxy.ProxyContentProvider$P20"
             android:authorities="${applicationId}.proxy_content_provider_20"
-            android:exported="true"
+            android:exported="false"
             android:process=":p20" />
         <provider
             android:name=".proxy.ProxyContentProvider$P21"
             android:authorities="${applicationId}.proxy_content_provider_21"
-            android:exported="true"
+            android:exported="false"
             android:process=":p21" />
         <provider
             android:name=".proxy.ProxyContentProvider$P22"
             android:authorities="${applicationId}.proxy_content_provider_22"
-            android:exported="true"
+            android:exported="false"
             android:process=":p22" />
         <provider
             android:name=".proxy.ProxyContentProvider$P23"
             android:authorities="${applicationId}.proxy_content_provider_23"
-            android:exported="true"
+            android:exported="false"
             android:process=":p23" />
         <provider
             android:name=".proxy.ProxyContentProvider$P24"
             android:authorities="${applicationId}.proxy_content_provider_24"
-            android:exported="true"
+            android:exported="false"
             android:process=":p24" />
         <provider
             android:name=".proxy.ProxyContentProvider$P25"
             android:authorities="${applicationId}.proxy_content_provider_25"
-            android:exported="true"
+            android:exported="false"
             android:process=":p25" />
         <provider
             android:name=".proxy.ProxyContentProvider$P26"
             android:authorities="${applicationId}.proxy_content_provider_26"
-            android:exported="true"
+            android:exported="false"
             android:process=":p26" />
         <provider
             android:name=".proxy.ProxyContentProvider$P27"
             android:authorities="${applicationId}.proxy_content_provider_27"
-            android:exported="true"
+            android:exported="false"
             android:process=":p27" />
         <provider
             android:name=".proxy.ProxyContentProvider$P28"
             android:authorities="${applicationId}.proxy_content_provider_28"
-            android:exported="true"
+            android:exported="false"
             android:process=":p28" />
         <provider
             android:name=".proxy.ProxyContentProvider$P29"
             android:authorities="${applicationId}.proxy_content_provider_29"
-            android:exported="true"
+            android:exported="false"
             android:process=":p29" />
         <provider
             android:name=".proxy.ProxyContentProvider$P30"
             android:authorities="${applicationId}.proxy_content_provider_30"
-            android:exported="true"
+            android:exported="false"
             android:process=":p30" />
         <provider
             android:name=".proxy.ProxyContentProvider$P31"
             android:authorities="${applicationId}.proxy_content_provider_31"
-            android:exported="true"
+            android:exported="false"
             android:process=":p31" />
         <provider
             android:name=".proxy.ProxyContentProvider$P32"
             android:authorities="${applicationId}.proxy_content_provider_32"
-            android:exported="true"
+            android:exported="false"
             android:process=":p32" />
         <provider
             android:name=".proxy.ProxyContentProvider$P33"
             android:authorities="${applicationId}.proxy_content_provider_33"
-            android:exported="true"
+            android:exported="false"
             android:process=":p33" />
         <provider
             android:name=".proxy.ProxyContentProvider$P34"
             android:authorities="${applicationId}.proxy_content_provider_34"
-            android:exported="true"
+            android:exported="false"
             android:process=":p34" />
         <provider
             android:name=".proxy.ProxyContentProvider$P35"
             android:authorities="${applicationId}.proxy_content_provider_35"
-            android:exported="true"
+            android:exported="false"
             android:process=":p35" />
         <provider
             android:name=".proxy.ProxyContentProvider$P36"
             android:authorities="${applicationId}.proxy_content_provider_36"
-            android:exported="true"
+            android:exported="false"
             android:process=":p36" />
         <provider
             android:name=".proxy.ProxyContentProvider$P37"
             android:authorities="${applicationId}.proxy_content_provider_37"
-            android:exported="true"
+            android:exported="false"
             android:process=":p37" />
         <provider
             android:name=".proxy.ProxyContentProvider$P38"
             android:authorities="${applicationId}.proxy_content_provider_38"
-            android:exported="true"
+            android:exported="false"
             android:process=":p38" />
         <provider
             android:name=".proxy.ProxyContentProvider$P39"
             android:authorities="${applicationId}.proxy_content_provider_39"
-            android:exported="true"
+            android:exported="false"
             android:process=":p39" />
         <provider
             android:name=".proxy.ProxyContentProvider$P40"
             android:authorities="${applicationId}.proxy_content_provider_40"
-            android:exported="true"
+            android:exported="false"
             android:process=":p40" />
         <provider
             android:name=".proxy.ProxyContentProvider$P41"
             android:authorities="${applicationId}.proxy_content_provider_41"
-            android:exported="true"
+            android:exported="false"
             android:process=":p41" />
         <provider
             android:name=".proxy.ProxyContentProvider$P42"
             android:authorities="${applicationId}.proxy_content_provider_42"
-            android:exported="true"
+            android:exported="false"
             android:process=":p42" />
         <provider
             android:name=".proxy.ProxyContentProvider$P43"
             android:authorities="${applicationId}.proxy_content_provider_43"
-            android:exported="true"
+            android:exported="false"
             android:process=":p43" />
         <provider
             android:name=".proxy.ProxyContentProvider$P44"
             android:authorities="${applicationId}.proxy_content_provider_44"
-            android:exported="true"
+            android:exported="false"
             android:process=":p44" />
         <provider
             android:name=".proxy.ProxyContentProvider$P45"
             android:authorities="${applicationId}.proxy_content_provider_45"
-            android:exported="true"
+            android:exported="false"
             android:process=":p45" />
         <provider
             android:name=".proxy.ProxyContentProvider$P46"
             android:authorities="${applicationId}.proxy_content_provider_46"
-            android:exported="true"
+            android:exported="false"
             android:process=":p46" />
         <provider
             android:name=".proxy.ProxyContentProvider$P47"
             android:authorities="${applicationId}.proxy_content_provider_47"
-            android:exported="true"
+            android:exported="false"
             android:process=":p47" />
         <provider
             android:name=".proxy.ProxyContentProvider$P48"
             android:authorities="${applicationId}.proxy_content_provider_48"
-            android:exported="true"
+            android:exported="false"
             android:process=":p48" />
         <provider
             android:name=".proxy.ProxyContentProvider$P49"
             android:authorities="${applicationId}.proxy_content_provider_49"
-            android:exported="true"
+            android:exported="false"
             android:process=":p49" />
 
         <service

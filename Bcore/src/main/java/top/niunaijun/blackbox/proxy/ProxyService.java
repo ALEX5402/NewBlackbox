@@ -19,11 +19,17 @@ public class ProxyService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        if (intent == null) {
+            return null;
+        }
         return AppServiceDispatcher.get().onBind(intent);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            return START_NOT_STICKY;
+        }
         AppServiceDispatcher.get().onStartCommand(intent, flags, startId);
         return START_NOT_STICKY;
     }
@@ -54,6 +60,9 @@ public class ProxyService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        if (intent == null) {
+            return false;
+        }
         AppServiceDispatcher.get().onUnbind(intent);
         return false;
     }
