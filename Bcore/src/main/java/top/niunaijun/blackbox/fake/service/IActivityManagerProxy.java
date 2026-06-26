@@ -783,6 +783,11 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                     || permission.equals(Manifest.permission.SEND_SMS)) {
                 return PackageManager.PERMISSION_GRANTED;
             }
+
+            if (isNetworkPermission(permission)) {
+                Slog.d(TAG, "ActivityManager checkPermission: Granting network permission: " + permission);
+                return PackageManager.PERMISSION_GRANTED;
+            }
             
             
             if (isAudioPermission(permission)) {
@@ -796,6 +801,19 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 return PackageManager.PERMISSION_GRANTED;
             }
             
+            return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("checkPermissionForDevice")
+    public static class checkPermissionForDevice extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            String permission = (String) args[0];
+            if (isNetworkPermission(permission)) {
+                Slog.d(TAG, "ActivityManager checkPermissionForDevice: Granting network permission: " + permission);
+                return PackageManager.PERMISSION_GRANTED;
+            }
             return method.invoke(who, args);
         }
     }
@@ -816,6 +834,16 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 || permission.equals("android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED")
                 || permission.equals("android.permission.FOREGROUND_SERVICE_PHONE_CALL")
                 || permission.equals("android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE");
+    }
+
+    private static boolean isNetworkPermission(String permission) {
+        if (permission == null) return false;
+        return permission.equals(Manifest.permission.INTERNET)
+                || permission.equals(Manifest.permission.ACCESS_NETWORK_STATE)
+                || permission.equals(Manifest.permission.ACCESS_WIFI_STATE)
+                || permission.equals(Manifest.permission.CHANGE_NETWORK_STATE)
+                || permission.equals(Manifest.permission.CHANGE_WIFI_STATE)
+                || permission.equals(Manifest.permission.CHANGE_WIFI_MULTICAST_STATE);
     }
 
     @ProxyMethod("checkUriPermission")
