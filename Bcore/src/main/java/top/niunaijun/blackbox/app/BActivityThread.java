@@ -394,6 +394,13 @@ public class BActivityThread extends IBActivityThread.Stub {
 
         VirtualRuntime.setupRuntime(processName, applicationInfo);
 
+        // Fase 2: Implement Build.prop spoofing per app
+        try {
+            top.niunaijun.blackbox.fake.hook.BuildProxy.spoofBuild(packageName);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
         BRVMRuntime.get(BRVMRuntime.get().getRuntime()).setTargetSdkVersion(applicationInfo.targetSdkVersion);
         if (BuildCompat.isS()) {
             BRCompatibility.get().setTargetSdkVersion(applicationInfo.targetSdkVersion);

@@ -40,57 +40,22 @@ public class IJobServiceProxy extends BinderInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                
-                if (args == null || args.length == 0) {
-                    Slog.w(TAG, "Schedule: No arguments provided, returning RESULT_FAILURE");
-                    return 0; 
-                }
-                
-                if (args[0] == null) {
-                    Slog.w(TAG, "Schedule: args[0] is null, returning RESULT_FAILURE");
+                if (args == null || args.length == 0 || args[0] == null) {
                     return 0; 
                 }
                 
                 if (!(args[0] instanceof JobInfo)) {
-                    Slog.w(TAG, "Schedule: args[0] is not JobInfo: " + args[0].getClass().getSimpleName());
-                    
                     return handleNonJobInfoSchedule(who, method, args);
                 }
                 
                 JobInfo jobInfo = (JobInfo) args[0];
-                Slog.d(TAG, "Schedule: Processing JobInfo for package: " + jobInfo.getService().getPackageName());
                 
-                
-                try {
-                    JobInfo proxyJobInfo = BlackBoxCore.getBJobManager().schedule(jobInfo);
-                    if (proxyJobInfo != null) {
-                        args[0] = proxyJobInfo;
-                        Slog.d(TAG, "Schedule: Successfully created proxy JobInfo");
-                        return method.invoke(who, args);
-                    }
-                } catch (Exception e) {
-                    Slog.w(TAG, "Schedule: BlackBox job manager failed, trying system fallback", e);
-                }
-                
-                
-                return scheduleWithUIDSpoofing(who, method, args, jobInfo);
+                // Phase 3 Fix: Redirect to VirtualJobScheduler to isolate background tasks from host System OS
+                return top.niunaijun.blackbox.app.VirtualJobScheduler.get().schedule(jobInfo);
                 
             } catch (Exception e) {
                 Slog.e(TAG, "Schedule: Error processing job", e);
-                
-                
-                if (isUIDValidationError(e)) {
-                    Slog.w(TAG, "UID validation failed for job scheduling, returning RESULT_FAILURE: " + e.getCause().getMessage());
-                    return 0; 
-                }
-                
-                
-                try {
-                    return method.invoke(who, args);
-                } catch (Exception fallbackException) {
-                    Slog.e(TAG, "Schedule: Fallback also failed", fallbackException);
-                    return 0; 
-                }
+                return 0;
             }
         }
         
@@ -182,17 +147,12 @@ public class IJobServiceProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
                 Integer jobId = (Integer) args[0];
-                if (jobId == null) {
-                    Slog.w(TAG, "Cancel: JobId is null");
-                    return method.invoke(who, args);
+                if (jobId != null) {
+                    top.niunaijun.blackbox.app.VirtualJobScheduler.get().cancel(jobId);
                 }
-                
-                args[0] = BlackBoxCore.getBJobManager()
-                        .cancel(BActivityThread.getAppConfig().processName, jobId);
-                return method.invoke(who, args);
+                return 0;
             } catch (Exception e) {
-                Slog.e(TAG, "Cancel: Error canceling job", e);
-                return method.invoke(who, args);
+                return 0;
             }
         }
     }
@@ -202,11 +162,10 @@ public class IJobServiceProxy extends BinderInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                BlackBoxCore.getBJobManager().cancelAll(BActivityThread.getAppConfig().processName);
-                return method.invoke(who, args);
+                top.niunaijun.blackbox.app.VirtualJobScheduler.get().cancelAll(top.niunaijun.blackbox.app.BActivityThread.getAppConfig().processName);
+                return 0;
             } catch (Exception e) {
-                Slog.e(TAG, "CancelAll: Error canceling all jobs", e);
-                return method.invoke(who, args);
+                return 0;
             }
         }
     }
@@ -216,57 +175,22 @@ public class IJobServiceProxy extends BinderInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                
-                if (args == null || args.length == 0) {
-                    Slog.w(TAG, "Enqueue: No arguments provided, returning RESULT_FAILURE");
-                    return 0; 
-                }
-                
-                if (args[0] == null) {
-                    Slog.w(TAG, "Enqueue: args[0] is null, returning RESULT_FAILURE");
+                if (args == null || args.length == 0 || args[0] == null) {
                     return 0; 
                 }
                 
                 if (!(args[0] instanceof JobInfo)) {
-                    Slog.w(TAG, "Enqueue: args[0] is not JobInfo: " + args[0].getClass().getSimpleName());
-                    
                     return handleNonJobInfoEnqueue(who, method, args);
                 }
                 
                 JobInfo jobInfo = (JobInfo) args[0];
-                Slog.d(TAG, "Enqueue: Processing JobInfo for package: " + jobInfo.getService().getPackageName());
                 
-                
-                try {
-                    JobInfo proxyJobInfo = BlackBoxCore.getBJobManager().schedule(jobInfo);
-                    if (proxyJobInfo != null) {
-                        args[0] = proxyJobInfo;
-                        Slog.d(TAG, "Enqueue: Successfully created proxy JobInfo");
-                        return method.invoke(who, args);
-                    }
-                } catch (Exception e) {
-                    Slog.w(TAG, "Enqueue: BlackBox job manager failed, trying system fallback", e);
-                }
-                
-                
-                return enqueueWithUIDSpoofing(who, method, args, jobInfo);
+                // Phase 3 Fix: Redirect to VirtualJobScheduler
+                return top.niunaijun.blackbox.app.VirtualJobScheduler.get().schedule(jobInfo);
                 
             } catch (Exception e) {
                 Slog.e(TAG, "Enqueue: Error processing job", e);
-                
-                
-                if (isUIDValidationError(e)) {
-                    Slog.w(TAG, "UID validation failed for job enqueuing, returning RESULT_FAILURE: " + e.getCause().getMessage());
-                    return 0; 
-                }
-                
-                
-                try {
-                    return method.invoke(who, args);
-                } catch (Exception fallbackException) {
-                    Slog.e(TAG, "Enqueue: Fallback also failed", fallbackException);
-                    return 0; 
-                }
+                return 0;
             }
         }
         

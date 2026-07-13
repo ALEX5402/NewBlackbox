@@ -236,6 +236,12 @@ public class IAccountManagerProxy extends BinderInvocationStub {
 
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null && args.length > 2 && args[1] instanceof Account) {
+                Account account = (Account) args[1];
+                if ("com.google".equals(account.type)) {
+                    return method.invoke(who, args);
+                }
+            }
             BAccountManager.get().getAuthToken((IAccountManagerResponse) args[0],
                     (Account) args[1],
                     (String) args[2],
@@ -251,6 +257,12 @@ public class IAccountManagerProxy extends BinderInvocationStub {
 
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null && args.length > 1 && args[1] instanceof String) {
+                String accountType = (String) args[1];
+                if ("com.google".equals(accountType)) {
+                    return method.invoke(who, args);
+                }
+            }
             BAccountManager.get().addAccount((IAccountManagerResponse) args[0],
                     (String) args[1],
                     (String) args[2],

@@ -14,11 +14,32 @@ import java.util.Map;
 import black.android.os.BRServiceManager;
 
 
-public abstract class BinderInvocationStub extends ClassInvocationStub implements IBinder {
+public abstract class BinderInvocationStub extends ClassInvocationStub implements IBinder, IBinder.DeathRecipient {
     private IBinder mBaseBinder;
+    private String mServiceName;
 
     public BinderInvocationStub(IBinder baseBinder) {
         mBaseBinder = baseBinder;
+        try {
+            if (mBaseBinder != null) {
+                mBaseBinder.linkToDeath(this, 0);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void binderDied() {
+        if (mServiceName != null) {
+            Map<String, IBinder> services = BRServiceManager.get().sCache();
+            if (services != null) {
+                services.remove(mServiceName);
+            }
+        }
+        if (mBaseBinder != null) {
+            mBaseBinder.unlinkToDeath(this, 0);
+        }
     }
 
     @Override
@@ -74,7 +95,10 @@ public abstract class BinderInvocationStub extends ClassInvocationStub implement
 
 
     protected void replaceSystemService(String name) {
+        mServiceName = name;
         Map<String, IBinder> services = BRServiceManager.get().sCache();
-        services.put(name, this);
+        if (services != null) {
+            services.put(name, this);
+        }
     }
 }
