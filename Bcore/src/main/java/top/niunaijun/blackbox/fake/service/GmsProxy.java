@@ -60,20 +60,29 @@ public class GmsProxy extends BinderInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                
-                if (args != null && args.length > 0) {
-                    String callingPackage = (String) args[0];
-                    if ("com.google.android.gms".equals(callingPackage)) {
-                        
-                        args[0] = BlackBoxCore.getHostPkg();
-                        Slog.d(TAG, "GmsProxy: Fixed calling package from com.google.android.gms to " + BlackBoxCore.getHostPkg());
+                if (args != null) {
+                    for (int i = 0; i < args.length; i++) {
+                        if (args[i] != null && args[i].getClass().getName().equals("com.google.android.gms.common.internal.GetServiceRequest")) {
+                            try {
+                                java.lang.reflect.Field pkgField = args[i].getClass().getField("callingPackage");
+                                pkgField.setAccessible(true);
+                                if ("com.google.android.gms".equals(pkgField.get(args[i]))) {
+                                    pkgField.set(args[i], BlackBoxCore.getHostPkg());
+                                    Slog.d(TAG, "GmsProxy: Fixed calling package in GetServiceRequest to " + BlackBoxCore.getHostPkg());
+                                }
+                            } catch (Exception ignored) {}
+                            break;
+                        } else if (args[i] instanceof String && "com.google.android.gms".equals(args[i])) {
+                            args[i] = BlackBoxCore.getHostPkg();
+                            Slog.d(TAG, "GmsProxy: Fixed calling package in String to " + BlackBoxCore.getHostPkg());
+                        }
                     }
                 }
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.e(TAG, "GmsProxy: Error in getService", e);
-                
-                return null;
+                throw e;
             }
         }
     }
@@ -85,10 +94,10 @@ public class GmsProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.e(TAG, "GmsProxy: Error in getServiceBroker", e);
-                
-                return null;
+                throw e;
             }
         }
     }
@@ -101,10 +110,10 @@ public class GmsProxy extends BinderInvocationStub {
             try {
                 Slog.d(TAG, "GmsProxy: Handling authenticate call");
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.w(TAG, "GmsProxy: Authentication error, returning success", e);
-                
-                return createMockAuthResult();
+                throw e;
             }
         }
     }
@@ -117,8 +126,12 @@ public class GmsProxy extends BinderInvocationStub {
             try {
                 Slog.d(TAG, "GmsProxy: Handling getAccount call");
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.w(TAG, "GmsProxy: GetAccount error, returning null", e);
+                if (method.getReturnType().isArray()) {
+                    return java.lang.reflect.Array.newInstance(method.getReturnType().getComponentType(), 0);
+                }
                 return null;
             }
         }
@@ -132,9 +145,10 @@ public class GmsProxy extends BinderInvocationStub {
             try {
                 Slog.d(TAG, "GmsProxy: Handling getToken call");
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.w(TAG, "GmsProxy: GetToken error, returning mock token", e);
-                return "mock_gms_token_" + System.currentTimeMillis();
+                throw e;
             }
         }
     }
@@ -147,9 +161,10 @@ public class GmsProxy extends BinderInvocationStub {
             try {
                 Slog.d(TAG, "GmsProxy: Handling invalidateToken call");
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.w(TAG, "GmsProxy: InvalidateToken error, ignoring", e);
-                return null;
+                throw e;
             }
         }
     }
@@ -162,22 +177,11 @@ public class GmsProxy extends BinderInvocationStub {
             try {
                 Slog.d(TAG, "GmsProxy: Handling clearToken call");
                 return method.invoke(who, args);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             } catch (Exception e) {
-                Slog.w(TAG, "GmsProxy: ClearToken error, ignoring", e);
-                return null;
+                throw e;
             }
-        }
-    }
-
-    
-    private static Object createMockAuthResult() {
-        try {
-            
-            Class<?> bundleClass = Class.forName("android.os.Bundle");
-            return bundleClass.newInstance();
-        } catch (Exception e) {
-            Slog.w(TAG, "Failed to create mock auth result", e);
-            return null;
         }
     }
 }
