@@ -372,9 +372,6 @@ public class BaseInstrumentationDelegate extends Instrumentation {
     @Override
     public void callActivityOnResume(Activity activity) {
         mBaseInstrumentation.callActivityOnResume(activity);
-        try {
-            top.niunaijun.blackbox.app.ProcessFreezer.onActivityResumed();
-        } catch (Throwable e) {}
         for (AppLifecycleCallback appLifecycleCallback : BlackBoxCore.get().getAppLifecycleCallbacks()) {
             appLifecycleCallback.onActivityResumed(activity);
         }
@@ -404,9 +401,6 @@ public class BaseInstrumentationDelegate extends Instrumentation {
     @Override
     public void callActivityOnPause(Activity activity) {
         mBaseInstrumentation.callActivityOnPause(activity);
-        try {
-            top.niunaijun.blackbox.app.ProcessFreezer.onActivityPaused();
-        } catch (Throwable e) {}
         for (AppLifecycleCallback appLifecycleCallback : BlackBoxCore.get().getAppLifecycleCallbacks()) {
             appLifecycleCallback.onActivityPaused(activity);
         }
