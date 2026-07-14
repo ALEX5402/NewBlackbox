@@ -394,9 +394,9 @@ public class BActivityThread extends IBActivityThread.Stub {
 
         VirtualRuntime.setupRuntime(processName, applicationInfo);
 
-        // Fase 2: Implement Build.prop spoofing per app
+        // Spoof Build.prop per user profile to avoid fingerprint collisions
         try {
-            top.niunaijun.blackbox.fake.hook.BuildProxy.spoofBuild(packageName);
+            top.niunaijun.blackbox.fake.hook.BuildProxy.spoofBuild(getUserId());
         } catch (Throwable e) {
             e.printStackTrace();
         }
