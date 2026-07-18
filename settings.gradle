@@ -6,6 +6,7 @@ pluginManagement {
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         maven { url 'https://maven.aliyun.com/repository/public' }
+        google()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
