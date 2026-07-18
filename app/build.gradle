@@ -85,7 +85,7 @@ dependencies {
     
     implementation 'com.github.Othershe:CornerLabelView:1.0.0'
     
-    implementation 'com.github.nukc.stateview:kotlin:2.2.0'
+//    implementation 'com.github.nukc.stateview:kotlin:2.2.0'
     
     implementation 'com.github.Ferfalk:SimpleSearchView:0.2.0'
     implementation 'com.tbuonomo:dotsindicator:4.2'
