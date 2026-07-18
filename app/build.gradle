@@ -45,7 +45,14 @@ android {
     kotlinOptions {
         jvmTarget = '21'
     }
-
+    packaging {
+        jniLibs {
+            excludes.add("**/libandroidx.graphics.path.so")
+        }
+        resources {
+            excludes.add("**/libandroidx.graphics.path.so")
+        }
+    }
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach { output ->
             output.outputFileName = "BlackBox_${variant.versionName}_${output.baseName}.apk"
