@@ -134,8 +134,16 @@ public class IPackageManagerProxy extends BinderInvocationStub {
             int flags = MethodParameterUtils.toInt(args[1]);
             
             
-            if ("com.android.vending".equals(packageName)) {
-                return createFakeGooglePlayServicesPackageInfo();
+            if ("com.google.android.gms".equals(packageName)
+                    || "com.google.android.gsf".equals(packageName)
+                    || "com.android.vending".equals(packageName)) {
+                try {
+                    return method.invoke(who, args);
+                } catch (Throwable ignored) {
+                    if ("com.android.vending".equals(packageName)) {
+                        return createFakeGooglePlayServicesPackageInfo();
+                    }
+                }
             }
             
             PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, flags, BlackBoxCore.getUserId());
@@ -283,6 +291,15 @@ public class IPackageManagerProxy extends BinderInvocationStub {
             int flags = MethodParameterUtils.toInt(args[1]);
 
 
+
+            if ("com.google.android.gms".equals(packageName)
+                    || "com.google.android.gsf".equals(packageName)
+                    || "com.android.vending".equals(packageName)) {
+                try {
+                    return method.invoke(who, args);
+                } catch (Throwable ignored) {
+                }
+            }
 
             ApplicationInfo applicationInfo = BlackBoxCore.getBPackageManager().getApplicationInfo(packageName, flags, BlackBoxCore.getUserId());
             if (applicationInfo != null) {
