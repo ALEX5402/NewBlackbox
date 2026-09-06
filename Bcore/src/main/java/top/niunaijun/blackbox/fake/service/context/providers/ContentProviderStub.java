@@ -42,44 +42,35 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if ("asBinder".equals(method.getName())) {
-            return method.invoke(mBase, args);
-        }
-        
-        
-        String methodName = method.getName();
-        
-        
-        
-        if ("call".equals(methodName)) {
-            AttributionSourceUtils.fixAttributionSourceInArgs(args);
-        } else {
-            
-            if (args != null && args.length > 0) {
-                for (int i = 0; i < args.length; i++) {
-                    Object arg = args[i];
-                    if (arg instanceof String) {
-                        String strArg = (String) arg;
-                        
-                        if (!isSystemProviderAuthority(strArg)) {
-                            
-                            args[i] = mAppPkg;
-                        }
+public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    if ("asBinder".equals(method.getName())) {
+        return method.invoke(mBase, args);
+    }
+
+    String methodName = method.getName();
+
+    if ("call".equals(methodName)) {
+        AttributionSourceUtils.fixAttributionSourceInArgs(args);
+    } else {
+        if (args != null && args.length > 0) {
+            for (int i = 0; i < args.length; i++) {
+                Object arg = args[i];
+                if (arg instanceof String) {
+                    String strArg = (String) arg;
+                    if (!isSystemProviderAuthority(strArg)) {
+                        args[i] = mAppPkg;
                     }
                 }
-                
-                AttributionSourceUtils.fixAttributionSourceInArgs(args);
             }
+            AttributionSourceUtils.fixAttributionSourceInArgs(args);
         }
-        
-        
-        methodName = method.getName();
-        if (methodName.equals("query") || methodName.equals("insert") || 
-            methodName.equals("update") || methodName.equals("delete") || 
-            methodName.equals("bulkInsert") || methodName.equals("call")) {
-            
-            
+    }
+
+    try {
+        if (methodName.equals("query") || methodName.equals("insert")
+                || methodName.equals("update") || methodName.equals("delete")
+                || methodName.equals("bulkInsert") || methodName.equals("call")) {
+
             try {
                 return method.invoke(mBase, args);
             } catch (Throwable e) {
@@ -97,33 +88,21 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
                 }
                 throw e;
             }
-                }
-                
-                
-                if (methodName.equals("call")) {
-                    Slog.w(TAG, "Error in call method, returning safe default: " + e.getMessage());
-                    return getSafeDefaultValue(methodName, method.getReturnType());
-                }
-                
-                throw e.getCause();
-            }
         }
-        
-        
-        try {
-            return method.invoke(mBase, args);
-        } catch (Throwable e) {
-            Throwable cause = unwrap(e);
-            if (isIgnorableProviderError(cause)) {
-                Slog.w(TAG, "Provider " + methodName + " denied, returning safe default: " + cause.getMessage());
-                return getSafeDefaultValue(methodName, method.getReturnType());
-            }
-            if (cause != null) {
-                throw cause;
-            }
-            throw e;
+
+        return method.invoke(mBase, args);
+    } catch (Throwable e) {
+        Throwable cause = unwrap(e);
+        if (isIgnorableProviderError(cause)) {
+            Slog.w(TAG, "Provider " + methodName + " denied, returning safe default: " + cause.getMessage());
+            return getSafeDefaultValue(methodName, method.getReturnType());
         }
+        if (cause != null) {
+            throw cause;
+        }
+        throw e;
     }
+}
     
     private Object getSafeDefaultValue(String methodName) {
         switch (methodName) {
