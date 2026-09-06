@@ -196,9 +196,15 @@ public class BAccountManager extends BlackManager<IBAccountManagerService> {
                       String authTokenType, boolean notifyOnAuthFailure, boolean expectActivityLaunch,
                       Bundle options) {
         try {
-            getService().getAuthToken(response, account, authTokenType, notifyOnAuthFailure, expectActivityLaunch, options, BActivityThread.getUserId());
-        } catch (RemoteException e) {
+            IBAccountManagerService service = getService();
+            if (service == null) {
+                notifyAccountError(response, "account service unavailable");
+                return;
+            }
+            service.getAuthToken(response, account, authTokenType, notifyOnAuthFailure, expectActivityLaunch, options, BActivityThread.getUserId());
+        } catch (Exception e) {
             e.printStackTrace();
+            notifyAccountError(response, e.getMessage());
         }
     }
 
@@ -206,46 +212,77 @@ public class BAccountManager extends BlackManager<IBAccountManagerService> {
                     String authTokenType, String[] requiredFeatures, boolean expectActivityLaunch,
                     Bundle options) {
         try {
-            getService().addAccount(response, accountType, authTokenType, requiredFeatures, expectActivityLaunch, options, BActivityThread.getUserId());
-        } catch (RemoteException e) {
+            IBAccountManagerService service = getService();
+            if (service == null) {
+                notifyAccountError(response, "account service unavailable");
+                return;
+            }
+            service.addAccount(response, accountType, authTokenType, requiredFeatures, expectActivityLaunch, options, BActivityThread.getUserId());
+        } catch (Exception e) {
             e.printStackTrace();
+            notifyAccountError(response, e.getMessage());
         }
     }
 
     public void addAccountAsUser(IAccountManagerResponse response, String accountType,
                           String authTokenType, String[] requiredFeatures, boolean expectActivityLaunch,
                           Bundle options) {
-        try {
-            getService().addAccountAsUser(response, accountType, authTokenType, requiredFeatures, expectActivityLaunch, options, BActivityThread.getUserId());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        addAccount(response, accountType, authTokenType, requiredFeatures, expectActivityLaunch, options);
     }
 
     public void updateCredentials(IAccountManagerResponse response, Account account,
                            String authTokenType, boolean expectActivityLaunch, Bundle options) {
         try {
-            getService().updateCredentials(response, account, authTokenType, expectActivityLaunch, options, BActivityThread.getUserId());
-        } catch (RemoteException e) {
+            IBAccountManagerService service = getService();
+            if (service == null) {
+                notifyAccountError(response, "account service unavailable");
+                return;
+            }
+            service.updateCredentials(response, account, authTokenType, expectActivityLaunch, options, BActivityThread.getUserId());
+        } catch (Exception e) {
             e.printStackTrace();
+            notifyAccountError(response, e.getMessage());
         }
     }
 
     public void editProperties(IAccountManagerResponse response, String accountType,
                         boolean expectActivityLaunch) {
         try {
-            getService().editProperties(response, accountType, expectActivityLaunch, BActivityThread.getUserId());
-        } catch (RemoteException e) {
+            IBAccountManagerService service = getService();
+            if (service == null) {
+                notifyAccountError(response, "account service unavailable");
+                return;
+            }
+            service.editProperties(response, accountType, expectActivityLaunch, BActivityThread.getUserId());
+        } catch (Exception e) {
             e.printStackTrace();
+            notifyAccountError(response, e.getMessage());
         }
     }
 
     public void confirmCredentialsAsUser(IAccountManagerResponse response, Account account,
                                   Bundle options, boolean expectActivityLaunch) {
         try {
-            getService().confirmCredentialsAsUser(response, account, options, expectActivityLaunch, BActivityThread.getUserId());
-        } catch (RemoteException e) {
+            IBAccountManagerService service = getService();
+            if (service == null) {
+                notifyAccountError(response, "account service unavailable");
+                return;
+            }
+            service.confirmCredentialsAsUser(response, account, options, expectActivityLaunch, BActivityThread.getUserId());
+        } catch (Exception e) {
             e.printStackTrace();
+            notifyAccountError(response, e.getMessage());
+        }
+    }
+
+    private void notifyAccountError(IAccountManagerResponse response, String message) {
+        if (response == null) {
+            return;
+        }
+        try {
+            response.onError(android.accounts.AccountManager.ERROR_CODE_REMOTE_EXCEPTION,
+                    message == null ? "account operation failed" : message);
+        } catch (RemoteException ignored) {
         }
     }
 
