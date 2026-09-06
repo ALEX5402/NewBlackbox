@@ -1864,6 +1864,5 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         }
         options.putInt(AccountManager.KEY_CALLER_UID, callerUid);
         options.putInt(AccountManager.KEY_CALLER_PID, callingPid);
-        BinderCallingUid.set(callerUid, callerPkg);
     }
 }
