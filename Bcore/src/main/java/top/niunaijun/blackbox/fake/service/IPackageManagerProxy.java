@@ -179,10 +179,7 @@ public class IPackageManagerProxy extends BinderInvocationStub {
     public static class GetNameForUid extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            int uid = (Integer) args[0];
-            if (uid == BlackBoxCore.getHostUid()) {
-                uid = BActivityThread.getBUid();
-            }
+            int uid = resolveVirtualUid((Integer) args[0]);
             String[] packages = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
             if (packages != null && packages.length > 0) {
                 return packages[0];
@@ -209,14 +206,8 @@ public class IPackageManagerProxy extends BinderInvocationStub {
     public static class CheckUidSignatures extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            int uid1 = (Integer) args[0];
-            int uid2 = (Integer) args[1];
-            if (uid1 == BlackBoxCore.getHostUid()) {
-                uid1 = BActivityThread.getBUid();
-            }
-            if (uid2 == BlackBoxCore.getHostUid()) {
-                uid2 = BActivityThread.getBUid();
-            }
+            int uid1 = resolveVirtualUid((Integer) args[0]);
+            int uid2 = resolveVirtualUid((Integer) args[1]);
             String[] pkgs1 = BlackBoxCore.getBPackageManager().getPackagesForUid(uid1);
             String[] pkgs2 = BlackBoxCore.getBPackageManager().getPackagesForUid(uid2);
             if (pkgs1 != null && pkgs1.length > 0 && pkgs2 != null && pkgs2.length > 0) {
@@ -242,10 +233,7 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                     return true;
                 }
                 if (args[0] instanceof Integer) {
-                    int uid = (Integer) args[0];
-                    if (uid == BlackBoxCore.getHostUid()) {
-                        uid = BActivityThread.getBUid();
-                    }
+                    int uid = resolveVirtualUid((Integer) args[0]);
                     String[] packages = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
                     if (packages != null) {
                         for (String pkg : packages) {
@@ -430,11 +418,8 @@ public class IPackageManagerProxy extends BinderInvocationStub {
     public static class GetPackagesForUid extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            int uid = (Integer) args[0];
-            if (uid == BlackBoxCore.getHostUid()) {
-                uid = BActivityThread.getBUid();
-                args[0] = uid;
-            }
+            int uid = resolveVirtualUid((Integer) args[0]);
+            args[0] = uid;
             String[] packagesForUid = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
             if (packagesForUid == null || packagesForUid.length == 0) {
                 String currentPkg = BActivityThread.getAppPackageName();
@@ -686,6 +671,17 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         }
         
         return false;
+    }
+
+    private static int resolveVirtualUid(int uid) {
+        if (uid != BlackBoxCore.getHostUid()) {
+            return uid;
+        }
+        int binderUid = BinderCallingUid.get();
+        if (BinderCallingUid.isVirtualAppUid(binderUid)) {
+            return binderUid;
+        }
+        return BActivityThread.getBUid();
     }
 
     private static boolean isGoogleInternalPermission(String permission) {
