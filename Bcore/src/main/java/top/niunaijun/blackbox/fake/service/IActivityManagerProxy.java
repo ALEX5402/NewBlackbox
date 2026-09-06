@@ -794,7 +794,10 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             MethodParameterUtils.replaceLastUid(args);
             String permission = (String) args[0];
             if (permission.equals(Manifest.permission.ACCOUNT_MANAGER)
-                    || permission.equals(Manifest.permission.SEND_SMS)) {
+                    || permission.equals(Manifest.permission.SEND_SMS)
+                    || (permission != null && (permission.startsWith("com.google.android.setupwizard.")
+                    || permission.startsWith("com.google.android.gms.permission.")
+                    || permission.startsWith("com.android.vending.")))) {
                 return PackageManager.PERMISSION_GRANTED;
             }
             
