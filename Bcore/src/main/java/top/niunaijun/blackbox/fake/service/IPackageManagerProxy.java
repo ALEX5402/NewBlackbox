@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.pm.Signature;
 import android.os.Build;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import black.android.app.BRActivityThread;
@@ -24,6 +26,7 @@ import black.android.app.ContextImpl;
 import black.android.content.pm.BRPackageManager;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
+import top.niunaijun.blackbox.core.GmsCore;
 import top.niunaijun.blackbox.core.env.AppSystemEnv;
 import top.niunaijun.blackbox.fake.FakeCore;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
@@ -160,8 +163,104 @@ public class IPackageManagerProxy extends BinderInvocationStub {
     public static class GetPackageUid extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            MethodParameterUtils.replaceFirstAppPkg(args);
+            return hookGetPackageUid(who, method, args);
+        }
+    }
+
+    @ProxyMethod("getPackageUidForUser")
+    public static class GetPackageUidForUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return hookGetPackageUid(who, method, args);
+        }
+    }
+
+    @ProxyMethod("getNameForUid")
+    public static class GetNameForUid extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            int uid = (Integer) args[0];
+            if (uid == BlackBoxCore.getHostUid()) {
+                uid = BActivityThread.getBUid();
+            }
+            String[] packages = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
+            if (packages != null && packages.length > 0) {
+                return packages[0];
+            }
             return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("checkSignatures")
+    public static class CheckSignatures extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null && args.length >= 2 && args[0] instanceof String && args[1] instanceof String) {
+                Integer result = compareVirtualSignatures((String) args[0], (String) args[1]);
+                if (result != null) {
+                    return result;
+                }
+            }
+            return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("checkUidSignatures")
+    public static class CheckUidSignatures extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            int uid1 = (Integer) args[0];
+            int uid2 = (Integer) args[1];
+            if (uid1 == BlackBoxCore.getHostUid()) {
+                uid1 = BActivityThread.getBUid();
+            }
+            if (uid2 == BlackBoxCore.getHostUid()) {
+                uid2 = BActivityThread.getBUid();
+            }
+            String[] pkgs1 = BlackBoxCore.getBPackageManager().getPackagesForUid(uid1);
+            String[] pkgs2 = BlackBoxCore.getBPackageManager().getPackagesForUid(uid2);
+            if (pkgs1 != null && pkgs1.length > 0 && pkgs2 != null && pkgs2.length > 0) {
+                Integer result = compareVirtualSignatures(pkgs1[0], pkgs2[0]);
+                if (result != null) {
+                    return result;
+                }
+            }
+            try {
+                return method.invoke(who, args);
+            } catch (Exception e) {
+                return PackageManager.SIGNATURE_NO_MATCH;
+            }
+        }
+    }
+
+    @ProxyMethod("hasSigningCertificate")
+    public static class HasSigningCertificate extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null && args.length > 0) {
+                if (args[0] instanceof String && GmsCore.isGoogleAppOrService((String) args[0])) {
+                    return true;
+                }
+                if (args[0] instanceof Integer) {
+                    int uid = (Integer) args[0];
+                    if (uid == BlackBoxCore.getHostUid()) {
+                        uid = BActivityThread.getBUid();
+                    }
+                    String[] packages = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
+                    if (packages != null) {
+                        for (String pkg : packages) {
+                            if (GmsCore.isGoogleAppOrService(pkg)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            try {
+                return method.invoke(who, args);
+            } catch (Exception e) {
+                return false;
+            }
         }
     }
 
@@ -333,10 +432,16 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             int uid = (Integer) args[0];
             if (uid == BlackBoxCore.getHostUid()) {
-                args[0] = BActivityThread.getBUid();
-                uid = (int) args[0];
+                uid = BActivityThread.getBUid();
+                args[0] = uid;
             }
             String[] packagesForUid = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
+            if (packagesForUid == null || packagesForUid.length == 0) {
+                String currentPkg = BActivityThread.getAppPackageName();
+                if (currentPkg != null) {
+                    packagesForUid = new String[]{currentPkg};
+                }
+            }
             Slog.d(TAG, args[0] + " , " + BActivityThread.getAppProcessName() + " GetPackagesForUid: " + Arrays.toString(packagesForUid));
             return packagesForUid;
         }
@@ -410,6 +515,11 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                 Slog.d(TAG, "SimpleAudioPermissionHook: Granting notification/Xiaomi permission: " + permission + " to " + packageName);
                 return PackageManager.PERMISSION_GRANTED;
             }
+
+            if (isGoogleInternalPermission(permission)) {
+                Slog.d(TAG, "SimpleAudioPermissionHook: Granting Google internal permission: " + permission + " to " + packageName);
+                return PackageManager.PERMISSION_GRANTED;
+            }
             
             
             return method.invoke(who, args);
@@ -438,6 +548,11 @@ public class IPackageManagerProxy extends BinderInvocationStub {
             
             if (isNotificationOrXiaomiPermission(permission)) {
                 Slog.d(TAG, "CheckSelfPermission: Granting notification/Xiaomi permission: " + permission + " to " + packageName);
+                return PackageManager.PERMISSION_GRANTED;
+            }
+
+            if (isGoogleInternalPermission(permission)) {
+                Slog.d(TAG, "CheckSelfPermission: Granting Google internal permission: " + permission + " to " + packageName);
                 return PackageManager.PERMISSION_GRANTED;
             }
             
@@ -571,6 +686,68 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         }
         
         return false;
+    }
+
+    private static boolean isGoogleInternalPermission(String permission) {
+        if (permission == null) {
+            return false;
+        }
+        return permission.startsWith("com.google.android.gms.permission.")
+                || permission.startsWith("com.google.android.providers.gsf.permission.")
+                || permission.equals("com.android.vending.INTENT_VENDING_ONLY")
+                || permission.equals("com.android.vending.TOS_ACKED")
+                || permission.equals("com.android.vending.BILLING")
+                || permission.equals("android.permission.GET_ACCOUNTS")
+                || permission.equals("android.permission.MANAGE_ACCOUNTS")
+                || permission.equals("android.permission.USE_CREDENTIALS")
+                || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS")
+                || permission.equals("android.permission.ACCOUNT_MANAGER");
+    }
+
+    private static Object hookGetPackageUid(Object who, Method method, Object[] args) throws Throwable {
+        String packageName = args != null && args.length > 0 ? (String) args[0] : null;
+        ApplicationInfo applicationInfo = null;
+        if (packageName != null) {
+            applicationInfo = BlackBoxCore.getBPackageManager().getApplicationInfo(
+                    packageName, 0, BlackBoxCore.getUserId());
+        }
+        if (applicationInfo != null) {
+            return applicationInfo.uid;
+        }
+        MethodParameterUtils.replaceFirstAppPkg(args);
+        return method.invoke(who, args);
+    }
+
+    private static Integer compareVirtualSignatures(String pkg1, String pkg2) {
+        if (pkg1 == null || pkg2 == null) {
+            return null;
+        }
+        if (pkg1.equals(pkg2)) {
+            return PackageManager.SIGNATURE_MATCH;
+        }
+        if (GmsCore.isGoogleAppOrService(pkg1) && GmsCore.isGoogleAppOrService(pkg2)) {
+            return PackageManager.SIGNATURE_MATCH;
+        }
+        Signature[] sigs1 = getVirtualSignatures(pkg1);
+        Signature[] sigs2 = getVirtualSignatures(pkg2);
+        if (sigs1 == null || sigs2 == null) {
+            return null;
+        }
+        if (sigs1.length == 0 || sigs2.length == 0) {
+            return PackageManager.SIGNATURE_NO_MATCH;
+        }
+        HashSet<Signature> set1 = new HashSet<>(Arrays.asList(sigs1));
+        HashSet<Signature> set2 = new HashSet<>(Arrays.asList(sigs2));
+        return set1.equals(set2) ? PackageManager.SIGNATURE_MATCH : PackageManager.SIGNATURE_NO_MATCH;
+    }
+
+    private static Signature[] getVirtualSignatures(String packageName) {
+        PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(
+                packageName, PackageManager.GET_SIGNATURES, BlackBoxCore.getUserId());
+        if (packageInfo != null) {
+            return packageInfo.signatures;
+        }
+        return null;
     }
 
     @ProxyMethod("setSplashScreenTheme")
