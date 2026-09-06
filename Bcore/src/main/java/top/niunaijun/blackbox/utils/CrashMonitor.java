@@ -137,10 +137,14 @@ public class CrashMonitor {
     private static void installGlobalCrashHandlers() {
         try {
             
+            final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread thread, Throwable throwable) {
                     handleCrash("JavaException", thread, throwable);
+                    if (previous != null) {
+                        previous.uncaughtException(thread, throwable);
+                    }
                 }
             });
             
