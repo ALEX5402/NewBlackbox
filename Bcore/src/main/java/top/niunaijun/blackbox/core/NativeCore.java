@@ -12,6 +12,8 @@ import java.util.List;
 import dalvik.system.DexFile;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
+import top.niunaijun.blackbox.core.GmsCore;
+import top.niunaijun.blackbox.fake.service.BinderCallingUid;
 import top.niunaijun.blackbox.utils.compat.DexFileCompat;
 
 import top.niunaijun.blackbox.core.system.JarManager;
@@ -50,22 +52,18 @@ public class NativeCore {
                 return origCallingUid;
 
             if (origCallingUid == BlackBoxCore.getHostUid()) {
-                
-                String appPackageName = BlackBoxCore.getAppPackageName();
-                if (appPackageName != null && appPackageName.equals("com.google.android.gms")){
-                    
+                int binderUid = BinderCallingUid.get();
+                if (BinderCallingUid.isVirtualAppUid(binderUid)) {
+                    return binderUid;
                 }
-                
-                
-                
-                if (appPackageName != null && appPackageName.equals("com.google.android.webview")){
+                String appPackageName = BlackBoxCore.getAppPackageName();
+                if (appPackageName != null && appPackageName.equals("com.google.android.webview")) {
                     return Process.myUid();
                 }
-                
-                
                 try {
                     int callingBUid = BlackBoxCore.getCallingBUid();
-                    if (callingBUid > 0 && callingBUid < Process.LAST_APPLICATION_UID) {
+                    if (callingBUid > 0 && callingBUid < Process.LAST_APPLICATION_UID
+                            && callingBUid != BlackBoxCore.getHostUid()) {
                         return callingBUid;
                     }
                 } catch (Exception e) {
