@@ -1,4 +1,4 @@
-}package top.niunaijun.blackbox.core;
+package top.niunaijun.blackbox.core;
 
 import android.content.pm.PackageManager;
 
