@@ -1,7 +1,6 @@
 
 
 
-
 #include "BoxCore.h"
 #include "Log.h"
 #include "IO.h"
@@ -44,7 +43,15 @@ JNIEnv *ensureEnvCreated() {
 
 int BoxCore::getCallingUid(JNIEnv *env, int orig) {
     env = ensureEnvCreated();
-    return env->CallStaticIntMethod(VMEnv.NativeCoreClass, VMEnv.getCallingUidId, orig);
+    if (env == NULL || VMEnv.NativeCoreClass == NULL || VMEnv.getCallingUidId == NULL) {
+        return orig;
+    }
+    jint result = env->CallStaticIntMethod(VMEnv.NativeCoreClass, VMEnv.getCallingUidId, orig);
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        return orig;
+    }
+    return result;
 }
 
 jstring BoxCore::redirectPathString(JNIEnv *env, jstring path) {
