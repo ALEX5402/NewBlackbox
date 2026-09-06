@@ -690,9 +690,8 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         }
         return permission.startsWith("com.google.android.gms.permission.")
                 || permission.startsWith("com.google.android.providers.gsf.permission.")
-                || permission.equals("com.android.vending.INTENT_VENDING_ONLY")
-                || permission.equals("com.android.vending.TOS_ACKED")
-                || permission.equals("com.android.vending.BILLING")
+                || permission.startsWith("com.google.android.setupwizard.")
+                || permission.startsWith("com.android.vending.")
                 || permission.equals("android.permission.GET_ACCOUNTS")
                 || permission.equals("android.permission.MANAGE_ACCOUNTS")
                 || permission.equals("android.permission.USE_CREDENTIALS")
