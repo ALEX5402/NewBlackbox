@@ -251,12 +251,16 @@ public class IAccountManagerProxy extends BinderInvocationStub {
 
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().addAccount((IAccountManagerResponse) args[0],
-                    (String) args[1],
-                    (String) args[2],
-                    (String[]) args[3],
-                    (boolean) args[4],
-                    (Bundle) args[5]);
+            try {
+                BAccountManager.get().addAccount((IAccountManagerResponse) args[0],
+                        (String) args[1],
+                        (String) args[2],
+                        (String[]) args[3],
+                        (boolean) args[4],
+                        (Bundle) args[5]);
+            } catch (Exception e) {
+                Slog.w(TAG, "addAccount failed", e);
+            }
             return 0;
         }
     }
@@ -266,12 +270,16 @@ public class IAccountManagerProxy extends BinderInvocationStub {
 
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().addAccountAsUser((IAccountManagerResponse) args[0],
-                    (String) args[1],
-                    (String) args[2],
-                    (String[]) args[3],
-                    (boolean) args[4],
-                    (Bundle) args[5]);
+            try {
+                BAccountManager.get().addAccountAsUser((IAccountManagerResponse) args[0],
+                        (String) args[1],
+                        (String) args[2],
+                        (String[]) args[3],
+                        (boolean) args[4],
+                        (Bundle) args[5]);
+            } catch (Exception e) {
+                Slog.w(TAG, "addAccountAsUser failed", e);
+            }
             return 0;
         }
     }
