@@ -26,6 +26,7 @@ import black.android.content.pm.BRPackageParserSigningDetails;
 import black.android.content.pm.BRSigningInfo;
 import black.android.content.res.BRAssetManager;
 import top.niunaijun.blackbox.BlackBoxCore;
+import top.niunaijun.blackbox.core.GmsCore;
 import top.niunaijun.blackbox.core.env.AppSystemEnv;
 import top.niunaijun.blackbox.core.env.BEnvironment;
 import top.niunaijun.blackbox.entity.pm.InstallOption;
@@ -305,6 +306,18 @@ public class PackageManagerCompat {
         ai.publicSourceDir = sourceDir;
         ai.sourceDir = sourceDir;
         ai.uid = p.mExtras.appId;
+        if (p.installOption != null && p.installOption.isFlag(InstallOption.FLAG_SYSTEM)) {
+            ai.flags |= ApplicationInfo.FLAG_SYSTEM;
+        }
+        if (GmsCore.isGoogleAppOrService(ai.packageName)) {
+            ai.flags |= ApplicationInfo.FLAG_SYSTEM;
+            if (BuildCompat.isL()) {
+                Integer privateFlags = BRApplicationInfoL.get(ai).privateFlags();
+                int pf = privateFlags != null ? privateFlags : 0;
+                pf |= 0x8;
+                BRApplicationInfoL.get(ai)._set_privateFlags(pf);
+            }
+        }
 
 
         if (BuildCompat.isL()) {
