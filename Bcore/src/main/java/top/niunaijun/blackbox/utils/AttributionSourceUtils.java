@@ -41,49 +41,8 @@ public class AttributionSourceUtils {
     public static void fixAttributionSourceUid(Object attributionSource) {
         try {
             if (attributionSource == null) return;
-            
-            Class<?> attributionSourceClass = attributionSource.getClass();
-            
-            
-            String[] uidFieldNames = {"mUid", "uid", "mCallingUid", "callingUid", "mSourceUid", "sourceUid"};
-            
-            for (String fieldName : uidFieldNames) {
-                try {
-                    java.lang.reflect.Field uidField = attributionSourceClass.getDeclaredField(fieldName);
-                    uidField.setAccessible(true);
-                    uidField.set(attributionSource, BlackBoxCore.getHostUid());
-                    Slog.d(TAG, "Fixed AttributionSource UID via field: " + fieldName);
-                    break;
-                } catch (NoSuchFieldException e) {
-                    
-                }
-            }
-            
-            
-            try {
-                java.lang.reflect.Method setUidMethod = attributionSourceClass.getDeclaredMethod("setUid", int.class);
-                setUidMethod.setAccessible(true);
-                setUidMethod.invoke(attributionSource, BlackBoxCore.getHostUid());
-                Slog.d(TAG, "Fixed AttributionSource UID via setter method");
-            } catch (Exception e) {
-                
-            }
-            
-            
-            String[] packageFieldNames = {"mPackageName", "packageName", "mSourcePackage", "sourcePackage"};
-            
-            for (String fieldName : packageFieldNames) {
-                try {
-                    java.lang.reflect.Field packageField = attributionSourceClass.getDeclaredField(fieldName);
-                    packageField.setAccessible(true);
-                    packageField.set(attributionSource, BlackBoxCore.getHostPkg());
-                    Slog.d(TAG, "Fixed AttributionSource package name via field: " + fieldName);
-                    break;
-                } catch (NoSuchFieldException e) {
-                    
-                }
-            }
-            
+            top.niunaijun.blackbox.utils.compat.ContextCompat.fixAttributionSourceState(
+                    attributionSource, BlackBoxCore.getHostUid());
         } catch (Exception e) {
             Slog.w(TAG, "Error fixing AttributionSource UID: " + e.getMessage());
         }
