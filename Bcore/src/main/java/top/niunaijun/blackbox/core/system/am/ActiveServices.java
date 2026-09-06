@@ -25,6 +25,7 @@ import top.niunaijun.blackbox.core.system.ProcessRecord;
 import top.niunaijun.blackbox.core.system.pm.BPackageManagerService;
 import top.niunaijun.blackbox.entity.UnbindRecord;
 import top.niunaijun.blackbox.entity.am.RunningServiceInfo;
+import top.niunaijun.blackbox.fake.service.BinderCallingUid;
 import top.niunaijun.blackbox.proxy.ProxyManifest;
 import top.niunaijun.blackbox.proxy.record.ProxyServiceRecord;
 
@@ -200,6 +201,12 @@ public class ActiveServices {
         stub.setComponent(stubComp);
         stub.setAction(UUID.randomUUID().toString());
         ProxyServiceRecord.saveStub(stub, targetIntent, serviceInfo, runningServiceRecord, processRecord.userId, runningServiceRecord.mStartId.get());
+        if (targetIntent.hasExtra(BinderCallingUid.EXTRA_CALLING_BUID)) {
+            stub.putExtra(BinderCallingUid.EXTRA_CALLING_BUID,
+                    targetIntent.getIntExtra(BinderCallingUid.EXTRA_CALLING_BUID, -1));
+            stub.putExtra(BinderCallingUid.EXTRA_CALLING_PKG,
+                    targetIntent.getStringExtra(BinderCallingUid.EXTRA_CALLING_PKG));
+        }
         return stub;
     }
 
