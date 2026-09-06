@@ -589,7 +589,21 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                     args[i] = null;
                 }
             }
-            return method.invoke(who, args);
+            for (int i = args.length - 1; i >= 0; i--) {
+                if (args[i] instanceof Integer) {
+                    int value = (Integer) args[i];
+                    if (value < 0) {
+                        args[i] = BlackBoxCore.getHostUserId();
+                    }
+                    break;
+                }
+            }
+            try {
+                return method.invoke(who, args);
+            } catch (Exception e) {
+                Slog.w(TAG, "broadcastIntent failed", e);
+                return 0;
+            }
         }
 
         int getIntentIndex(Object[] args) {
