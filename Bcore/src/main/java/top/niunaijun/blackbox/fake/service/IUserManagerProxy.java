@@ -40,22 +40,40 @@ public class IUserManagerProxy extends BinderInvocationStub {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        String name = method.getName();
+        if (name != null && name.contains("SeedAccount")) {
+            Slog.w(TAG, "stub " + name + ", skip MANAGE_USERS");
+            Class<?> ret = method.getReturnType();
+            if (ret == boolean.class || ret == Boolean.class) {
+                return false;
+            }
+            return null;
+        }
         try {
             return super.invoke(proxy, method, args);
-        } catch (SecurityException e) {
-            String name = method.getName();
-            if (name != null && name.contains("ApplicationRestrictions")) {
-                Slog.w(TAG, "SecurityException in " + name + ", returning empty restrictions");
-                return new Bundle();
+        } catch (Throwable e) {
+            Throwable cause = e;
+            if (e.getCause() instanceof SecurityException) {
+                cause = e.getCause();
             }
-            if (name != null && name.contains("SeedAccount")) {
-                Slog.w(TAG, "SecurityException in " + name + ", returning empty seed account");
+            if (cause instanceof SecurityException) {
+                if (name != null && name.contains("ApplicationRestrictions")) {
+                    Slog.w(TAG, "SecurityException in " + name + ", returning empty restrictions");
+                    return new Bundle();
+                }
+                Slog.w(TAG, "SecurityException in " + name + ", returning default");
                 Class<?> ret = method.getReturnType();
                 if (ret == boolean.class || ret == Boolean.class) {
                     return false;
                 }
+                if (ret == int.class || ret == Integer.class) {
+                    return 0;
+                }
                 if (ret == Bundle.class) {
-                    return null;
+                    return new Bundle();
+                }
+                if (java.util.List.class.isAssignableFrom(ret)) {
+                    return new ArrayList<>();
                 }
                 return null;
             }
@@ -115,6 +133,11 @@ public class IUserManagerProxy extends BinderInvocationStub {
     @ProxyMethod("getSeedAccountOptions")
     public static class GetSeedAccountOptions extends MethodHook {
         @Override
+        protected boolean isEnable() {
+            return true;
+        }
+
+        @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return null;
         }
@@ -122,6 +145,11 @@ public class IUserManagerProxy extends BinderInvocationStub {
 
     @ProxyMethod("getSeedAccountName")
     public static class GetSeedAccountName extends MethodHook {
+        @Override
+        protected boolean isEnable() {
+            return true;
+        }
+
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return null;
@@ -131,6 +159,11 @@ public class IUserManagerProxy extends BinderInvocationStub {
     @ProxyMethod("getSeedAccountType")
     public static class GetSeedAccountType extends MethodHook {
         @Override
+        protected boolean isEnable() {
+            return true;
+        }
+
+        @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return null;
         }
@@ -138,6 +171,11 @@ public class IUserManagerProxy extends BinderInvocationStub {
 
     @ProxyMethod("isSeedAccountSet")
     public static class IsSeedAccountSet extends MethodHook {
+        @Override
+        protected boolean isEnable() {
+            return true;
+        }
+
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return false;
@@ -147,6 +185,11 @@ public class IUserManagerProxy extends BinderInvocationStub {
     @ProxyMethod("setSeedAccountData")
     public static class SetSeedAccountData extends MethodHook {
         @Override
+        protected boolean isEnable() {
+            return true;
+        }
+
+        @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return 0;
         }
@@ -154,6 +197,11 @@ public class IUserManagerProxy extends BinderInvocationStub {
 
     @ProxyMethod("clearSeedAccountData")
     public static class ClearSeedAccountData extends MethodHook {
+        @Override
+        protected boolean isEnable() {
+            return true;
+        }
+
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return 0;
