@@ -48,6 +48,17 @@ public class IUserManagerProxy extends BinderInvocationStub {
                 Slog.w(TAG, "SecurityException in " + name + ", returning empty restrictions");
                 return new Bundle();
             }
+            if (name != null && name.contains("SeedAccount")) {
+                Slog.w(TAG, "SecurityException in " + name + ", returning empty seed account");
+                Class<?> ret = method.getReturnType();
+                if (ret == boolean.class || ret == Boolean.class) {
+                    return false;
+                }
+                if (ret == Bundle.class) {
+                    return null;
+                }
+                return null;
+            }
             throw e;
         }
     }
@@ -98,6 +109,54 @@ public class IUserManagerProxy extends BinderInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return new ArrayList<>();
+        }
+    }
+
+    @ProxyMethod("getSeedAccountOptions")
+    public static class GetSeedAccountOptions extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+    }
+
+    @ProxyMethod("getSeedAccountName")
+    public static class GetSeedAccountName extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+    }
+
+    @ProxyMethod("getSeedAccountType")
+    public static class GetSeedAccountType extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+    }
+
+    @ProxyMethod("isSeedAccountSet")
+    public static class IsSeedAccountSet extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return false;
+        }
+    }
+
+    @ProxyMethod("setSeedAccountData")
+    public static class SetSeedAccountData extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return 0;
+        }
+    }
+
+    @ProxyMethod("clearSeedAccountData")
+    public static class ClearSeedAccountData extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return 0;
         }
     }
 }
