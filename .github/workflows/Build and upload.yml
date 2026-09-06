@@ -1,0 +1,64 @@
+name: Build and Upload Artifacts
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build APKs and AARs
+        run: ./gradlew assembleDebug assembleRelease :Bcore:assembleDebug :Bcore:assembleRelease :black-reflection:assemble :compiler:assemble
+
+      - name: Upload App APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apks
+          path: app/build/outputs/apk/**/*.apk
+
+      - name: Upload Bcore AARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcore-aars
+          path: Bcore/build/outputs/aar/*.aar
+
+      - name: Upload black-reflection Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: black-reflection-artifacts
+          path: |
+            black-reflection/build/libs/*.jar
+            black-reflection/build/outputs/**/*.aar
+            black-reflection/build/outputs/**/*.jar
+
+      - name: Upload compiler Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiler-artifacts
+          path: |
+            compiler/build/libs/*.jar
+            compiler/build/outputs/**/*.aar
+            compiler/build/outputs/**/*.jar
+            
