@@ -11,7 +11,6 @@ import java.util.List;
 
 import dalvik.system.DexFile;
 import top.niunaijun.blackbox.BlackBoxCore;
-import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.fake.service.BinderCallingUid;
 import top.niunaijun.blackbox.utils.compat.DexFileCompat;
 
@@ -40,55 +39,32 @@ public class NativeCore {
     public static native boolean disableResourceLoading();
 
 
+    private static final ThreadLocal<Boolean> sInGetCallingUid = new ThreadLocal<>();
+
     @Keep
     public static int getCallingUid(int origCallingUid) {
+        if (Boolean.TRUE.equals(sInGetCallingUid.get())) {
+            return origCallingUid;
+        }
+        sInGetCallingUid.set(Boolean.TRUE);
         try {
-            
-            if (origCallingUid > 0 && origCallingUid < Process.FIRST_APPLICATION_UID)
+            if (origCallingUid > 0 && origCallingUid < Process.FIRST_APPLICATION_UID) {
                 return origCallingUid;
-            
-            if (origCallingUid > Process.LAST_APPLICATION_UID)
+            }
+            if (origCallingUid > Process.LAST_APPLICATION_UID) {
                 return origCallingUid;
-
+            }
             if (origCallingUid == BlackBoxCore.getHostUid()) {
                 int binderUid = BinderCallingUid.get();
                 if (BinderCallingUid.isVirtualAppUid(binderUid)) {
                     return binderUid;
                 }
-                String appPackageName = BlackBoxCore.getAppPackageName();
-                if (appPackageName != null && appPackageName.equals("com.google.android.webview")) {
-                    return Process.myUid();
-                }
-                
-                
-                try {
-                    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-                    for (StackTraceElement element : stackTrace) {
-                        String className = element.getClassName();
-                        String methodName = element.getMethodName();
-                        
-                        
-                        if ((className.contains("Settings") || className.contains("FeatureFlag")) &&
-                            (methodName.contains("getString") || methodName.contains("getInt") || 
-                             methodName.contains("getLong") || methodName.contains("getFloat"))) {
-                            
-                            Log.d(TAG, "System settings access detected, using system UID to prevent mismatch");
-                            
-                            return Process.SYSTEM_UID; 
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.w(TAG, "Error analyzing stack trace for UID resolution: " + e.getMessage());
-                }
-                
-                
-                return BlackBoxCore.getHostUid();
             }
             return origCallingUid;
-        } catch (Exception e) {
-            Log.e(TAG, "Error in getCallingUid: " + e.getMessage());
-            
-            return Process.myUid();
+        } catch (Throwable t) {
+            return origCallingUid;
+        } finally {
+            sInGetCallingUid.remove();
         }
     }
 
