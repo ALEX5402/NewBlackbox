@@ -216,8 +216,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         List<Account> accounts = new ArrayList<>();
         synchronized (userAccounts.lock) {
             for (BAccount account : userAccounts.accounts) {
-                Integer visibility = account.visibility.get(packageName);
-                if (visibility != null && visibility == AccountManager.VISIBILITY_VISIBLE) {
+                if (isAccountVisibleToPackage(account, packageName)) {
                     accounts.add(account.account);
                 }
             }
@@ -232,9 +231,8 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         List<Account> accounts = new ArrayList<>();
         synchronized (userAccounts.lock) {
             for (BAccount account : userAccounts.accounts) {
-                if (account.account.type.equals(type)) {
-                    Integer visibility = account.visibility.get(packageName);
-                    if (visibility != null && visibility == AccountManager.VISIBILITY_VISIBLE) {
+                if (type == null || account.account.type.equals(type)) {
+                    if (isAccountVisibleToPackage(account, packageName)) {
                         accounts.add(account.account);
                     }
                 }
@@ -249,7 +247,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         List<Account> accounts = new ArrayList<>();
         synchronized (userAccounts.lock) {
             for (BAccount account : userAccounts.accounts) {
-                if (account.account.type.equals(accountType)) {
+                if (accountType == null || account.account.type.equals(accountType)) {
                     accounts.add(account.account);
                 }
             }
@@ -1093,7 +1091,22 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         if (AccountManager.VISIBILITY_UNDEFINED != visibility) {
             return visibility;
         }
-        return AccountManager.VISIBILITY_NOT_VISIBLE;
+        return AccountManager.VISIBILITY_VISIBLE;
+    }
+
+    private boolean isAccountVisibleToPackage(BAccount account, String packageName) {
+        if (account == null) {
+            return false;
+        }
+        if (account.visibility == null || account.visibility.isEmpty()) {
+            return true;
+        }
+        Integer visibility = packageName != null ? account.visibility.get(packageName) : null;
+        if (visibility == null) {
+            return true;
+        }
+        return visibility == AccountManager.VISIBILITY_VISIBLE
+                || visibility == AccountManager.VISIBILITY_USER_MANAGED_VISIBLE;
     }
 
     
@@ -1691,13 +1704,20 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
                 }
             }
             if (result != null
-                    && !TextUtils.isEmpty(result.getString(AccountManager.KEY_AUTHTOKEN))) {
+                    && result.containsKey(AccountManager.KEY_ACCOUNT_NAME)
+                    && result.containsKey(AccountManager.KEY_ACCOUNT_TYPE)
+                    && intent == null) {
                 String accountName = result.getString(AccountManager.KEY_ACCOUNT_NAME);
                 String accountType = result.getString(AccountManager.KEY_ACCOUNT_TYPE);
                 if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(accountType)) {
                     Account account = new Account(accountName, accountType);
-
-
+                    String password = result.getString(AccountManager.KEY_PASSWORD);
+                    addAccountInternal(mAccounts, account, password, result, null);
+                    String authToken = result.getString(AccountManager.KEY_AUTHTOKEN);
+                    if (!TextUtils.isEmpty(authToken)) {
+                        saveAuthTokenToDatabase(mAccounts, account, AccountManager.KEY_AUTHTOKEN, authToken);
+                    }
+                    Slog.d(TAG, "persisted account from authenticator result: " + account);
                 }
             }
             IAccountManagerResponse response;
