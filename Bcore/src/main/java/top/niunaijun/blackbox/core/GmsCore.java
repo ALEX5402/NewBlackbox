@@ -1,4 +1,4 @@
-package top.niunaijun.blackbox.core;
+}package top.niunaijun.blackbox.core;
 
 import android.content.pm.PackageManager;
 
@@ -45,6 +45,13 @@ public class GmsCore {
 
     public static boolean isGoogleAppOrService(String str) {
         return GOOGLE_APP.contains(str) || GOOGLE_SERVICE.contains(str);
+    }
+
+    public static boolean isPrivilegedGoogleApp(String packageName) {
+        return VENDING_PKG.equals(packageName)
+                || GMS_PKG.equals(packageName)
+                || GSF_PKG.equals(packageName)
+                || "com.google.android.gsf.login".equals(packageName);
     }
 
     private static InstallResult installPackages(Set<String> list, int userId) {
