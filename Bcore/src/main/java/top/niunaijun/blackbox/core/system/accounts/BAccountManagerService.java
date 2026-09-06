@@ -199,15 +199,10 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
     @Override
     public AuthenticatorDescription[] getAuthenticatorTypes(int userId) throws RemoteException {
-        
-        BUserAccounts userAccounts = getUserAccounts(userId);
         List<AuthenticatorDescription> authenticatorDescriptions = new ArrayList<>();
-        synchronized (userAccounts.lock) {
-            for (BAccount account : userAccounts.accounts) {
-                AuthenticatorInfo authenticatorInfo = mAuthenticatorCache.authenticators.get(account.account.type);
-                if (authenticatorInfo != null) {
-                    authenticatorDescriptions.add(authenticatorInfo.desc);
-                }
+        for (AuthenticatorInfo authenticatorInfo : mAuthenticatorCache.authenticators.values()) {
+            if (authenticatorInfo != null && authenticatorInfo.desc != null) {
+                authenticatorDescriptions.add(authenticatorInfo.desc);
             }
         }
         return authenticatorDescriptions.toArray(new AuthenticatorDescription[]{});
@@ -686,7 +681,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
     @Override
     public void addAccountAsUser(IAccountManagerResponse response, String accountType, String authTokenType, String[] requiredFeatures, boolean expectActivityLaunch, Bundle options, int userId) throws RemoteException {
-        
+        addAccount(response, accountType, authTokenType, requiredFeatures, expectActivityLaunch, options, userId);
     }
 
     @Override
@@ -736,7 +731,23 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
     @Override
     public void confirmCredentialsAsUser(IAccountManagerResponse response, Account account, Bundle options, boolean expectActivityLaunch, int userId) throws RemoteException {
-        
+        if (response == null) throw new IllegalArgumentException("response is null");
+        if (account == null) throw new IllegalArgumentException("account is null");
+        BUserAccounts accounts = getUserAccounts(userId);
+        new Session(accounts, response, account.type, expectActivityLaunch,
+                true , account.name,
+                true , true ) {
+            @Override
+            public void run() throws RemoteException {
+                mAuthenticator.confirmCredentials(this, account, options);
+            }
+
+            @Override
+            protected String toDebugString(long now) {
+                return super.toDebugString(now) + ", confirmCredentials"
+                        + ", " + account.toString();
+            }
+        }.bind();
     }
 
     @Override
@@ -1374,7 +1385,20 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
     }
 
     public void loadAuthenticatorCache(String packageName) {
-        mAuthenticatorCache.authenticators.clear();
+        if (packageName == null) {
+            mAuthenticatorCache.authenticators.clear();
+        } else {
+            Iterator<Map.Entry<String, AuthenticatorInfo>> iterator =
+                    mAuthenticatorCache.authenticators.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, AuthenticatorInfo> entry = iterator.next();
+                AuthenticatorInfo info = entry.getValue();
+                if (info != null && info.serviceInfo != null
+                        && packageName.equals(info.serviceInfo.packageName)) {
+                    iterator.remove();
+                }
+            }
+        }
         Intent intent = new Intent(AccountManager.ACTION_AUTHENTICATOR_INTENT);
         if (packageName != null) {
             intent.setPackage(packageName);
