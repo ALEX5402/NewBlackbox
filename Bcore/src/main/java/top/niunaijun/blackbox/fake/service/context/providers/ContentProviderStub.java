@@ -53,7 +53,6 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
         
         
         if ("call".equals(methodName)) {
-            
             AttributionSourceUtils.fixAttributionSourceInArgs(args);
         } else {
             
