@@ -1,6 +1,7 @@
 package top.niunaijun.blackbox.fake.service;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -8,14 +9,16 @@ import java.util.ArrayList;
 import black.android.content.pm.BRUserInfo;
 import black.android.os.BRIUserManagerStub;
 import black.android.os.BRServiceManager;
-import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
+import top.niunaijun.blackbox.utils.Slog;
 
 
 public class IUserManagerProxy extends BinderInvocationStub {
+    public static final String TAG = "IUserManagerProxy";
+
     public IUserManagerProxy() {
         super(BRServiceManager.get().getService(Context.USER_SERVICE));
     }
@@ -35,12 +38,49 @@ public class IUserManagerProxy extends BinderInvocationStub {
         return false;
     }
 
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try {
+            return super.invoke(proxy, method, args);
+        } catch (SecurityException e) {
+            String name = method.getName();
+            if (name != null && name.contains("ApplicationRestrictions")) {
+                Slog.w(TAG, "SecurityException in " + name + ", returning empty restrictions");
+                return new Bundle();
+            }
+            throw e;
+        }
+    }
+
     @ProxyMethod("getApplicationRestrictions")
     public static class GetApplicationRestrictions extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            args[0] = BlackBoxCore.getHostPkg();
-            return method.invoke(who, args);
+            return new Bundle();
+        }
+    }
+
+    @ProxyMethod("getApplicationRestrictionsForUser")
+    public static class GetApplicationRestrictionsForUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return new Bundle();
+        }
+    }
+
+    @ProxyMethod("setApplicationRestrictions")
+    public static class SetApplicationRestrictions extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+    }
+
+    @ProxyMethod("setApplicationRestrictionsForUser")
+    public static class SetApplicationRestrictionsForUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
         }
     }
 
