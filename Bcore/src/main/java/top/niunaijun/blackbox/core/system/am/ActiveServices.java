@@ -201,11 +201,20 @@ public class ActiveServices {
         stub.setComponent(stubComp);
         stub.setAction(UUID.randomUUID().toString());
         ProxyServiceRecord.saveStub(stub, targetIntent, serviceInfo, runningServiceRecord, processRecord.userId, runningServiceRecord.mStartId.get());
-        if (targetIntent.hasExtra(BinderCallingUid.EXTRA_CALLING_BUID)) {
-            stub.putExtra(BinderCallingUid.EXTRA_CALLING_BUID,
-                    targetIntent.getIntExtra(BinderCallingUid.EXTRA_CALLING_BUID, -1));
-            stub.putExtra(BinderCallingUid.EXTRA_CALLING_PKG,
-                    targetIntent.getStringExtra(BinderCallingUid.EXTRA_CALLING_PKG));
+        int callingBUid = targetIntent.getIntExtra(BinderCallingUid.EXTRA_CALLING_BUID, -1);
+        String callingPkg = targetIntent.getStringExtra(BinderCallingUid.EXTRA_CALLING_PKG);
+        if (!BinderCallingUid.isVirtualAppUid(callingBUid)) {
+            ProcessRecord caller = BProcessManagerService.get().findProcessByPid(Binder.getCallingPid());
+            if (caller != null) {
+                callingBUid = caller.buid;
+                callingPkg = caller.getPackageName();
+            }
+        }
+        if (BinderCallingUid.isVirtualAppUid(callingBUid)) {
+            stub.putExtra(BinderCallingUid.EXTRA_CALLING_BUID, callingBUid);
+            if (callingPkg != null) {
+                stub.putExtra(BinderCallingUid.EXTRA_CALLING_PKG, callingPkg);
+            }
         }
         return stub;
     }
