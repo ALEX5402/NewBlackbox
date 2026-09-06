@@ -1,9 +1,6 @@
 name: Build and Send APK to Telegram
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
