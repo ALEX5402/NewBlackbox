@@ -95,6 +95,8 @@ public class IPermissionManagerProxy extends BinderInvocationStub {
         String permission = (String) args[0];
         return permission.startsWith("com.google.android.gms.permission.")
                 || permission.startsWith("com.google.android.providers.gsf.permission.")
+                || permission.startsWith("com.google.android.setupwizard.")
+                || permission.startsWith("com.android.vending.")
                 || permission.equals("android.permission.ACCOUNT_MANAGER")
                 || permission.equals("android.permission.GET_ACCOUNTS")
                 || permission.equals("android.permission.MANAGE_ACCOUNTS")
