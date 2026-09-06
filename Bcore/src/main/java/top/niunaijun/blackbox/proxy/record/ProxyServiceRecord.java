@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.IBinder;
 
+import top.niunaijun.blackbox.fake.service.BinderCallingUid;
 import top.niunaijun.blackbox.utils.compat.BundleCompat;
 
 
@@ -13,6 +14,8 @@ public class ProxyServiceRecord {
     public IBinder mToken;
     public int mUserId;
     public int mStartId;
+    public int mCallingBUid = -1;
+    public String mCallingPkg;
 
     public ProxyServiceRecord(Intent serviceIntent, ServiceInfo serviceInfo, IBinder token, int userId, int startId) {
         mServiceIntent = serviceIntent;
@@ -36,6 +39,9 @@ public class ProxyServiceRecord {
         int userId = intent.getIntExtra("_B_|_user_id_", 0);
         int startId = intent.getIntExtra("_B_|_start_id_", 0);
         IBinder token = BundleCompat.getBinder(intent, "_B_|_token_");
-        return new ProxyServiceRecord(target, serviceInfo, token, userId, startId);
+        ProxyServiceRecord record = new ProxyServiceRecord(target, serviceInfo, token, userId, startId);
+        record.mCallingBUid = intent.getIntExtra(BinderCallingUid.EXTRA_CALLING_BUID, -1);
+        record.mCallingPkg = intent.getStringExtra(BinderCallingUid.EXTRA_CALLING_PKG);
+        return record;
     }
 }
