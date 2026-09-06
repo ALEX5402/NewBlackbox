@@ -532,11 +532,8 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
                 authenticatorInfo != null && authenticatorInfo.desc.customTokens;
 
         
+        populateCallerIdentity(loginOptions);
         final String callerPkg = loginOptions.getString(AccountManager.KEY_ANDROID_PACKAGE_NAME);
-
-        
-        loginOptions.putInt(AccountManager.KEY_CALLER_UID, Binder.getCallingUid());
-        loginOptions.putInt(AccountManager.KEY_CALLER_PID, Binder.getCallingPid());
 
         if (notifyOnAuthFailure) {
             loginOptions.putBoolean(AccountManagerCompat.KEY_NOTIFY_ON_FAILURE, true);
@@ -657,8 +654,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
 
         final Bundle options = (optionsIn == null) ? new Bundle() : optionsIn;
-
-
+        populateCallerIdentity(options);
 
         BUserAccounts accounts = getUserAccounts(userId);
         new Session(accounts, response, accountType, expectActivityLaunch,
@@ -1827,5 +1823,20 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         if (processByPid == null)
             throw new IllegalArgumentException("ProcessRecord is null, PID: " + callingPid);
         return processByPid.getPackageName();
+    }
+
+    private void populateCallerIdentity(Bundle options) {
+        if (options == null) {
+            return;
+        }
+        int callingPid = Binder.getCallingPid();
+        ProcessRecord processByPid = BProcessManagerService.get().findProcessByPid(callingPid);
+        int callerUid = processByPid != null ? processByPid.buid : Binder.getCallingUid();
+        String callerPkg = processByPid != null ? processByPid.getPackageName() : null;
+        if (callerPkg != null) {
+            options.putString(AccountManager.KEY_ANDROID_PACKAGE_NAME, callerPkg);
+        }
+        options.putInt(AccountManager.KEY_CALLER_UID, callerUid);
+        options.putInt(AccountManager.KEY_CALLER_PID, callingPid);
     }
 }
