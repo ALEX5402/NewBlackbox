@@ -68,6 +68,7 @@ import top.niunaijun.blackbox.utils.ArrayUtils;
 import top.niunaijun.blackbox.utils.CloseUtils;
 import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.Slog;
+import top.niunaijun.blackbox.fake.service.BinderCallingUid;
 import top.niunaijun.blackbox.utils.compat.AccountManagerCompat;
 
 
@@ -1454,6 +1455,8 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
         private final boolean mStripAuthTokenFromResult;
         protected final BUserAccounts mAccounts;
+        private int mCallerUid = -1;
+        private String mCallerPkg;
 
         public Session(BUserAccounts accounts, IAccountManagerResponse response, String accountType,
                        boolean expectActivityLaunch, boolean stripAuthTokenFromResult, String accountName,
@@ -1477,6 +1480,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
             mAccountName = accountName;
             mAuthDetailsRequired = authDetailsRequired;
             mUpdateLastAuthenticatedTime = updateLastAuthenticatedTime;
+            captureCallerIdentity();
 
             synchronized (mSessions) {
                 mSessions.put(toString(), this);
@@ -1488,6 +1492,18 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
                     mResponse = null;
                     binderDied();
                 }
+            }
+        }
+
+        private void captureCallerIdentity() {
+            int callingPid = Binder.getCallingPid();
+            ProcessRecord processByPid = BProcessManagerService.get().findProcessByPid(callingPid);
+            if (processByPid != null) {
+                mCallerUid = processByPid.buid;
+                mCallerPkg = processByPid.getPackageName();
+            } else {
+                mCallerUid = Binder.getCallingUid();
+                mCallerPkg = null;
             }
         }
 
@@ -1586,10 +1602,15 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         public void onServiceConnected(ComponentName name, IBinder service) {
             mAuthenticator = IAccountAuthenticator.Stub.asInterface(service);
             try {
+                if (mCallerUid > 0) {
+                    BinderCallingUid.set(mCallerUid, mCallerPkg);
+                }
                 run();
             } catch (RemoteException e) {
                 onError(AccountManager.ERROR_CODE_REMOTE_EXCEPTION,
                         "remote exception");
+            } finally {
+                BinderCallingUid.clear();
             }
         }
 
@@ -1771,8 +1792,13 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
             intent.setAction(AccountManager.ACTION_AUTHENTICATOR_INTENT);
             ComponentName componentName = new ComponentName(authenticatorInfo.serviceInfo.packageName, authenticatorInfo.serviceInfo.name);
             intent.setComponent(componentName);
-            
             intent.putExtra("_B_|_UserId", mAccounts.userId);
+            if (mCallerUid > 0) {
+                intent.putExtra(BinderCallingUid.EXTRA_CALLING_BUID, mCallerUid);
+            }
+            if (mCallerPkg != null) {
+                intent.putExtra(BinderCallingUid.EXTRA_CALLING_PKG, mCallerPkg);
+            }
 
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "performing bindService to " + componentName);
@@ -1838,5 +1864,6 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         }
         options.putInt(AccountManager.KEY_CALLER_UID, callerUid);
         options.putInt(AccountManager.KEY_CALLER_PID, callingPid);
+        BinderCallingUid.set(callerUid, callerPkg);
     }
 }
