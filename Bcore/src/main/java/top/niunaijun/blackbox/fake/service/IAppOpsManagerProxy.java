@@ -4,6 +4,7 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.os.IBinder;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import black.android.app.BRAppOpsManager;
@@ -44,35 +45,16 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        
-        
-        
-        if (methodName.startsWith("check") || 
-            methodName.startsWith("note") || 
-            methodName.startsWith("start")) {
-            Slog.d(TAG, "AppOps invoke: Bypassing system for " + methodName + ", allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
-        }
-        
-        
-        if (methodName.startsWith("finish")) {
-            Slog.d(TAG, "AppOps invoke: Bypassing system for " + methodName);
-            return null;
-        }
-        
-        
         try {
             MethodParameterUtils.replaceFirstAppPkg(args);
             MethodParameterUtils.replaceLastUid(args);
             return super.invoke(proxy, method, args);
         } catch (SecurityException e) {
-            
             Slog.w(TAG, "AppOps invoke: SecurityException caught for " + methodName + ", allowing operation", e);
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         } catch (Exception e) {
             Slog.e(TAG, "AppOps invoke: Error in method " + methodName, e);
-            
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
@@ -81,11 +63,95 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
         return false;
     }
 
+    private static Object allowedResult(Method method, Object[] args) {
+        Class<?> returnType = method.getReturnType();
+        if (returnType == void.class || returnType == Void.class) {
+            return null;
+        }
+        if (returnType == int.class || returnType == Integer.class) {
+            return AppOpsManager.MODE_ALLOWED;
+        }
+        if (returnType == boolean.class || returnType == Boolean.class) {
+            return true;
+        }
+        if ("android.app.SyncNotedAppOp".equals(returnType.getName())) {
+            return createSyncNotedAppOp(args);
+        }
+        return null;
+    }
+
+    private static Object createSyncNotedAppOp(Object[] args) {
+        int opCode = extractOpCode(args);
+        String packageName = extractPackageName(args);
+        String attributionTag = extractAttributionTag(args);
+        try {
+            Class<?> clazz = Class.forName("android.app.SyncNotedAppOp");
+            try {
+                Constructor<?> ctor = clazz.getDeclaredConstructor(int.class, int.class, String.class, String.class);
+                ctor.setAccessible(true);
+                return ctor.newInstance(AppOpsManager.MODE_ALLOWED, opCode, attributionTag, packageName);
+            } catch (NoSuchMethodException ignored) {
+            }
+            try {
+                Constructor<?> ctor = clazz.getDeclaredConstructor(int.class, int.class);
+                ctor.setAccessible(true);
+                return ctor.newInstance(AppOpsManager.MODE_ALLOWED, opCode);
+            } catch (NoSuchMethodException ignored) {
+            }
+            Constructor<?> ctor = clazz.getDeclaredConstructor(int.class, String.class);
+            ctor.setAccessible(true);
+            return ctor.newInstance(opCode, attributionTag);
+        } catch (Throwable t) {
+            Slog.w(TAG, "Failed to create SyncNotedAppOp for op " + opCode, t);
+            return null;
+        }
+    }
+
+    private static int extractOpCode(Object[] args) {
+        if (args == null) {
+            return 0;
+        }
+        for (Object arg : args) {
+            if (arg instanceof Integer) {
+                return (Integer) arg;
+            }
+        }
+        return 0;
+    }
+
+    private static String extractPackageName(Object[] args) {
+        if (args == null) {
+            return null;
+        }
+        for (Object arg : args) {
+            if (arg instanceof String && ((String) arg).contains(".")) {
+                return (String) arg;
+            }
+        }
+        return null;
+    }
+
+    private static String extractAttributionTag(Object[] args) {
+        if (args == null) {
+            return null;
+        }
+        int seenString = 0;
+        for (Object arg : args) {
+            if (arg instanceof String) {
+                seenString++;
+                if (seenString == 2) {
+                    return (String) arg;
+                }
+            }
+        }
+        return null;
+    }
+
     @ProxyMethod("noteProxyOperation")
     public static class NoteProxyOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
@@ -93,8 +159,7 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckPackage extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
@@ -102,21 +167,26 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
-            
             Slog.d(TAG, "AppOps CheckOperation: Bypassing system check, allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
-    
+    @ProxyMethod("checkAudioOperation")
+    public static class CheckAudioOperation extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            Slog.d(TAG, "AppOps CheckAudioOperation: Bypassing system check, allowing operation");
+            return allowedResult(method, args);
+        }
+    }
+
     @ProxyMethod("checkOperationForDevice")
     public static class CheckOperationForDevice extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
             Slog.d(TAG, "AppOps CheckOperationForDevice: Bypassing system check, allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
@@ -124,9 +194,26 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class NoteOperation extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
             Slog.d(TAG, "AppOps NoteOperation: Bypassing system check, allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
+        }
+    }
+
+    @ProxyMethod("startOperation")
+    public static class StartOperation extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            Slog.d(TAG, "AppOps StartOperation: Bypassing system check, allowing operation");
+            return allowedResult(method, args);
+        }
+    }
+
+    @ProxyMethod("startProxyOperation")
+    public static class StartProxyOperation extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            Slog.d(TAG, "AppOps StartProxyOperation: Bypassing system check, allowing operation");
+            return allowedResult(method, args);
         }
     }
 
@@ -134,20 +221,17 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class CheckOpNoThrow extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
             Slog.d(TAG, "AppOps CheckOpNoThrow: Bypassing system check, allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
-    
     @ProxyMethod("startOp")
     public static class StartOp extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
             Slog.d(TAG, "AppOps StartOp: Bypassing system check, allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
@@ -155,13 +239,11 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
     public static class StartOpNoThrow extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            
             Slog.d(TAG, "AppOps StartOpNoThrow: Bypassing system check, allowing operation");
-            return AppOpsManager.MODE_ALLOWED;
+            return allowedResult(method, args);
         }
     }
 
-    
     @ProxyMethod("finishOp")
     public static class FinishOp extends MethodHook {
         @Override
@@ -178,7 +260,22 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
         }
     }
 
-    
+    @ProxyMethod("finishOperation")
+    public static class FinishOperation extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+    }
+
+    @ProxyMethod("finishProxyOperation")
+    public static class FinishProxyOperation extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+    }
+
     @ProxyMethod("noteOp")
     public static class NoteOp extends MethodHook {
         @Override
@@ -188,15 +285,14 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
                 String name = getOpPublicName(op);
                 if (name != null && (name.contains("RECORD_AUDIO") || name.contains("AUDIO") || name.contains("MICROPHONE"))) {
                     Slog.d(TAG, "AppOps NoteOp: Allowing RECORD_AUDIO operation: " + name);
-                    return AppOpsManager.MODE_ALLOWED;
+                    return allowedResult(method, args);
                 }
             } catch (Throwable ignored) {
             }
-            return method.invoke(who, args);
+            return allowedResult(method, args);
         }
     }
 
-    
     @ProxyMethod("noteOpNoThrow")
     public static class NoteOpNoThrow extends MethodHook {
         @Override
@@ -206,17 +302,17 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
                 String name = getOpPublicName(op);
                 if (name != null && (name.contains("RECORD_AUDIO") || name.contains("AUDIO") || name.contains("MICROPHONE"))) {
                     Slog.d(TAG, "AppOps NoteOpNoThrow: Allowing RECORD_AUDIO operation: " + name);
-                    return AppOpsManager.MODE_ALLOWED;
+                    return allowedResult(method, args);
                 }
             } catch (Throwable ignored) {
             }
-            return method.invoke(who, args);
+            return allowedResult(method, args);
         }
     }
 
     private static boolean isMediaStorageOrAudioOp(String opPublicNameOrStr) {
         if (opPublicNameOrStr == null) return false;
-        
+
         String n = opPublicNameOrStr.toUpperCase();
         return n.contains("READ_MEDIA")
                 || n.contains("READ_EXTERNAL_STORAGE")
@@ -241,7 +337,6 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
 
     private static String getOpPublicName(int op) {
         try {
-            
             java.lang.reflect.Method m = AppOpsManager.class.getMethod("opToPublicName", int.class);
             Object name = m.invoke(null, op);
             return name != null ? name.toString() : null;
