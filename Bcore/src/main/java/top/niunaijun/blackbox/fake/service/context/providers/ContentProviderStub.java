@@ -83,17 +83,20 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
             try {
                 return method.invoke(mBase, args);
             } catch (Throwable e) {
-                
-                Throwable cause = e.getCause();
-                if (isUidMismatchError(cause)) {
-                    Slog.w(TAG, "UID mismatch in ContentProvider call, returning safe default: " + cause.getMessage());
+                Throwable cause = unwrap(e);
+                if (isIgnorableProviderError(cause)) {
+                    Slog.w(TAG, "Provider " + methodName + " denied, returning safe default: " + cause.getMessage());
                     return getSafeDefaultValue(methodName, method.getReturnType());
-                } else if (cause instanceof RuntimeException) {
-                    String message = cause.getMessage();
-                    if (message != null && (message.contains("uid") || message.contains("permission"))) {
-                        Slog.w(TAG, "Permission/UID error in ContentProvider call, returning safe default: " + message);
-                        return getSafeDefaultValue(methodName, method.getReturnType());
-                    }
+                }
+                if (methodName.equals("call") || methodName.equals("query")) {
+                    Slog.w(TAG, "Error in " + methodName + ", returning safe default: " + e.getMessage());
+                    return getSafeDefaultValue(methodName, method.getReturnType());
+                }
+                if (cause != null) {
+                    throw cause;
+                }
+                throw e;
+            }
                 }
                 
                 
@@ -110,13 +113,15 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
         try {
             return method.invoke(mBase, args);
         } catch (Throwable e) {
-            
-            Throwable cause = e.getCause();
-            if (isUidMismatchError(cause)) {
-                Slog.w(TAG, "UID mismatch in " + methodName + ", returning safe default: " + cause.getMessage());
+            Throwable cause = unwrap(e);
+            if (isIgnorableProviderError(cause)) {
+                Slog.w(TAG, "Provider " + methodName + " denied, returning safe default: " + cause.getMessage());
                 return getSafeDefaultValue(methodName, method.getReturnType());
             }
-            throw e.getCause();
+            if (cause != null) {
+                throw cause;
+            }
+            throw e;
         }
     }
     
@@ -158,19 +163,34 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
     }
     
     
-    private boolean isUidMismatchError(Throwable error) {
-        if (error == null) return false;
-        
+    private static Throwable unwrap(Throwable error) {
+        Throwable cause = error;
+        while (cause instanceof java.lang.reflect.InvocationTargetException && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        if (cause != null && cause.getCause() != null
+                && (cause instanceof RuntimeException || cause instanceof java.lang.reflect.UndeclaredThrowableException)) {
+            return cause.getCause();
+        }
+        return cause != null ? cause : error;
+    }
+
+    private boolean isIgnorableProviderError(Throwable error) {
+        if (error == null) {
+            return false;
+        }
+        if (error instanceof SecurityException) {
+            return true;
+        }
         String message = error.getMessage();
-        if (message == null) return false;
-        
-        
-        return message.contains("Calling uid") && 
-               message.contains("doesn't match source uid") ||
-               message.contains("uid") && 
-               message.contains("permission") ||
-               message.contains("SecurityException") ||
-               message.contains("UID mismatch");
+        if (message == null) {
+            return false;
+        }
+        String lower = message.toLowerCase();
+        return lower.contains("permission denial")
+                || lower.contains("uid mismatch")
+                || (lower.contains("calling uid") && lower.contains("doesn't match source uid"))
+                || (lower.contains("uid") && lower.contains("permission"));
     }
     
     
