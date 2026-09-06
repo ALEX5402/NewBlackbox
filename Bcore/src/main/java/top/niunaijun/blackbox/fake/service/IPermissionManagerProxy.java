@@ -2,12 +2,16 @@ package top.niunaijun.blackbox.fake.service;
 
 import android.content.pm.PackageManager;
 
+import java.lang.reflect.Method;
+
 import black.android.app.BRActivityThread;
 import black.android.app.BRContextImpl;
 import black.android.os.BRServiceManager;
 import black.android.permission.BRIPermissionManagerStub;
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
+import top.niunaijun.blackbox.fake.hook.MethodHook;
+import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.fake.service.base.PkgMethodProxy;
 import top.niunaijun.blackbox.fake.service.base.ValueMethodProxy;
 import top.niunaijun.blackbox.utils.Reflector;
@@ -47,6 +51,8 @@ public class IPermissionManagerProxy extends BinderInvocationStub {
         addMethodHook(new ValueMethodProxy("removeOnPermissionsChangeListener", 0));
         addMethodHook(new ValueMethodProxy("checkDeviceIdentifierAccess", false));
         addMethodHook(new PkgMethodProxy("shouldShowRequestPermissionRationale"));
+        addMethodHook(new CheckPermission());
+        addMethodHook(new CheckUidPermission());
         if (BuildCompat.isOreo()) {
             addMethodHook(new ValueMethodProxy("notifyDexLoad", 0));
             addMethodHook(new ValueMethodProxy("notifyPackageUse", 0));
@@ -58,6 +64,42 @@ public class IPermissionManagerProxy extends BinderInvocationStub {
     @Override
     public boolean isBadEnv() {
         return false;
+    }
+
+    @ProxyMethod("checkPermission")
+    public static class CheckPermission extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (isGoogleInternalPermission(args)) {
+                return PackageManager.PERMISSION_GRANTED;
+            }
+            return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("checkUidPermission")
+    public static class CheckUidPermission extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (isGoogleInternalPermission(args)) {
+                return PackageManager.PERMISSION_GRANTED;
+            }
+            return method.invoke(who, args);
+        }
+    }
+
+    private static boolean isGoogleInternalPermission(Object[] args) {
+        if (args == null || args.length == 0 || !(args[0] instanceof String)) {
+            return false;
+        }
+        String permission = (String) args[0];
+        return permission.startsWith("com.google.android.gms.permission.")
+                || permission.startsWith("com.google.android.providers.gsf.permission.")
+                || permission.equals("android.permission.ACCOUNT_MANAGER")
+                || permission.equals("android.permission.GET_ACCOUNTS")
+                || permission.equals("android.permission.MANAGE_ACCOUNTS")
+                || permission.equals("android.permission.USE_CREDENTIALS")
+                || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS");
     }
 
 }
