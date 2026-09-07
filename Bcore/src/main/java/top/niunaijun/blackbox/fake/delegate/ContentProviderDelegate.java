@@ -2,11 +2,13 @@ package top.niunaijun.blackbox.fake.delegate;
 
 import android.net.Uri;
 import android.os.Build;
+import android.os.IBinder;
 import android.os.IInterface;
 import android.util.ArrayMap;
 
 import java.lang.reflect.Proxy;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import black.android.app.BRActivityThread;
@@ -20,8 +22,10 @@ import black.android.providers.BRSettingsNameValueCacheOreo;
 import black.android.providers.BRSettingsSecure;
 import black.android.providers.BRSettingsSystem;
 import top.niunaijun.blackbox.BlackBoxCore;
+import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.fake.service.context.providers.ContentProviderStub;
 import top.niunaijun.blackbox.fake.service.context.providers.SystemProviderStub;
+import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
 
@@ -73,10 +77,63 @@ public class ContentProviderDelegate {
             if (!sInjected.contains(providerName)) {
                 sInjected.add(providerName);
                 final IInterface iInterface = BRActivityThreadProviderClientRecordP.get(value).mProvider();
-                BRActivityThreadProviderClientRecordP.get(value)._set_mProvider(new ContentProviderStub().wrapper(iInterface, BlackBoxCore.getHostPkg()));
+                String wrapPkg = BlackBoxCore.getHostPkg();
+                if (isGoogleProviderAuthority(providerName)) {
+                    String appPkg = BActivityThread.getAppPackageName();
+                    if (appPkg != null && !appPkg.isEmpty()) {
+                        wrapPkg = appPkg;
+                    }
+                }
+                BRActivityThreadProviderClientRecordP.get(value)._set_mProvider(new ContentProviderStub().wrapper(iInterface, wrapPkg));
                 BRActivityThreadProviderClientRecordP.get(value)._set_mNames(new String[]{providerName});
             }
         }
+    }
+
+    public static IBinder getProviderBinder(String authority) {
+        if (authority == null || authority.isEmpty()) {
+            return null;
+        }
+        try {
+            Object activityThread = BlackBoxCore.mainThread();
+            Map<?, ?> map = BRActivityThread.get(activityThread).mProviderMap();
+            if (map == null) {
+                return null;
+            }
+            for (Object value : map.values()) {
+                if (value == null) {
+                    continue;
+                }
+                String[] names = BRActivityThreadProviderClientRecordP.get(value).mNames();
+                if (names == null) {
+                    continue;
+                }
+                for (String name : names) {
+                    if (authority.equals(name) || (name != null && authority.startsWith(name + ";"))) {
+                        IInterface provider = BRActivityThreadProviderClientRecordP.get(value).mProvider();
+                        if (provider != null) {
+                            return provider.asBinder();
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            Slog.w(TAG, "Failed to find local provider binder for " + authority + ": " + e.getMessage());
+        }
+        return null;
+    }
+
+    public static boolean isGoogleProviderAuthority(String authority) {
+        if (authority == null) {
+            return false;
+        }
+        return authority.contains("com.google.android.gms")
+                || authority.contains("com.google.android.gsf")
+                || authority.contains("com.android.vending")
+                || authority.contains("com.google.settings")
+                || authority.contains("gservices")
+                || authority.contains("googlesettings")
+                || authority.contains("appdoctor");
     }
 
     public static void clearSettingProvider() {
