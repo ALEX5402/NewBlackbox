@@ -83,6 +83,7 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         addMethodHook(new ValueMethodProxy("addOnPermissionsChangeListener", 0));
         addMethodHook(new ValueMethodProxy("removeOnPermissionsChangeListener", 0));
         addMethodHook(new SimpleAudioPermissionHook());
+        addMethodHook(new CheckUidPermission());
         addMethodHook(new CheckSelfPermission());
         addMethodHook(new ShouldShowRequestPermissionRationale());
         addMethodHook(new RequestPermissions());
@@ -536,6 +537,21 @@ public class IPackageManagerProxy extends BinderInvocationStub {
             }
             
             
+            return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("checkUidPermission")
+    public static class CheckUidPermission extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            String permission = args != null && args.length > 0 ? (String) args[0] : null;
+            if (isGoogleInternalPermission(permission) || isPrivilegedTelephonyPermission(permission)
+                    || isAudioPermission(permission) || isStorageOrMediaPermission(permission)
+                    || isNotificationOrXiaomiPermission(permission)) {
+                Slog.d(TAG, "CheckUidPermission: Granting permission: " + permission);
+                return PackageManager.PERMISSION_GRANTED;
+            }
             return method.invoke(who, args);
         }
     }
