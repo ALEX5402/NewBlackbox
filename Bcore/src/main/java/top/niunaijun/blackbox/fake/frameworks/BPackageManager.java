@@ -109,6 +109,10 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                     userId);
         }
         if (ris == null || ris.size() <= 0) {
+            Intent googleIntent = createGoogleServiceLaunchIntent(packageName, userId);
+            if (googleIntent != null) {
+                return googleIntent;
+            }
             return null;
         }
         Intent intent = new Intent(intentToResolve);
@@ -116,6 +120,39 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         intent.setClassName(ris.get(0).activityInfo.packageName,
                 ris.get(0).activityInfo.name);
         return intent;
+    }
+
+    private Intent createGoogleServiceLaunchIntent(String packageName, int userId) {
+        if (!top.niunaijun.blackbox.core.GmsCore.isGoogleAppOrService(packageName)) {
+            return null;
+        }
+        Intent main = new Intent(Intent.ACTION_MAIN);
+        main.setPackage(packageName);
+        List<ResolveInfo> activities = queryIntentActivities(main, 0, null, userId);
+        if (activities != null && !activities.isEmpty()) {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setClassName(activities.get(0).activityInfo.packageName, activities.get(0).activityInfo.name);
+            Log.d(TAG, "Using MAIN activity for Google package " + packageName + ": " + activities.get(0).activityInfo.name);
+            return intent;
+        }
+        try {
+            PackageInfo packageInfo = getPackageInfo(packageName, android.content.pm.PackageManager.GET_ACTIVITIES, userId);
+            if (packageInfo != null && packageInfo.activities != null) {
+                for (ActivityInfo activityInfo : packageInfo.activities) {
+                    if (activityInfo.exported) {
+                        Intent intent = new Intent();
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setClassName(activityInfo.packageName, activityInfo.name);
+                        Log.d(TAG, "Using exported activity for Google package " + packageName + ": " + activityInfo.name);
+                        return intent;
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            Log.w(TAG, "Failed to resolve exported activity for " + packageName, e);
+        }
+        return null;
     }
     
     
@@ -129,6 +166,11 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
             }
         } catch (Exception e) {
             Log.w(TAG, "Fallback launch intent failed for " + packageName, e);
+        }
+
+        Intent googleIntent = createGoogleServiceLaunchIntent(packageName, BlackBoxCore.getUserId());
+        if (googleIntent != null) {
+            return googleIntent;
         }
         
         
