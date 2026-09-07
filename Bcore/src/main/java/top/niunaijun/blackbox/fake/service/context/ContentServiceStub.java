@@ -1,355 +1,38 @@
-package top.niunaijun.blackbox.fake.service.context.providers;
-
-import android.os.IInterface;
+package top.niunaijun.blackbox.fake.service.context;
 
 import java.lang.reflect.Method;
 
-import black.android.content.BRAttributionSource;
-import top.niunaijun.blackbox.app.BActivityThread;
-import top.niunaijun.blackbox.BlackBoxCore;
-import top.niunaijun.blackbox.fake.hook.ClassInvocationStub;
-import top.niunaijun.blackbox.utils.compat.ContextCompat;
-import top.niunaijun.blackbox.utils.Slog;
-import android.os.Bundle;
-import top.niunaijun.blackbox.utils.AttributionSourceUtils;
+import black.android.content.BRIContentServiceStub;
+import black.android.os.BRServiceManager;
+import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
+import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
 
-public class ContentProviderStub extends ClassInvocationStub implements BContentProvider {
-    public static final String TAG = "ContentProviderStub";
-    private IInterface mBase;
-    private String mAppPkg;
+public class ContentServiceStub extends BinderInvocationStub {
+    public static final String TAG = "ContentServiceStub";
 
-    public IInterface wrapper(final IInterface contentProviderProxy, final String appPkg) {
-        mBase = contentProviderProxy;
-        mAppPkg = appPkg;
-        injectHook();
-        return (IInterface) getProxyInvocation();
+    public ContentServiceStub() {
+        super(BRServiceManager.get().getService("content"));
     }
 
     @Override
     protected Object getWho() {
-        return mBase;
+        return BRIContentServiceStub.get().asInterface(BRServiceManager.get().getService("content"));
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-
-    }
-
-    @Override
-    protected void onBindMethod() {
-
-    }
-
-    @Override
-public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    if ("asBinder".equals(method.getName())) {
-        return method.invoke(mBase, args);
-    }
-
-    String methodName = method.getName();
-
-    if ("call".equals(methodName)) {
-        AttributionSourceUtils.fixAttributionSourceInArgs(args);
-    } else {
-        if (args != null && args.length > 0) {
-            for (int i = 0; i < args.length; i++) {
-                Object arg = args[i];
-                if (arg instanceof String) {
-                    String strArg = (String) arg;
-                    if (!isSystemProviderAuthority(strArg) && !isGooglePackageOrAuthority(strArg)) {
-                        args[i] = mAppPkg;
-                    }
-                }
-            }
-            AttributionSourceUtils.fixAttributionSourceInArgs(args);
-        }
-    }
-
-    try {
-        if (methodName.equals("query") || methodName.equals("insert")
-                || methodName.equals("update") || methodName.equals("delete")
-                || methodName.equals("bulkInsert") || methodName.equals("call")) {
-
-            try {
-                Object result = method.invoke(mBase, args);
-                if (methodName.equals("call")) {
-                    result = allowGoogleCertificates(args, result);
-                }
-                return result;
-            } catch (Throwable e) {
-                Throwable cause = unwrap(e);
-                if (isGoogleCertificateCall(args, cause) || isIgnorableProviderError(cause)) {
-                    Slog.w(TAG, "Provider " + methodName + " denied, returning Google-safe default: " + cause.getMessage());
-                    return googleSafeDefault(methodName, method.getReturnType(), args, cause);
-                }
-                if (methodName.equals("call") || methodName.equals("query")) {
-                    Slog.w(TAG, "Error in " + methodName + ", returning safe default: " + e.getMessage());
-                    return googleSafeDefault(methodName, method.getReturnType(), args, cause);
-                }
-                if (cause != null) {
-                    throw cause;
-                }
-                throw e;
-            }
-        }
-
-        return method.invoke(mBase, args);
-    } catch (Throwable e) {
-        Throwable cause = unwrap(e);
-        if (isGoogleCertificateCall(args, cause) || isIgnorableProviderError(cause)) {
-            Slog.w(TAG, "Provider " + methodName + " denied, returning Google-safe default: " + cause.getMessage());
-            return googleSafeDefault(methodName, method.getReturnType(), args, cause);
-        }
-        if (cause != null) {
-            throw cause;
-        }
-        throw e;
-    }
-}
-    
-    private Object getSafeDefaultValue(String methodName) {
-        switch (methodName) {
-            case "query":
-                return null; 
-            case "insert":
-                return android.net.Uri.EMPTY; 
-            case "update":
-            case "delete":
-                return 0; 
-            case "bulkInsert":
-                return 0; 
-            case "call":
-                return new Bundle(); 
-            case "getType":
-                return null; 
-            case "openFile":
-                return null; 
-            case "openAssetFile":
-                return null; 
-            default:
-                return null; 
-        }
-    }
-
-    private Object googleSafeDefault(String methodName, Class<?> returnType, Object[] args, Throwable cause) {
-        if (isGoogleCertificateCall(args, cause) && (returnType == null || returnType == Bundle.class)) {
-            return allowedGoogleCertificatesBundle();
-        }
-        return getSafeDefaultValue(methodName, returnType);
-    }
-
-    private Object allowGoogleCertificates(Object[] args, Object result) {
-        if (!isGoogleCertificateCall(args, null)) {
-            return result;
-        }
-        if (result instanceof Bundle) {
-            Bundle bundle = (Bundle) result;
-            if (bundle.isEmpty() || isDeniedCertificateResult(bundle)) {
-                Slog.d(TAG, "Overriding GoogleCertificatesRslt denial with allowed bundle");
-                return allowedGoogleCertificatesBundle();
-            }
-            return bundle;
-        }
-        if (result == null) {
-            return allowedGoogleCertificatesBundle();
-        }
-        return result;
-    }
-
-    private boolean isGoogleCertificateCall(Object[] args, Throwable cause) {
-        if (cause != null && cause.getMessage() != null) {
-            String message = cause.getMessage().toLowerCase();
-            if (message.contains("googlecertificates") || message.contains("googlecertificatesrslt")) {
-                return true;
-            }
-        }
-        if (args == null) {
-            return false;
-        }
-        for (Object arg : args) {
-            if (!(arg instanceof String)) {
-                continue;
-            }
-            String value = ((String) arg).toLowerCase();
-            if (value.contains("googlecertificates")
-                    || value.contains("googlecertificatesrslt")
-                    || value.contains("gms.googlecertificates")
-                    || "isGoogleOrPlatformSigned".equals(arg)
-                    || "isPackageGoogleSigned".equals(arg)
-                    || "isGoogleSigned".equals(arg)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isDeniedCertificateResult(Bundle bundle) {
-        try {
-            for (String key : bundle.keySet()) {
-                Object value = bundle.get(key);
-                if (value instanceof Boolean && !((Boolean) value)) {
-                    return true;
-                }
-                if (value instanceof String) {
-                    String text = ((String) value).toLowerCase();
-                    if (text.contains("not allowed") || text.contains("denied") || text.contains("googlecertificatesrslt")) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        return false;
-    }
-
-    private Bundle allowedGoogleCertificatesBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("result", true);
-        bundle.putBoolean("allow", true);
-        bundle.putBoolean("allowed", true);
-        bundle.putString("GoogleCertificatesRslt", "allowed");
-        return bundle;
-    }
-
-    private boolean isSystemProviderAuthority(String authority) {
-        if (authority == null) return false;
-        
-        
-        return authority.equals("settings") || 
-               authority.equals("settings_global") || 
-               authority.equals("settings_system") || 
-               authority.equals("settings_secure") ||
-               authority.equals("media") ||
-               authority.equals("telephony") ||
-               authority.contains("googlecertificates") ||
-               authority.contains("com.google.android.gms") ||
-               authority.contains("com.google.android.gsf") ||
-               authority.contains("com.google.settings") ||
-               authority.contains("gservices") ||
-               authority.startsWith("android.provider.Settings");
-    }
-
-    private boolean isGooglePackageOrAuthority(String value) {
-        if (value == null) {
-            return false;
-        }
-        return value.startsWith("com.google.")
-                || value.startsWith("com.android.vending")
-                || value.contains("gservices")
-                || value.contains("googlesettings")
-                || value.contains("appdoctor");
-    }
-    
-    
-    private static Throwable unwrap(Throwable error) {
-        Throwable cause = error;
-        while (cause instanceof java.lang.reflect.InvocationTargetException && cause.getCause() != null) {
-            cause = cause.getCause();
-        }
-        if (cause != null && cause.getCause() != null
-                && (cause instanceof RuntimeException || cause instanceof java.lang.reflect.UndeclaredThrowableException)) {
-            return cause.getCause();
-        }
-        return cause != null ? cause : error;
-    }
-
-    private boolean isIgnorableProviderError(Throwable error) {
-        if (error == null) {
-            return false;
-        }
-        if (error instanceof SecurityException) {
-            return true;
-        }
-        String message = error.getMessage();
-        if (message == null) {
-            return false;
-        }
-        String lower = message.toLowerCase();
-        return lower.contains("permission denial")
-                || lower.contains("uid mismatch")
-                || lower.contains("cannot write to google settings")
-                || lower.contains("google settings table")
-                || lower.contains("internal_broadcast")
-                || (lower.contains("calling uid") && lower.contains("doesn't match source uid"))
-                || (lower.contains("uid") && lower.contains("permission"));
-    }
-    
-    
-    private Object getSafeDefaultValue(String methodName, Class<?> returnType) {
-        if (returnType == null) {
-            return getSafeDefaultValue(methodName);
-        }
-        
-        
-        if (returnType == String.class) {
-            return "true"; 
-        } else if (returnType == int.class || returnType == Integer.class) {
-            return 1; 
-        } else if (returnType == long.class || returnType == Long.class) {
-            return 1L; 
-        } else if (returnType == float.class || returnType == Float.class) {
-            return 1.0f; 
-        } else if (returnType == boolean.class || returnType == Boolean.class) {
-            return true; 
-        } else if (returnType == Bundle.class) {
-            return new Bundle(); 
-        }
-        
-        
-        return getSafeDefaultValue(methodName);
-    }
-
-    
-    private void fixAttributionSourceUid(Object attributionSource) {
-        try {
-            if (attributionSource == null) return;
-            
-            Class<?> attributionSourceClass = attributionSource.getClass();
-            
-            
-            try {
-                java.lang.reflect.Field uidField = attributionSourceClass.getDeclaredField("mUid");
-                uidField.setAccessible(true);
-                uidField.set(attributionSource, BlackBoxCore.getHostUid());
-                Slog.d(TAG, "Fixed AttributionSource UID via field access");
-            } catch (NoSuchFieldException e) {
-                
-                try {
-                    java.lang.reflect.Field uidField = attributionSourceClass.getDeclaredField("uid");
-                    uidField.setAccessible(true);
-                    uidField.set(attributionSource, BlackBoxCore.getHostUid());
-                    Slog.d(TAG, "Fixed AttributionSource UID via alternative field");
-                } catch (NoSuchFieldException e2) {
-                    
-                    try {
-                        java.lang.reflect.Method setUidMethod = attributionSourceClass.getDeclaredMethod("setUid", int.class);
-                        setUidMethod.setAccessible(true);
-                        setUidMethod.invoke(attributionSource, BlackBoxCore.getHostUid());
-                        Slog.d(TAG, "Fixed AttributionSource UID via setter method");
-                    } catch (Exception e3) {
-                        Slog.w(TAG, "Could not fix AttributionSource UID: " + e3.getMessage());
-                    }
-                }
-            }
-            
-            
-            try {
-                java.lang.reflect.Field packageField = attributionSourceClass.getDeclaredField("mPackageName");
-                packageField.setAccessible(true);
-                packageField.set(attributionSource, mAppPkg);
-                Slog.d(TAG, "Fixed AttributionSource package name");
-            } catch (Exception e) {
-                
-            }
-            
-        } catch (Exception e) {
-            Slog.w(TAG, "Error fixing AttributionSource UID: " + e.getMessage());
-        }
+        replaceSystemService("content");
     }
 
     @Override
     public boolean isBadEnv() {
         return false;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        MethodParameterUtils.replaceFirstAppPkg(args);
+        return super.invoke(proxy, method, args);
     }
 }
