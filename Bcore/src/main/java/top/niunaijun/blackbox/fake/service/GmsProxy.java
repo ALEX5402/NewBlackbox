@@ -21,14 +21,24 @@ public class GmsProxy extends BinderInvocationStub {
         super(resolveGmsBinder());
     }
 
+    private static final String[] GMS_SERVICE_NAMES = new String[]{
+            SERVICE_NAME,
+            "com.google.android.gms",
+            "GmsServiceBroker",
+            "gms.common"
+    };
+
     private static IBinder resolveGmsBinder() {
-        try {
-            IBinder binder = BRServiceManager.get().getService(SERVICE_NAME);
-            if (binder != null) {
-                return binder;
+        for (String name : GMS_SERVICE_NAMES) {
+            try {
+                IBinder binder = BRServiceManager.get().getService(name);
+                if (binder != null && binder.isBinderAlive()) {
+                    Slog.d(TAG, "Resolved GMS binder via service name: " + name);
+                    return binder;
+                }
+            } catch (Throwable e) {
+                Slog.w(TAG, "Unable to query gms service binder for " + name, e);
             }
-        } catch (Throwable e) {
-            Slog.w(TAG, "Unable to query gms service binder", e);
         }
         Slog.d(TAG, "No system gms binder, using Chimera stub");
         return new GmsChimeraStub();
