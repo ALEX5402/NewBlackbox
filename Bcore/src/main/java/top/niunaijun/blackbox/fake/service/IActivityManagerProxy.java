@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.IInterface;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import black.android.app.BRActivityManagerNative;
 import black.android.app.BRActivityManagerOreo;
@@ -39,6 +40,7 @@ import top.niunaijun.blackbox.proxy.record.ProxyBroadcastRecord;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
+import top.niunaijun.blackbox.utils.compat.ParceledListSliceCompat;
 
 
 @ScanClass(ActivityManagerCommonProxy.class)
@@ -324,6 +326,17 @@ public class IActivityManagerProxy extends BinderInvocationStub {
                 }
             }
             return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("getHistoricalProcessExitReasons")
+    public static class GetHistoricalProcessExitReasons extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (ParceledListSliceCompat.isReturnParceledListSlice(method)) {
+                return ParceledListSliceCompat.create(new ArrayList<>());
+            }
+            return new ArrayList<>();
         }
     }
 
