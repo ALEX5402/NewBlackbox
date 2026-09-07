@@ -61,6 +61,7 @@ import top.niunaijun.blackbox.core.env.BEnvironment;
 import top.niunaijun.blackbox.core.system.BProcessManagerService;
 import top.niunaijun.blackbox.core.system.ISystemService;
 import top.niunaijun.blackbox.core.system.ProcessRecord;
+import top.niunaijun.blackbox.core.system.am.BActivityManagerService;
 import top.niunaijun.blackbox.core.system.pm.BPackageManagerService;
 import top.niunaijun.blackbox.core.system.pm.PackageMonitor;
 import top.niunaijun.blackbox.core.system.user.BUserHandle;
@@ -1824,13 +1825,25 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
                 Log.v(TAG, "performing bindService to " + componentName);
             }
             int flags = Context.BIND_AUTO_CREATE;
-
-
-
-            if (!mContext.bindService(intent, this, flags)) {
-                if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                    Log.v(TAG, "bindService to " + componentName + " failed");
+            try {
+                Intent proxyIntent = BActivityManagerService.get().bindService(
+                        intent, null, null, mAccounts.userId);
+                if (proxyIntent != null) {
+                    intent = proxyIntent;
                 }
+            } catch (Throwable t) {
+                Slog.w(TAG, "Failed to resolve virtual authenticator bind for "
+                        + componentName + ": " + t.getMessage());
+            }
+            try {
+                if (!mContext.bindService(intent, this, flags)) {
+                    if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                        Log.v(TAG, "bindService to " + componentName + " failed");
+                    }
+                    return false;
+                }
+            } catch (SecurityException e) {
+                Slog.w(TAG, "bindService denied for " + componentName + ": " + e.getMessage());
                 return false;
             }
 
