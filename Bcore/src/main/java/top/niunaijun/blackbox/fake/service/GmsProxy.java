@@ -1,7 +1,7 @@
 package top.niunaijun.blackbox.fake.service;
 
-import android.content.Context;
 import android.os.IBinder;
+import android.os.IInterface;
 
 import java.lang.reflect.Method;
 
@@ -15,38 +15,67 @@ import top.niunaijun.blackbox.utils.Slog;
 
 public class GmsProxy extends BinderInvocationStub {
     public static final String TAG = "GmsProxy";
+    public static final String SERVICE_NAME = "gms";
 
     public GmsProxy() {
-        super(BRServiceManager.get().getService("gms"));
+        super(resolveGmsBinder());
+    }
+
+    private static IBinder resolveGmsBinder() {
+        try {
+            IBinder binder = BRServiceManager.get().getService(SERVICE_NAME);
+            if (binder != null) {
+                return binder;
+            }
+        } catch (Throwable e) {
+            Slog.w(TAG, "Unable to query gms service binder", e);
+        }
+        Slog.d(TAG, "No system gms binder, using Chimera stub");
+        return new GmsChimeraStub();
     }
 
     @Override
     protected Object getWho() {
-        IBinder binder = BRServiceManager.get().getService("gms");
+        IBinder binder = resolveGmsBinder();
+        Object broker = asGmsBroker(binder);
+        if (broker != null) {
+            return broker;
+        }
+        if (binder instanceof IInterface) {
+            return binder;
+        }
+        return new GmsChimeraStub();
+    }
+
+    private static Object asGmsBroker(IBinder binder) {
         if (binder == null) {
-            Slog.e(TAG, "Failed to get gms service binder");
             return null;
         }
-        try {
-            Class<?> stubClass = Class.forName("com.google.android.gms.common.api.internal.IGmsServiceBroker$Stub");
-            Method asInterfaceMethod = stubClass.getMethod("asInterface", IBinder.class);
-            Object iface = asInterfaceMethod.invoke(null, binder);
-            if (iface != null) {
-                Slog.d(TAG, "Successfully obtained IGmsServiceBroker interface");
-                return iface;
-            } else {
-                Slog.e(TAG, "Reflection succeeded but returned null interface");
-                return null;
+        String[] stubNames = new String[]{
+                "com.google.android.gms.common.internal.IGmsServiceBroker$Stub",
+                "com.google.android.gms.common.api.internal.IGmsServiceBroker$Stub"
+        };
+        for (String stubName : stubNames) {
+            try {
+                Class<?> stubClass = Class.forName(stubName);
+                Method asInterfaceMethod = stubClass.getMethod("asInterface", IBinder.class);
+                Object iface = asInterfaceMethod.invoke(null, binder);
+                if (iface != null) {
+                    Slog.d(TAG, "Successfully obtained IGmsServiceBroker via " + stubName);
+                    return iface;
+                }
+            } catch (ClassNotFoundException ignored) {
+            } catch (Throwable e) {
+                Slog.w(TAG, "Failed to get IGmsServiceBroker via " + stubName, e);
             }
-        } catch (Exception e) {
-            Slog.e(TAG, "Failed to get IGmsServiceBroker interface", e);
-            return null;
         }
+        return null;
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        replaceSystemService("gms");
+        replaceSystemService(SERVICE_NAME);
+        Slog.d(TAG, "GmsProxy injected");
     }
 
     @Override
@@ -54,46 +83,66 @@ public class GmsProxy extends BinderInvocationStub {
         return false;
     }
 
-    
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try {
+            return super.invoke(proxy, method, args);
+        } catch (Throwable e) {
+            Slog.w(TAG, "GmsProxy invoke failed for " + method.getName() + ", returning stub");
+            Class<?> type = method.getReturnType();
+            if (type == IBinder.class || IBinder.class.isAssignableFrom(type) || IInterface.class.isAssignableFrom(type)) {
+                return new GmsChimeraStub();
+            }
+            if (type == boolean.class || type == Boolean.class) {
+                return true;
+            }
+            if (type == int.class || type == Integer.class) {
+                return 0;
+            }
+            return null;
+        }
+    }
+
     @ProxyMethod("getService")
     public static class GetService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                
-                if (args != null && args.length > 0) {
+                if (args != null && args.length > 0 && args[0] instanceof String) {
                     String callingPackage = (String) args[0];
-                    if ("com.google.android.gms".equals(callingPackage)) {
-                        
+                    if ("com.google.android.gms".equals(callingPackage)
+                            || "com.google.android.gsf".equals(callingPackage)) {
                         args[0] = BlackBoxCore.getHostPkg();
-                        Slog.d(TAG, "GmsProxy: Fixed calling package from com.google.android.gms to " + BlackBoxCore.getHostPkg());
+                        Slog.d(TAG, "GmsProxy: Fixed calling package from " + callingPackage + " to " + BlackBoxCore.getHostPkg());
                     }
                 }
-                return method.invoke(who, args);
+                Object result = method.invoke(who, args);
+                if (result != null) {
+                    return result;
+                }
             } catch (Exception e) {
-                Slog.e(TAG, "GmsProxy: Error in getService", e);
-                
-                return null;
+                Slog.w(TAG, "GmsProxy: Error in getService, returning Chimera stub", e);
             }
+            return new GmsChimeraStub();
         }
     }
 
-    
     @ProxyMethod("getServiceBroker")
     public static class GetServiceBroker extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
-                return method.invoke(who, args);
+                Object result = method.invoke(who, args);
+                if (result != null) {
+                    return result;
+                }
             } catch (Exception e) {
-                Slog.e(TAG, "GmsProxy: Error in getServiceBroker", e);
-                
-                return null;
+                Slog.w(TAG, "GmsProxy: Error in getServiceBroker, returning Chimera stub", e);
             }
+            return new GmsChimeraStub();
         }
     }
 
-    
     @ProxyMethod("authenticate")
     public static class Authenticate extends MethodHook {
         @Override
@@ -103,13 +152,11 @@ public class GmsProxy extends BinderInvocationStub {
                 return method.invoke(who, args);
             } catch (Exception e) {
                 Slog.w(TAG, "GmsProxy: Authentication error, returning success", e);
-                
                 return createMockAuthResult();
             }
         }
     }
 
-    
     @ProxyMethod("getAccount")
     public static class GetAccount extends MethodHook {
         @Override
@@ -124,7 +171,6 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    
     @ProxyMethod("getToken")
     public static class GetToken extends MethodHook {
         @Override
@@ -139,7 +185,6 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    
     @ProxyMethod("invalidateToken")
     public static class InvalidateToken extends MethodHook {
         @Override
@@ -154,7 +199,6 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    
     @ProxyMethod("clearToken")
     public static class ClearToken extends MethodHook {
         @Override
@@ -169,10 +213,8 @@ public class GmsProxy extends BinderInvocationStub {
         }
     }
 
-    
     private static Object createMockAuthResult() {
         try {
-            
             Class<?> bundleClass = Class.forName("android.os.Bundle");
             return bundleClass.newInstance();
         } catch (Exception e) {
