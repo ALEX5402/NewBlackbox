@@ -1081,8 +1081,15 @@ public class BActivityThread extends IBActivityThread.Stub {
         }
         String[] split = providerInfo.authority.split(";");
         for (String auth : split) {
+            IBinder local = ContentProviderDelegate.getProviderBinder(auth);
+            if (local != null) {
+                return local;
+            }
             ContentProviderClient contentProviderClient = BlackBoxCore.getContext()
                     .getContentResolver().acquireContentProviderClient(auth);
+            if (contentProviderClient == null) {
+                continue;
+            }
             IInterface iInterface = BRContentProviderClient.get(contentProviderClient).mContentProvider();
             if (iInterface == null)
                 continue;
