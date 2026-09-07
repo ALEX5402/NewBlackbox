@@ -18,6 +18,7 @@ public class AppSystemEnv {
 
     static {
         sSystemPackages.add("android");
+        sSystemPackages.add("com.android.providers.downloads");
         sSystemPackages.add("com.google.android.webview");
         sSystemPackages.add("com.google.android.webview.dev");
         sSystemPackages.add("com.google.android.webview.beta");
