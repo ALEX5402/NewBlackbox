@@ -65,7 +65,9 @@ public class IContentProviderProxy extends ClassInvocationStub {
                 return method.invoke(who, args);
             } catch (Exception e) {
                 Slog.w(TAG, "Error in insert hook: " + e.getMessage());
-                
+                if (isGoogleSettingsError(e)) {
+                    return android.net.Uri.EMPTY;
+                }
                 return null;
             }
         }
@@ -84,7 +86,6 @@ public class IContentProviderProxy extends ClassInvocationStub {
                 return method.invoke(who, args);
             } catch (Exception e) {
                 Slog.w(TAG, "Error in update hook: " + e.getMessage());
-                
                 return 0;
             }
         }
@@ -121,16 +122,17 @@ public class IContentProviderProxy extends ClassInvocationStub {
                 
                 return method.invoke(who, args);
             } catch (SecurityException e) {
-                
                 String message = e.getMessage();
-                if (message != null && message.contains("Calling uid") && message.contains("doesn't match source uid")) {
-                    Slog.w(TAG, "UID mismatch in call method, returning safe default: " + message);
-                    return null; 
+                if (isGoogleSettingsError(e) || (message != null && message.contains("Calling uid") && message.contains("doesn't match source uid"))) {
+                    Slog.w(TAG, "Provider call denied, returning safe default: " + message);
+                    return new android.os.Bundle();
                 }
                 throw e;
             } catch (Exception e) {
                 Slog.w(TAG, "Error in call hook: " + e.getMessage());
-                
+                if (isGoogleSettingsError(e)) {
+                    return new android.os.Bundle();
+                }
                 return null;
             }
         }
@@ -188,5 +190,31 @@ public class IContentProviderProxy extends ClassInvocationStub {
                 return "";
             }
         }
+    }
+
+    private static boolean isGoogleSettingsError(Throwable error) {
+        if (error == null) {
+            return false;
+        }
+        if (error instanceof SecurityException) {
+            String message = error.getMessage();
+            if (message == null) {
+                return true;
+            }
+            String lower = message.toLowerCase();
+            return lower.contains("permission denial")
+                    || lower.contains("cannot write to google settings")
+                    || lower.contains("google settings table")
+                    || lower.contains("internal_broadcast")
+                    || lower.contains("uid mismatch");
+        }
+        String message = error.getMessage();
+        if (message == null) {
+            return false;
+        }
+        String lower = message.toLowerCase();
+        return lower.contains("cannot write to google settings")
+                || lower.contains("google settings table")
+                || lower.contains("internal_broadcast");
     }
 }
