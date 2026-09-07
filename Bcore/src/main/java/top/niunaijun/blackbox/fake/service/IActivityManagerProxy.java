@@ -463,7 +463,7 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 component = new ComponentName(pkg, cls);
                 intent.setComponent(component);
             }
-            ServiceConnectionDelegate proxy = ServiceConnectionDelegate.createProxy(connection, intent);
+            IServiceConnection proxy = ServiceConnectionDelegate.createProxy(connection, intent);
             proxy.connected(component, new GmsChimeraStub());
         } catch (Throwable e) {
             Slog.w(TAG, "Failed to deliver GMS stub binder", e);
