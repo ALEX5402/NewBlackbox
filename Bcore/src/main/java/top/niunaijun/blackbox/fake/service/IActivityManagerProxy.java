@@ -283,7 +283,7 @@ public class IActivityManagerProxy extends BinderInvocationStub {
         }
     }
 
-    @ProxyMethod("getIntentSender")
+    @ProxyMethods({"getIntentSender", "getIntentSenderWithFeature"})
     public static class GetIntentSender extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
