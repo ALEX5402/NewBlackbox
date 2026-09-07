@@ -224,6 +224,10 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             String resolvedType = (String) args[2];
             ResolveInfo resolveInfo = BlackBoxCore.getBPackageManager().resolveService(intent, 0, resolvedType, BActivityThread.getUserId());
             if (resolveInfo == null) {
+                if (isGmsChimeraIntent(intent)) {
+                    Slog.w(TAG, "GMS Chimera startService unresolved, ignoring crash: " + intent);
+                    return null;
+                }
                 return method.invoke(who, args);
             }
 
@@ -339,10 +343,10 @@ public class IActivityManagerProxy extends ClassInvocationStub {
     }
 
     public static Object BindServiceCommon(Object who, Method method, Object[] args,int callingPackageIndex) throws Throwable {
+        Intent intent = args != null && args.length > 2 ? (Intent) args[2] : null;
+        IServiceConnection connection = args != null && args.length > 4 ? (IServiceConnection) args[4] : null;
         try {
-            Intent intent = (Intent) args[2];
             String resolvedType = (String) args[3];
-            IServiceConnection connection = (IServiceConnection) args[4];
 
             
             if (intent == null) {
@@ -390,10 +394,79 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                     return method.invoke(who, args);
                 }
             }
-            return method.invoke(who, args);
+            Object result = method.invoke(who, args);
+            if (shouldStubGmsBind(intent, result) && connection != null) {
+                Slog.w(TAG, "GMS Chimera bind failed, delivering stub binder: " + intent);
+                deliverGmsStubConnection(connection, intent);
+                return 1;
+            }
+            return result;
         } catch (Exception e) {
             Slog.e(TAG, "BindServiceCommon: Unexpected error", e);
+            if (isGmsChimeraIntent(intent) && connection != null) {
+                deliverGmsStubConnection(connection, intent);
+                return 1;
+            }
             return method.invoke(who, args);
+        }
+    }
+
+    private static boolean shouldStubGmsBind(Intent intent, Object result) {
+        if (!isGmsChimeraIntent(intent)) {
+            return false;
+        }
+        if (result instanceof Integer) {
+            return ((Integer) result) == 0;
+        }
+        if (result instanceof Boolean) {
+            return !((Boolean) result);
+        }
+        return result == null;
+    }
+
+    private static boolean isGmsChimeraIntent(Intent intent) {
+        if (intent == null) {
+            return false;
+        }
+        String pkg = intent.getPackage();
+        ComponentName component = intent.getComponent();
+        String action = intent.getAction();
+        if (pkg != null && isGoogleRuntimePackage(pkg)) {
+            return true;
+        }
+        if (component != null && component.getPackageName() != null
+                && isGoogleRuntimePackage(component.getPackageName())) {
+            return true;
+        }
+        return action != null && (action.contains("com.google.android.gms")
+                || action.contains("phenotype")
+                || action.contains("clearcut")
+                || action.contains("measurement")
+                || action.contains("chimera"));
+    }
+
+    private static boolean isGoogleRuntimePackage(String pkg) {
+        return pkg.startsWith("com.google.android.gms")
+                || pkg.equals("com.google.android.gsf")
+                || pkg.equals("com.google.android.gsf.login")
+                || pkg.equals("com.google.android.partnersetup")
+                || pkg.equals("com.google.android.feedback")
+                || pkg.equals("com.google.android.onetimeinitializer");
+    }
+
+    private static void deliverGmsStubConnection(IServiceConnection connection, Intent intent) {
+        try {
+            ComponentName component = intent.getComponent();
+            if (component == null) {
+                String pkg = intent.getPackage() != null ? intent.getPackage() : "com.google.android.gms";
+                String cls = intent.getAction() != null ? intent.getAction() : "GmsChimeraStub";
+                component = new ComponentName(pkg, cls);
+                intent.setComponent(component);
+            }
+            ServiceConnectionDelegate proxy = ServiceConnectionDelegate.createProxy(connection, intent);
+            proxy.connected(component, new GmsChimeraStub());
+        } catch (Throwable e) {
+            Slog.w(TAG, "Failed to deliver GMS stub binder", e);
         }
     }
 
@@ -795,8 +868,13 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             String permission = (String) args[0];
             if (permission.equals(Manifest.permission.ACCOUNT_MANAGER)
                     || permission.equals(Manifest.permission.SEND_SMS)
+                    || permission.equals(Manifest.permission.READ_PHONE_STATE)
+                    || permission.equals("android.permission.READ_PRIVILEGED_PHONE_STATE")
+                    || permission.equals("android.permission.MODIFY_PHONE_STATE")
+                    || permission.equals("android.permission.READ_PHONE_NUMBERS")
                     || (permission != null && (permission.startsWith("com.google.android.setupwizard.")
                     || permission.startsWith("com.google.android.gms.permission.")
+                    || permission.startsWith("com.google.android.providers.gsf.permission.")
                     || permission.startsWith("com.android.vending.")))) {
                 return PackageManager.PERMISSION_GRANTED;
             }
