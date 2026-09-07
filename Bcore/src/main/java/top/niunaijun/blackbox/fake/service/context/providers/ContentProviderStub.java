@@ -72,16 +72,20 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
                 || methodName.equals("bulkInsert") || methodName.equals("call")) {
 
             try {
-                return method.invoke(mBase, args);
+                Object result = method.invoke(mBase, args);
+                if (methodName.equals("call")) {
+                    result = allowGoogleCertificates(args, result);
+                }
+                return result;
             } catch (Throwable e) {
                 Throwable cause = unwrap(e);
-                if (isIgnorableProviderError(cause)) {
-                    Slog.w(TAG, "Provider " + methodName + " denied, returning safe default: " + cause.getMessage());
-                    return getSafeDefaultValue(methodName, method.getReturnType());
+                if (isGoogleCertificateCall(args, cause) || isIgnorableProviderError(cause)) {
+                    Slog.w(TAG, "Provider " + methodName + " denied, returning Google-safe default: " + cause.getMessage());
+                    return googleSafeDefault(methodName, method.getReturnType(), args, cause);
                 }
                 if (methodName.equals("call") || methodName.equals("query")) {
                     Slog.w(TAG, "Error in " + methodName + ", returning safe default: " + e.getMessage());
-                    return getSafeDefaultValue(methodName, method.getReturnType());
+                    return googleSafeDefault(methodName, method.getReturnType(), args, cause);
                 }
                 if (cause != null) {
                     throw cause;
@@ -93,9 +97,9 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
         return method.invoke(mBase, args);
     } catch (Throwable e) {
         Throwable cause = unwrap(e);
-        if (isIgnorableProviderError(cause)) {
-            Slog.w(TAG, "Provider " + methodName + " denied, returning safe default: " + cause.getMessage());
-            return getSafeDefaultValue(methodName, method.getReturnType());
+        if (isGoogleCertificateCall(args, cause) || isIgnorableProviderError(cause)) {
+            Slog.w(TAG, "Provider " + methodName + " denied, returning Google-safe default: " + cause.getMessage());
+            return googleSafeDefault(methodName, method.getReturnType(), args, cause);
         }
         if (cause != null) {
             throw cause;
@@ -128,6 +132,86 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
         }
     }
 
+    private Object googleSafeDefault(String methodName, Class<?> returnType, Object[] args, Throwable cause) {
+        if (isGoogleCertificateCall(args, cause) && (returnType == null || returnType == Bundle.class)) {
+            return allowedGoogleCertificatesBundle();
+        }
+        return getSafeDefaultValue(methodName, returnType);
+    }
+
+    private Object allowGoogleCertificates(Object[] args, Object result) {
+        if (!isGoogleCertificateCall(args, null)) {
+            return result;
+        }
+        if (result instanceof Bundle) {
+            Bundle bundle = (Bundle) result;
+            if (bundle.isEmpty() || isDeniedCertificateResult(bundle)) {
+                Slog.d(TAG, "Overriding GoogleCertificatesRslt denial with allowed bundle");
+                return allowedGoogleCertificatesBundle();
+            }
+            return bundle;
+        }
+        if (result == null) {
+            return allowedGoogleCertificatesBundle();
+        }
+        return result;
+    }
+
+    private boolean isGoogleCertificateCall(Object[] args, Throwable cause) {
+        if (cause != null && cause.getMessage() != null) {
+            String message = cause.getMessage().toLowerCase();
+            if (message.contains("googlecertificates") || message.contains("googlecertificatesrslt")) {
+                return true;
+            }
+        }
+        if (args == null) {
+            return false;
+        }
+        for (Object arg : args) {
+            if (!(arg instanceof String)) {
+                continue;
+            }
+            String value = ((String) arg).toLowerCase();
+            if (value.contains("googlecertificates")
+                    || value.contains("googlecertificatesrslt")
+                    || value.contains("gms.googlecertificates")
+                    || "isGoogleOrPlatformSigned".equals(arg)
+                    || "isPackageGoogleSigned".equals(arg)
+                    || "isGoogleSigned".equals(arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isDeniedCertificateResult(Bundle bundle) {
+        try {
+            for (String key : bundle.keySet()) {
+                Object value = bundle.get(key);
+                if (value instanceof Boolean && !((Boolean) value)) {
+                    return true;
+                }
+                if (value instanceof String) {
+                    String text = ((String) value).toLowerCase();
+                    if (text.contains("not allowed") || text.contains("denied") || text.contains("googlecertificatesrslt")) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    private Bundle allowedGoogleCertificatesBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("result", true);
+        bundle.putBoolean("allow", true);
+        bundle.putBoolean("allowed", true);
+        bundle.putString("GoogleCertificatesRslt", "allowed");
+        return bundle;
+    }
+
     private boolean isSystemProviderAuthority(String authority) {
         if (authority == null) return false;
         
@@ -138,6 +222,9 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
                authority.equals("settings_secure") ||
                authority.equals("media") ||
                authority.equals("telephony") ||
+               authority.contains("googlecertificates") ||
+               authority.contains("com.google.android.gms") ||
+               authority.contains("com.google.android.gsf") ||
                authority.startsWith("android.provider.Settings");
     }
     
