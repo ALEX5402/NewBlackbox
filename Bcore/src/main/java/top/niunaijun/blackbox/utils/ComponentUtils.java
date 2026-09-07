@@ -25,6 +25,39 @@ public class ComponentUtils {
         return component.getPackageName().equals(BlackBoxCore.getAppPackageName());
     }
 
+    public static String getIntentPackage(Intent intent) {
+        if (intent == null) {
+            return null;
+        }
+        String pkg = intent.getPackage();
+        if (pkg != null && !pkg.isEmpty()) {
+            return pkg;
+        }
+        ComponentName component = intent.getComponent();
+        if (component != null) {
+            return component.getPackageName();
+        }
+        return null;
+    }
+
+    public static void ensurePackage(Intent intent, String packageName) {
+        if (intent == null) {
+            return;
+        }
+        String pkg = getIntentPackage(intent);
+        if (pkg == null || pkg.isEmpty()) {
+            pkg = packageName;
+        }
+        if (pkg == null || pkg.isEmpty()) {
+            return;
+        }
+        intent.setPackage(pkg);
+        ComponentName component = intent.getComponent();
+        if (component != null && (component.getPackageName() == null || component.getPackageName().isEmpty())) {
+            intent.setClassName(pkg, component.getClassName());
+        }
+    }
+
     public static boolean isSelf(Intent[] intent) {
         for (Intent intent1 : intent) {
             if (!isSelf(intent1)) {
