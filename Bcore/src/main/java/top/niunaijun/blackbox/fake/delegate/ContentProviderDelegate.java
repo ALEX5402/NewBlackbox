@@ -41,17 +41,24 @@ public class ContentProviderDelegate {
             iInterface = BRIActivityManagerContentProviderHolder.get(holder).provider();
         }
 
-        if (iInterface instanceof Proxy)
+        if (iInterface == null || iInterface instanceof Proxy)
             return;
         IInterface bContentProvider;
+        String wrapPkg = BlackBoxCore.getHostPkg();
+        if (isGoogleProviderAuthority(auth)) {
+            String appPkg = BActivityThread.getAppPackageName();
+            if (appPkg != null && !appPkg.isEmpty()) {
+                wrapPkg = appPkg;
+            }
+        }
         switch (auth) {
             case "media":
             case "telephony":
             case "settings":
-                bContentProvider = new SystemProviderStub().wrapper(iInterface, BlackBoxCore.getHostPkg());
+                bContentProvider = new SystemProviderStub().wrapper(iInterface, wrapPkg);
                 break;
             default:
-                bContentProvider = new ContentProviderStub().wrapper(iInterface, BlackBoxCore.getHostPkg());
+                bContentProvider = new ContentProviderStub().wrapper(iInterface, wrapPkg);
                 break;
         }
         if (BuildCompat.isOreo()) {
