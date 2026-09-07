@@ -392,6 +392,10 @@ public class PackageManagerCompat {
         }
         if (permission.startsWith("com.google.android.gms.permission.")
                 || permission.startsWith("com.google.android.providers.gsf.permission.")
+                || permission.equals("com.google.android.providers.settings.permission.WRITE_GSETTINGS")
+                || permission.equals("com.google.android.providers.settings.permission.READ_GSETTINGS")
+                || permission.equals("android.permission.WRITE_SECURE_SETTINGS")
+                || permission.equals("android.permission.WRITE_SETTINGS")
                 || permission.startsWith("com.google.android.setupwizard.")
                 || permission.startsWith("com.android.vending.")) {
             return true;
