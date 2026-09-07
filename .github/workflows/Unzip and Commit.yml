@@ -1,0 +1,89 @@
+name: Unzip Archive to Root and Commit
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_name:
+        description: "ZIP file name (leave empty to auto-detect the repo's ZIP file)"
+        required: false
+        default: ""
+        type: string
+      delete_zip:
+        description: "Delete the ZIP file after extraction?"
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract to Root Directory
+        run: |
+          # Determine ZIP file name
+          if [ -n "${{ inputs.zip_name }}" ]; then
+            ZIP_FILE="${{ inputs.zip_name }}"
+          else
+            # Automatically find the first zip file in the repo root
+            ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1 | sed 's|^\./||')
+          fi
+
+          if [ -z "$ZIP_FILE" ] || [ ! -f "$ZIP_FILE" ]; then
+            echo "::error::ZIP file not found!"
+            exit 1
+          fi
+
+          echo "Found ZIP file: $ZIP_FILE"
+
+          # Extract into a temporary directory
+          TEMP_EXTRACT_DIR=".tmp_extract"
+          rm -rf "$TEMP_EXTRACT_DIR"
+          mkdir -p "$TEMP_EXTRACT_DIR"
+          unzip -o -q "$ZIP_FILE" -d "$TEMP_EXTRACT_DIR"
+
+          # If the zip contains a single parent directory, extract its inner contents directly to root
+          ITEMS=("$TEMP_EXTRACT_DIR"/*)
+          if [ ${#ITEMS[@]} -eq 1 ] && [ -d "${ITEMS[0]}" ]; then
+            PARENT_FOLDER="${ITEMS[0]}"
+            echo "Unwrapping nested parent folder: $PARENT_FOLDER directly into root..."
+            shopt -s dotglob
+            cp -rf "$PARENT_FOLDER"/* .
+            shopt -u dotglob
+          else
+            echo "Moving extracted items directly to root..."
+            shopt -s dotglob
+            cp -rf "$TEMP_EXTRACT_DIR"/* .
+            shopt -u dotglob
+          fi
+
+          # Clean up temporary extraction folder
+          rm -rf "$TEMP_EXTRACT_DIR"
+
+          # Delete original ZIP file if requested
+          if [ "${{ inputs.delete_zip }}" = "true" ]; then
+            echo "Removing $ZIP_FILE..."
+            rm -f "$ZIP_FILE"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage all changes
+          git add -A
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Extract archive directly into root directory"
+            git push origin ${{ github.ref_name }}
+          fi
+
+          
