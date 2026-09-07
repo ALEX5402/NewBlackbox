@@ -19,11 +19,13 @@ import java.util.List;
 
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
+import top.niunaijun.blackbox.core.GmsCore;
 import top.niunaijun.blackbox.core.system.ServiceManager;
 import top.niunaijun.blackbox.core.system.pm.IBPackageManagerService;
 import top.niunaijun.blackbox.entity.pm.InstallOption;
 import top.niunaijun.blackbox.entity.pm.InstallResult;
 import top.niunaijun.blackbox.entity.pm.InstalledPackage;
+import top.niunaijun.blackbox.utils.ComponentUtils;
 import top.niunaijun.blackbox.utils.TransactionThrottler;
 
 
@@ -86,7 +88,7 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         
         if (shouldUseFallbackMode()) {
             Log.w(TAG, "Using fallback launch intent for " + packageName + " due to service failures");
-            return createFallbackLaunchIntent(packageName);
+            return createFallbackLaunchIntent(packageName, userId);
         }
         
         Intent intentToResolve = new Intent(Intent.ACTION_MAIN);
@@ -108,67 +110,112 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
                     intentToResolve.resolveTypeIfNeeded(BlackBoxCore.getContext().getContentResolver()),
                     userId);
         }
-        if (ris == null || ris.size() <= 0) {
-            Intent googleIntent = createGoogleServiceLaunchIntent(packageName, userId);
-            if (googleIntent != null) {
-                return googleIntent;
-            }
-            return null;
+        ActivityInfo resolved = pickOwnActivity(packageName, ris);
+        if (resolved != null) {
+            return buildLaunchIntent(packageName, resolved.packageName, resolved.name, Intent.ACTION_MAIN);
         }
-        Intent intent = new Intent(intentToResolve);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setClassName(ris.get(0).activityInfo.packageName,
-                ris.get(0).activityInfo.name);
-        return intent;
+        Intent googleIntent = createGoogleServiceLaunchIntent(packageName, userId);
+        if (googleIntent != null) {
+            return googleIntent;
+        }
+        return null;
     }
 
     private Intent createGoogleServiceLaunchIntent(String packageName, int userId) {
-        if (!top.niunaijun.blackbox.core.GmsCore.isGoogleAppOrService(packageName)) {
+        if (!GmsCore.isGoogleAppOrService(packageName)) {
             return null;
         }
         Intent main = new Intent(Intent.ACTION_MAIN);
         main.setPackage(packageName);
         List<ResolveInfo> activities = queryIntentActivities(main, 0, null, userId);
-        if (activities != null && !activities.isEmpty()) {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setClassName(activities.get(0).activityInfo.packageName, activities.get(0).activityInfo.name);
-            Log.d(TAG, "Using MAIN activity for Google package " + packageName + ": " + activities.get(0).activityInfo.name);
-            return intent;
+        ActivityInfo mainActivity = pickOwnActivity(packageName, activities);
+        if (mainActivity != null) {
+            Log.d(TAG, "Using MAIN activity for Google package " + packageName + ": " + mainActivity.name);
+            return buildLaunchIntent(packageName, mainActivity.packageName, mainActivity.name, Intent.ACTION_MAIN);
         }
         try {
             PackageInfo packageInfo = getPackageInfo(packageName, android.content.pm.PackageManager.GET_ACTIVITIES, userId);
-            if (packageInfo != null && packageInfo.activities != null) {
-                for (ActivityInfo activityInfo : packageInfo.activities) {
-                    if (activityInfo.exported) {
-                        Intent intent = new Intent();
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.setClassName(activityInfo.packageName, activityInfo.name);
-                        Log.d(TAG, "Using exported activity for Google package " + packageName + ": " + activityInfo.name);
-                        return intent;
-                    }
-                }
+            ActivityInfo selected = pickOwnActivityFromPackage(packageName, packageInfo, true);
+            if (selected == null) {
+                selected = pickOwnActivityFromPackage(packageName, packageInfo, false);
+            }
+            if (selected != null) {
+                Log.d(TAG, "Using exported activity for Google package " + packageName + ": " + selected.name);
+                return buildLaunchIntent(packageName, selected.packageName, selected.name, null);
             }
         } catch (Throwable e) {
             Log.w(TAG, "Failed to resolve exported activity for " + packageName, e);
         }
+        Log.w(TAG, "No in-package activity found for Google package " + packageName);
         return null;
+    }
+
+    private Intent buildLaunchIntent(String packageName, String activityPackage, String activityName, String action) {
+        Intent intent = action != null ? new Intent(action) : new Intent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        String targetPkg = activityPackage != null ? activityPackage : packageName;
+        intent.setClassName(targetPkg, activityName);
+        intent.setPackage(packageName);
+        ComponentUtils.ensurePackage(intent, packageName);
+        return intent;
+    }
+
+    private ActivityInfo pickOwnActivity(String packageName, List<ResolveInfo> ris) {
+        if (ris == null || ris.isEmpty()) {
+            return null;
+        }
+        for (ResolveInfo ri : ris) {
+            if (ri != null && isUsableOwnActivity(packageName, ri.activityInfo)) {
+                return ri.activityInfo;
+            }
+        }
+        return null;
+    }
+
+    private ActivityInfo pickOwnActivityFromPackage(String packageName, PackageInfo packageInfo, boolean exportedOnly) {
+        if (packageInfo == null || packageInfo.activities == null) {
+            return null;
+        }
+        for (ActivityInfo activityInfo : packageInfo.activities) {
+            if (exportedOnly && (activityInfo == null || !activityInfo.exported)) {
+                continue;
+            }
+            if (isUsableOwnActivity(packageName, activityInfo)) {
+                return activityInfo;
+            }
+        }
+        return null;
+    }
+
+    private boolean isUsableOwnActivity(String packageName, ActivityInfo activityInfo) {
+        if (activityInfo == null || activityInfo.name == null) {
+            return false;
+        }
+        if (packageName != null && activityInfo.packageName != null
+                && !packageName.equals(activityInfo.packageName)) {
+            return false;
+        }
+        String name = activityInfo.name;
+        return !"android.app.AppDetailsActivity".equals(name)
+                && !name.endsWith(".AppDetailsActivity")
+                && !name.contains("AppDetailsActivity");
     }
     
     
-    private Intent createFallbackLaunchIntent(String packageName) {
+    private Intent createFallbackLaunchIntent(String packageName, int userId) {
         try {
             
             Intent intent = BlackBoxCore.getContext().getPackageManager().getLaunchIntentForPackage(packageName);
-            if (intent != null) {
+            if (intent != null && isUsableOwnActivity(packageName, toActivityInfo(intent, packageName))) {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ComponentUtils.ensurePackage(intent, packageName);
                 return intent;
             }
         } catch (Exception e) {
             Log.w(TAG, "Fallback launch intent failed for " + packageName, e);
         }
 
-        Intent googleIntent = createGoogleServiceLaunchIntent(packageName, BlackBoxCore.getUserId());
+        Intent googleIntent = createGoogleServiceLaunchIntent(packageName, userId);
         if (googleIntent != null) {
             return googleIntent;
         }
@@ -179,6 +226,19 @@ public class BPackageManager extends BlackManager<IBPackageManagerService> {
         intent.setPackage(packageName);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
+    }
+
+    private ActivityInfo toActivityInfo(Intent intent, String packageName) {
+        if (intent == null || intent.getComponent() == null) {
+            return null;
+        }
+        ActivityInfo info = new ActivityInfo();
+        info.packageName = intent.getComponent().getPackageName();
+        info.name = intent.getComponent().getClassName();
+        if (info.packageName == null) {
+            info.packageName = packageName;
+        }
+        return info;
     }
 
     public ResolveInfo resolveService(Intent intent, int flags, String resolvedType, int userId) {
