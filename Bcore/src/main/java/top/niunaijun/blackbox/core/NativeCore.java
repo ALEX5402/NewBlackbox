@@ -11,7 +11,6 @@ import java.util.List;
 
 import dalvik.system.DexFile;
 import top.niunaijun.blackbox.BlackBoxCore;
-import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.fake.service.BinderCallingUid;
 import top.niunaijun.blackbox.utils.compat.DexFileCompat;
 
@@ -59,16 +58,6 @@ public class NativeCore {
                 int binderUid = BinderCallingUid.get();
                 if (BinderCallingUid.isVirtualAppUid(binderUid)) {
                     return binderUid;
-                }
-                try {
-                    if (BActivityThread.getAppConfig() != null
-                            && GmsCore.isGoogleAppOrService(BActivityThread.getAppPackageName())) {
-                        int virtualUid = BActivityThread.getBUid();
-                        if (BinderCallingUid.isVirtualAppUid(virtualUid)) {
-                            return virtualUid;
-                        }
-                    }
-                } catch (Throwable ignored) {
                 }
             }
             return origCallingUid;
