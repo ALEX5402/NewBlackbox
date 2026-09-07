@@ -101,7 +101,11 @@ public class IPermissionManagerProxy extends BinderInvocationStub {
                 || permission.equals("android.permission.GET_ACCOUNTS")
                 || permission.equals("android.permission.MANAGE_ACCOUNTS")
                 || permission.equals("android.permission.USE_CREDENTIALS")
-                || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS");
+                || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS")
+                || permission.equals("android.permission.READ_PRIVILEGED_PHONE_STATE")
+                || permission.equals("android.permission.MODIFY_PHONE_STATE")
+                || permission.equals("android.permission.READ_PHONE_STATE")
+                || permission.equals("android.permission.READ_PHONE_NUMBERS");
     }
 
 }
