@@ -98,6 +98,9 @@ public class ActivityStack {
             synchronizeTasks();
         }
 
+        if (intent != null) {
+            ComponentUtils.ensurePackage(intent, null);
+        }
         ResolveInfo resolveInfo = BPackageManagerService.get().resolveActivity(intent, GET_ACTIVITIES, resolvedType, userId);
         if (resolveInfo == null || resolveInfo.activityInfo == null) {
             return 0;
