@@ -56,6 +56,7 @@ import top.niunaijun.blackbox.fake.frameworks.BUserManager;
 
 import top.niunaijun.blackbox.fake.hook.HookManager;
 import top.niunaijun.blackbox.proxy.ProxyManifest;
+import top.niunaijun.blackbox.utils.ComponentUtils;
 import top.niunaijun.blackbox.utils.FileUtils;
 import top.niunaijun.blackbox.utils.ShellUtils;
 import top.niunaijun.blackbox.utils.Slog;
@@ -1020,6 +1021,9 @@ public class BlackBoxCore extends ClientConfiguration {
     }
 
     public void startActivity(Intent intent, int userId) {
+        if (intent != null) {
+            ComponentUtils.ensurePackage(intent, null);
+        }
         if (mClientConfiguration.isEnableLauncherActivity()) {
             LauncherActivity.launch(intent, userId);
         } else {
@@ -1117,8 +1121,10 @@ public class BlackBoxCore extends ClientConfiguration {
 
         Intent launchIntentForPackage = getBPackageManager().getLaunchIntentForPackage(packageName, userId);
         if (launchIntentForPackage == null) {
+            Slog.w(TAG, "No launch intent for package: " + packageName);
             return false;
         }
+        ComponentUtils.ensurePackage(launchIntentForPackage, packageName);
         startActivity(launchIntentForPackage, userId);
         return true;
     }
