@@ -1,42 +1,78 @@
 package top.niunaijun.blackbox.fake.service;
 
-import android.accounts.Account;
-import android.accounts.IAccountManagerResponse;
+import android.app.IServiceConnection;
+import android.content.ComponentName;
 import android.content.Context;
-import android.os.Bundle;
+import android.content.IIntentReceiver;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
+import android.content.pm.ResolveInfo;
+import android.os.IBinder;
+import android.os.IInterface;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
-import black.android.accounts.BRIAccountManagerStub;
+import black.android.app.BRActivityManagerNative;
+import black.android.app.BRActivityManagerOreo;
+import black.android.app.BRIActivityManagerContentProviderHolder;
+import black.android.content.BRContentProviderHolderOreo;
+import black.android.content.BRContentProviderNative;
 import black.android.os.BRServiceManager;
-import top.niunaijun.blackbox.fake.frameworks.BAccountManager;
+import black.android.util.BRSingleton;
+import top.niunaijun.blackbox.BlackBoxCore;
+import top.niunaijun.blackbox.app.BActivityThread;
+import top.niunaijun.blackbox.entity.am.RunningAppProcessInfo;
+import top.niunaijun.blackbox.entity.am.RunningServiceInfo;
+import top.niunaijun.blackbox.fake.delegate.ContentProviderDelegate;
+import top.niunaijun.blackbox.fake.delegate.InnerReceiverDelegate;
+import top.niunaijun.blackbox.fake.delegate.ServiceConnectionDelegate;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
+import top.niunaijun.blackbox.fake.hook.ProxyMethods;
+import top.niunaijun.blackbox.fake.hook.ScanClass;
+import top.niunaijun.blackbox.fake.service.base.UidMethodProxy;
+import top.niunaijun.blackbox.fake.service.context.providers.ContentProviderStub;
+import top.niunaijun.blackbox.proxy.ProxyManifest;
+import top.niunaijun.blackbox.proxy.record.ProxyBroadcastRecord;
+import top.niunaijun.blackbox.utils.MethodParameterUtils;
 import top.niunaijun.blackbox.utils.Slog;
+import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
 
-public class IAccountManagerProxy extends BinderInvocationStub {
-    public static final String TAG = "IAccountManagerProxy";
+@ScanClass(ActivityManagerCommonProxy.class)
+public class IActivityManagerProxy extends BinderInvocationStub {
+    public static final String TAG = "IActivityManagerProxy";
 
-    public IAccountManagerProxy() {
-        super(BRServiceManager.get().getService(Context.ACCOUNT_SERVICE));
+    public IActivityManagerProxy() {
+        super(BRServiceManager.get().getService(Context.ACTIVITY_SERVICE));
     }
 
     @Override
     protected Object getWho() {
-        return BRIAccountManagerStub.get().asInterface(BRServiceManager.get().getService(Context.ACCOUNT_SERVICE));
+        if (BuildCompat.isOreo()) {
+            Object service = BRActivityManagerOreo.get().getService();
+            if (service != null) {
+                return service;
+            }
+        }
+        return BRActivityManagerNative.get().getDefault();
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        replaceSystemService(Context.ACCOUNT_SERVICE);
-    }
-
-    @Override
-    protected void onBindMethod() {
-        super.onBindMethod();
+        replaceSystemService(Context.ACTIVITY_SERVICE);
+        Object singleton;
+        if (BuildCompat.isOreo()) {
+            singleton = BRActivityManagerOreo.get().IActivityManagerSingleton();
+        } else {
+            singleton = BRActivityManagerNative.get().gDefault();
+        }
+        if (singleton != null) {
+            BRSingleton.get(singleton)._set_mInstance(proxyInvocation);
+        }
+        Slog.d(TAG, "IActivityManagerProxy injected");
     }
 
     @Override
@@ -45,404 +81,440 @@ public class IAccountManagerProxy extends BinderInvocationStub {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Slog.d(TAG, "call " + method.getName());
-        return super.invoke(proxy, method, args);
+    protected void onBindMethod() {
+        super.onBindMethod();
+        addMethodHook(new UidMethodProxy("handleIncomingUser", 0));
     }
 
-    @ProxyMethod("getPassword")
-    public static class getPassword extends MethodHook {
-
+    @ProxyMethods({"getContentProvider", "getContentProviderExternal"})
+    public static class GetContentProvider extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getPassword((Account) args[0]);
+            return handleGetContentProvider(who, method, args);
         }
     }
 
-    @ProxyMethod("getUserData")
-    public static class getUserData extends MethodHook {
-
+    @ProxyMethods({"checkPermission", "checkUidPermission", "checkComponentPermission", "checkUriPermission"})
+    public static class CheckPermission extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getUserData((Account) args[0], (String) args[1]);
+            if (args != null && args.length > 0 && args[0] instanceof String) {
+                String permission = (String) args[0];
+                if (isGoogleOrPrivilegedPermission(permission)) {
+                    return PackageManager.PERMISSION_GRANTED;
+                }
+            }
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] instanceof Integer && ((Integer) args[i]) == BActivityThread.getBUid()) {
+                        args[i] = BlackBoxCore.getHostUid();
+                    }
+                }
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAuthenticatorTypes")
-    public static class getAuthenticatorTypes extends MethodHook {
-
+    @ProxyMethod("startService")
+    public static class StartService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getAuthenticatorTypes();
+            Intent intent = MethodParameterUtils.getFirstParam(args, Intent.class);
+            String resolvedType = firstResolvedType(args);
+            if (intent == null) {
+                return method.invoke(who, args);
+            }
+            ResolveInfo info = BlackBoxCore.getBPackageManager().resolveService(
+                    intent, 0, resolvedType, BActivityThread.getUserId());
+            if (info == null || info.serviceInfo == null) {
+                MethodParameterUtils.replaceFirstAppPkg(args);
+                return method.invoke(who, args);
+            }
+            BlackBoxCore.getBActivityManager().startService(intent, resolvedType, false, BActivityThread.getUserId());
+            if (intent.getComponent() != null) {
+                return intent.getComponent();
+            }
+            return new ComponentName(info.serviceInfo.packageName, info.serviceInfo.name);
         }
     }
 
-    @ProxyMethod("getAccountsForPackage")
-    public static class getAccountsForPackage extends MethodHook {
-
+    @ProxyMethod("stopService")
+    public static class StopService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getAccountsForPackage((String) args[0], (int) args[1]);
+            Intent intent = MethodParameterUtils.getFirstParam(args, Intent.class);
+            String resolvedType = firstResolvedType(args);
+            if (intent != null) {
+                int result = BlackBoxCore.getBActivityManager().stopService(intent, resolvedType, BActivityThread.getUserId());
+                if (result >= 0) {
+                    return result;
+                }
+            }
+            MethodParameterUtils.replaceFirstAppPkg(args);
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAccountsByTypeForPackage")
-    public static class getAccountsByTypeForPackage extends MethodHook {
-
+    @ProxyMethods({"bindService", "bindServiceInstance"})
+    public static class BindService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getAccountsByTypeForPackage((String) args[0], (String) args[1]);
+            Intent intent = MethodParameterUtils.getFirstParam(args, Intent.class);
+            IServiceConnection conn = MethodParameterUtils.getFirstParam(args, IServiceConnection.class);
+            String resolvedType = firstResolvedType(args);
+            if (intent == null) {
+                return method.invoke(who, args);
+            }
+            ResolveInfo info = BlackBoxCore.getBPackageManager().resolveService(
+                    intent, 0, resolvedType, BActivityThread.getUserId());
+            if (info == null) {
+                MethodParameterUtils.replaceFirstAppPkg(args);
+                return method.invoke(who, args);
+            }
+            Intent proxyIntent = BlackBoxCore.getBActivityManager().bindService(
+                    intent, conn != null ? conn.asBinder() : null, resolvedType, BActivityThread.getUserId());
+            if (conn != null) {
+                IServiceConnection proxyConn = ServiceConnectionDelegate.createProxy(conn, intent);
+                replaceFirstInstance(args, IServiceConnection.class, proxyConn);
+            }
+            if (proxyIntent != null) {
+                replaceFirstInstance(args, Intent.class, proxyIntent);
+            }
+            MethodParameterUtils.replaceFirstAppPkg(args);
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAccountByTypeAndFeatures")
-    public static class getAccountByTypeAndFeatures extends MethodHook {
-
+    @ProxyMethod("unbindService")
+    public static class UnbindService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().getAccountByTypeAndFeatures((IAccountManagerResponse) args[0], (String) args[1], (String[]) args[2]);
-            return 0;
+            IServiceConnection conn = MethodParameterUtils.getFirstParam(args, IServiceConnection.class);
+            if (conn != null) {
+                BlackBoxCore.getBActivityManager().unbindService(conn.asBinder(), BActivityThread.getUserId());
+                IServiceConnection delegate = ServiceConnectionDelegate.getDelegate(conn.asBinder());
+                if (delegate != null) {
+                    replaceFirstInstance(args, IServiceConnection.class, delegate);
+                }
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAccountsByFeatures")
-    public static class getAccountsByFeatures extends MethodHook {
-
+    @ProxyMethod("peekService")
+    public static class PeekService extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().getAccountsByFeatures((IAccountManagerResponse) args[0], (String) args[1], (String[]) args[2]);
-            return 0;
+            Intent intent = MethodParameterUtils.getFirstParam(args, Intent.class);
+            String resolvedType = firstResolvedType(args);
+            if (intent != null) {
+                IBinder binder = BlackBoxCore.getBActivityManager().peekService(intent, resolvedType, BActivityThread.getUserId());
+                if (binder != null) {
+                    return binder;
+                }
+            }
+            MethodParameterUtils.replaceFirstAppPkg(args);
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAccounts")
-    public static class getAccounts extends MethodHook {
-
+    @ProxyMethods({"registerReceiver", "registerReceiverWithFeature", "registerReceiverForAllUsers"})
+    public static class RegisterReceiver extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            String type = args.length > 0 && args[0] instanceof String ? (String) args[0] : null;
-            return BAccountManager.get().getAccountsAsUser(type);
+            MethodParameterUtils.replaceFirstAppPkg(args);
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] instanceof IIntentReceiver) {
+                        args[i] = InnerReceiverDelegate.createProxy((IIntentReceiver) args[i]);
+                        break;
+                    }
+                }
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAccountsByType")
-    public static class getAccountsByType extends MethodHook {
-
+    @ProxyMethods({"broadcastIntent", "broadcastIntentWithFeature"})
+    public static class BroadcastIntent extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            String type = args.length > 0 && args[0] instanceof String ? (String) args[0] : null;
-            return BAccountManager.get().getAccountsAsUser(type);
+            Intent intent = MethodParameterUtils.getFirstParam(args, Intent.class);
+            if (intent == null) {
+                return method.invoke(who, args);
+            }
+            String resolvedType = firstResolvedType(args);
+            Intent proxy = BlackBoxCore.getBActivityManager().sendBroadcast(intent, resolvedType, BActivityThread.getUserId());
+            if (proxy != null) {
+                ProxyBroadcastRecord.saveStub(proxy, intent, BActivityThread.getUserId());
+                proxy.setComponent(new ComponentName(BlackBoxCore.getHostPkg(), ProxyManifest.getProxyReceiver()));
+                replaceFirstInstance(args, Intent.class, proxy);
+            }
+            MethodParameterUtils.replaceFirstAppPkg(args);
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("getAccountsAsUser")
-    public static class getAccountsAsUser extends MethodHook {
-
+    @ProxyMethod("getRunningAppProcesses")
+    public static class GetRunningAppProcesses extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            String type = args.length > 0 && args[0] instanceof String ? (String) args[0] : null;
-            return BAccountManager.get().getAccountsAsUser(type);
+            RunningAppProcessInfo info = BlackBoxCore.getBActivityManager()
+                    .getRunningAppProcesses(BActivityThread.getAppPackageName(), BActivityThread.getUserId());
+            if (info != null && info.mAppProcessInfoList != null) {
+                return info.mAppProcessInfoList;
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("addAccountExplicitly")
-    public static class addAccountExplicitly extends MethodHook {
-
+    @ProxyMethod("getServices")
+    public static class GetServices extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().addAccountExplicitly((Account) args[0], (String) args[1], (Bundle) args[2]);
+            RunningServiceInfo info = BlackBoxCore.getBActivityManager()
+                    .getRunningServices(BActivityThread.getAppPackageName(), BActivityThread.getUserId());
+            if (info != null && info.mRunningServiceInfoList != null) {
+                return info.mRunningServiceInfoList;
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("removeAccountAsUser")
-    public static class removeAccountAsUser extends MethodHook {
-
+    @ProxyMethod("getIntentSender")
+    public static class GetIntentSender extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().removeAccountAsUser((IAccountManagerResponse) args[0], (Account) args[1], (boolean) args[2]);
-            return 0;
+            MethodParameterUtils.replaceFirstAppPkg(args);
+            Object result = method.invoke(who, args);
+            if (result instanceof IInterface) {
+                BlackBoxCore.getBActivityManager().getIntentSender(
+                        ((IInterface) result).asBinder(),
+                        BActivityThread.getAppPackageName(),
+                        BActivityThread.getBUid());
+            }
+            return result;
         }
     }
 
-    @ProxyMethod("removeAccountExplicitly")
-    public static class removeAccountExplicitly extends MethodHook {
-
+    @ProxyMethod("getPackageForIntentSender")
+    public static class GetPackageForIntentSender extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().removeAccountExplicitly((Account) args[0]);
+            if (args != null && args.length > 0 && args[0] instanceof IInterface) {
+                String pkg = BlackBoxCore.getBActivityManager()
+                        .getPackageForIntentSender(((IInterface) args[0]).asBinder());
+                if (pkg != null) {
+                    return pkg;
+                }
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("copyAccountToUser")
-    public static class copyAccountToUser extends MethodHook {
-
+    @ProxyMethod("getUidForIntentSender")
+    public static class GetUidForIntentSender extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().copyAccountToUser((IAccountManagerResponse) args[0], (Account) args[1], (int) args[2], (int) args[3]);
-            return 0;
+            if (args != null && args.length > 0 && args[0] instanceof IInterface) {
+                int uid = BlackBoxCore.getBActivityManager()
+                        .getUidForIntentSender(((IInterface) args[0]).asBinder());
+                if (uid > 0) {
+                    return uid;
+                }
+            }
+            return method.invoke(who, args);
         }
     }
 
-    @ProxyMethod("invalidateAuthToken")
-    public static class invalidateAuthToken extends MethodHook {
+    private static Object handleGetContentProvider(Object who, Method method, Object[] args) throws Throwable {
+        int authIndex = getProviderAuthIndex(method, args);
+        if (args == null || authIndex < 0 || authIndex >= args.length || !(args[authIndex] instanceof String)) {
+            return method.invoke(who, args);
+        }
+        String auth = (String) args[authIndex];
+        if (ProxyManifest.isProxy(auth)) {
+            return method.invoke(who, args);
+        }
 
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().invalidateAuthToken((String) args[0], (String) args[1]);
-            return 0;
+        replaceCallingPackage(method, args);
+
+        ProviderInfo providerInfo = BlackBoxCore.getBPackageManager()
+                .resolveContentProvider(auth, PackageManager.GET_META_DATA, BActivityThread.getUserId());
+        if (providerInfo != null) {
+            Object holder = obtainHolder(who, method, args, authIndex);
+            if (holder == null) {
+                return null;
+            }
+            IBinder binder = BlackBoxCore.getBActivityManager().acquireContentProviderClient(providerInfo);
+            IInterface provider = binder != null ? BRContentProviderNative.get().asInterface(binder) : null;
+            if (provider == null) {
+                ContentProviderDelegate.update(holder, auth);
+                return holder;
+            }
+            String wrapPkg = providerInfo.packageName;
+            if (wrapPkg == null || wrapPkg.isEmpty()) {
+                wrapPkg = BActivityThread.getAppPackageName();
+            }
+            if (wrapPkg == null || wrapPkg.isEmpty()) {
+                wrapPkg = BlackBoxCore.getHostPkg();
+            }
+            applyHolder(holder, providerInfo, new ContentProviderStub().wrapper(provider, wrapPkg));
+            return holder;
+        }
+
+        Object holder;
+        try {
+            holder = method.invoke(who, args);
+        } catch (Throwable t) {
+            Throwable cause = unwrap(t);
+            if (isProviderPermissionError(cause) || ContentProviderDelegate.isGoogleProviderAuthority(auth)) {
+                Slog.w(TAG, "getContentProvider denied for " + auth + ", using host stub: " + cause.getMessage());
+                holder = obtainHolder(who, method, args, authIndex);
+                if (holder == null) {
+                    return null;
+                }
+                ContentProviderDelegate.update(holder, auth);
+                return holder;
+            }
+            throw cause;
+        }
+        if (holder != null) {
+            ContentProviderDelegate.update(holder, auth);
+        }
+        return holder;
+    }
+
+    private static void replaceCallingPackage(Method method, Object[] args) {
+        if (!BuildCompat.isQ() || args == null || args.length < 2) {
+            return;
+        }
+        if (method.getName().contains("External")) {
+            return;
+        }
+        if (args[1] instanceof String) {
+            args[1] = BlackBoxCore.getHostPkg();
         }
     }
 
-    @ProxyMethod("peekAuthToken")
-    public static class peekAuthToken extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().peekAuthToken((Account) args[0], (String) args[1]);
+    private static Object obtainHolder(Object who, Method method, Object[] args, int authIndex) throws Throwable {
+        Object saved = args[authIndex];
+        try {
+            int pid = BActivityThread.getAppPid();
+            if (pid < 0) {
+                pid = 0;
+            }
+            args[authIndex] = ProxyManifest.getProxyAuthorities(pid);
+            replaceCallingPackage(method, args);
+            return method.invoke(who, args);
+        } catch (Throwable t) {
+            Slog.w(TAG, "Failed to obtain provider holder: " + t.getMessage());
+            return null;
+        } finally {
+            args[authIndex] = saved;
         }
     }
 
-    @ProxyMethod("setAuthToken")
-    public static class setAuthToken extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().setAuthToken((Account) args[0], (String) args[1], (String) args[2]);
-            return 0;
+    private static void applyHolder(Object holder, ProviderInfo info, IInterface provider) {
+        if (BuildCompat.isOreo()) {
+            if (info != null) {
+                BRContentProviderHolderOreo.get(holder)._set_info(info);
+            }
+            BRContentProviderHolderOreo.get(holder)._set_provider(provider);
+            BRContentProviderHolderOreo.get(holder)._set_noReleaseNeeded(true);
+        } else {
+            if (info != null) {
+                BRIActivityManagerContentProviderHolder.get(holder)._set_info(info);
+            }
+            BRIActivityManagerContentProviderHolder.get(holder)._set_provider(provider);
+            BRIActivityManagerContentProviderHolder.get(holder)._set_noReleaseNeeded(true);
         }
     }
 
-    @ProxyMethod("setPassword")
-    public static class setPassword extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().setPassword((Account) args[0], (String) args[1]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("clearPassword")
-    public static class clearPassword extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().clearPassword((Account) args[0]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("setUserData")
-    public static class setUserData extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().setUserData((Account) args[0], (String) args[1], (String) args[2]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("updateAppPermission")
-    public static class updateAppPermission extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().updateAppPermission((Account) args[0], (String) args[1], (int) args[2], (boolean) args[3]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("getAuthToken")
-    public static class getAuthToken extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().getAuthToken((IAccountManagerResponse) args[0],
-                    (Account) args[1],
-                    (String) args[2],
-                    (boolean) args[3],
-                    (boolean) args[4],
-                    (Bundle) args[5]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("addAccount")
-    public static class addAccount extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            try {
-                BAccountManager.get().addAccount((IAccountManagerResponse) args[0],
-                        (String) args[1],
-                        (String) args[2],
-                        (String[]) args[3],
-                        (boolean) args[4],
-                        (Bundle) args[5]);
-            } catch (Exception e) {
-                Slog.w(TAG, "addAccount failed", e);
+    private static int getProviderAuthIndex(Method method, Object[] args) {
+        if (method.getName().contains("External")) {
+            if (args != null && args.length > 1 && args[0] instanceof String && args[1] instanceof String) {
+                return 1;
             }
             return 0;
         }
+        return BuildCompat.isQ() ? 2 : 1;
     }
 
-    @ProxyMethod("addAccountAsUser")
-    public static class addAccountAsUser extends MethodHook {
+    private static boolean isGoogleOrPrivilegedPermission(String permission) {
+        if (permission == null) {
+            return false;
+        }
+        return permission.startsWith("com.google.android.gms.permission.")
+                || permission.startsWith("com.google.android.providers.gsf.permission.")
+                || permission.equals("com.google.android.providers.settings.permission.WRITE_GSETTINGS")
+                || permission.equals("com.google.android.providers.settings.permission.READ_GSETTINGS")
+                || permission.equals("com.google.android.gms.permission.INTERNAL_BROADCAST")
+                || permission.startsWith("com.google.android.setupwizard.")
+                || permission.startsWith("com.android.vending.")
+                || permission.equals("android.permission.WRITE_SECURE_SETTINGS")
+                || permission.equals("android.permission.WRITE_SETTINGS")
+                || permission.equals("android.permission.GET_ACCOUNTS")
+                || permission.equals("android.permission.MANAGE_ACCOUNTS")
+                || permission.equals("android.permission.USE_CREDENTIALS")
+                || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS")
+                || permission.equals("android.permission.ACCOUNT_MANAGER");
+    }
 
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            try {
-                BAccountManager.get().addAccountAsUser((IAccountManagerResponse) args[0],
-                        (String) args[1],
-                        (String) args[2],
-                        (String[]) args[3],
-                        (boolean) args[4],
-                        (Bundle) args[5]);
-            } catch (Exception e) {
-                Slog.w(TAG, "addAccountAsUser failed", e);
+    private static boolean isProviderPermissionError(Throwable error) {
+        if (error == null) {
+            return false;
+        }
+        if (error instanceof SecurityException) {
+            return true;
+        }
+        String message = error.getMessage();
+        if (message == null) {
+            return false;
+        }
+        String lower = message.toLowerCase();
+        return lower.contains("permission denial")
+                || lower.contains("internal_broadcast")
+                || lower.contains("cannot write to google settings")
+                || lower.contains("google settings table");
+    }
+
+    private static Throwable unwrap(Throwable error) {
+        Throwable cause = error;
+        while (cause.getCause() != null && cause != cause.getCause()
+                && (cause instanceof RuntimeException || cause instanceof java.lang.reflect.InvocationTargetException
+                || cause instanceof java.lang.reflect.UndeclaredThrowableException)) {
+            cause = cause.getCause();
+        }
+        return cause != null ? cause : error;
+    }
+
+    private static String firstResolvedType(Object[] args) {
+        if (args == null) {
+            return null;
+        }
+        boolean skippedPkg = false;
+        for (Object arg : args) {
+            if (arg instanceof String) {
+                if (!skippedPkg) {
+                    skippedPkg = true;
+                    continue;
+                }
+                return (String) arg;
             }
-            return 0;
         }
+        return null;
     }
 
-    @ProxyMethod("updateCredentials")
-    public static class updateCredentials extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().updateCredentials((IAccountManagerResponse) args[0],
-                    (Account) args[1],
-                    (String) args[2],
-                    (boolean) args[3],
-                    (Bundle) args[4]);
-            return 0;
+    private static void replaceFirstInstance(Object[] args, Class<?> type, Object value) {
+        if (args == null) {
+            return;
         }
-    }
-
-    @ProxyMethod("editProperties")
-    public static class editProperties extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().editProperties((IAccountManagerResponse) args[0],
-                    (String) args[1],
-                    (boolean) args[2]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("confirmCredentialsAsUser")
-    public static class confirmCredentialsAsUser extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().confirmCredentialsAsUser((IAccountManagerResponse) args[0],
-                    (Account) args[1],
-                    (Bundle) args[2],
-                    (boolean) args[3]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("accountAuthenticated")
-    public static class accountAuthenticated extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().accountAuthenticated((Account) args[0]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("getAuthTokenLabel")
-    public static class getAuthTokenLabel extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().getAuthTokenLabel((IAccountManagerResponse) args[0],
-                    (String) args[1],
-                    (String) args[2]);
-            return 0;
-        }
-    }
-
-    @ProxyMethod("getPackagesAndVisibilityForAccount")
-    public static class getPackagesAndVisibilityForAccount extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getPackagesAndVisibilityForAccount((Account) args[0]);
-        }
-    }
-
-    @ProxyMethod("addAccountExplicitlyWithVisibility")
-    public static class addAccountExplicitlyWithVisibility extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().addAccountExplicitlyWithVisibility((Account) args[0],
-                    (String) args[1],
-                    (Bundle) args[2],
-                    (Map) args[3]
-            );
-        }
-    }
-
-    @ProxyMethod("setAccountVisibility")
-    public static class setAccountVisibility extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().setAccountVisibility((Account) args[0],
-                    (String) args[1],
-                    (int) args[2]
-            );
-        }
-    }
-
-    @ProxyMethod("getAccountVisibility")
-    public static class getAccountVisibility extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getAccountVisibility((Account) args[0],
-                    (String) args[1]
-            );
-        }
-    }
-
-    @ProxyMethod("getAccountsAndVisibilityForPackage")
-    public static class getAccountsAndVisibilityForPackage extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return BAccountManager.get().getAccountsAndVisibilityForPackage((String) args[0],
-                    (String) args[1]
-            );
-        }
-    }
-
-    @ProxyMethod("registerAccountListener")
-    public static class registerAccountListener extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().registerAccountListener((String[]) args[0],
-                    (String) args[1]
-            );
-            return 0;
-        }
-    }
-
-    @ProxyMethod("unregisterAccountListener")
-    public static class unregisterAccountListener extends MethodHook {
-
-        @Override
-        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            BAccountManager.get().unregisterAccountListener((String[]) args[0],
-                    (String) args[1]
-            );
-            return 0;
+        for (int i = 0; i < args.length; i++) {
+            if (type.isInstance(args[i])) {
+                args[i] = value;
+                return;
+            }
         }
     }
 }
