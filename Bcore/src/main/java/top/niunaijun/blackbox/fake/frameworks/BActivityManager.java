@@ -17,6 +17,7 @@ import top.niunaijun.blackbox.entity.UnbindRecord;
 import top.niunaijun.blackbox.entity.am.PendingResultData;
 import top.niunaijun.blackbox.entity.am.RunningAppProcessInfo;
 import top.niunaijun.blackbox.entity.am.RunningServiceInfo;
+import top.niunaijun.blackbox.utils.ComponentUtils;
 import top.niunaijun.blackbox.utils.Slog;
 
 
@@ -85,6 +86,9 @@ public class BActivityManager extends BlackManager<IBActivityManagerService> {
     }
 
     public void startActivity(Intent intent, int userId) {
+        if (intent != null) {
+            ComponentUtils.ensurePackage(intent, null);
+        }
         int retryCount = 0;
         final int maxRetries = 3;
         
