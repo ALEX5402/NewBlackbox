@@ -34,7 +34,34 @@ public class IPhoneSubInfoProxy extends ClassInvocationStub {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MethodParameterUtils.replaceFirstAppPkg(args);
-        return super.invoke(proxy, method, args);
+        try {
+            return super.invoke(proxy, method, args);
+        } catch (SecurityException e) {
+            return phoneSubSafeResult(method);
+        } catch (Throwable e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            if (cause instanceof SecurityException || cause instanceof android.os.RemoteException) {
+                return phoneSubSafeResult(method);
+            }
+            throw e;
+        }
+    }
+
+    private static Object phoneSubSafeResult(Method method) {
+        Class<?> type = method.getReturnType();
+        if (type == void.class || type == Void.class) {
+            return null;
+        }
+        if (type == int.class || type == Integer.class) {
+            return 0;
+        }
+        if (type == boolean.class || type == Boolean.class) {
+            return false;
+        }
+        if (type == int[].class) {
+            return new int[0];
+        }
+        return null;
     }
 
     @Override
