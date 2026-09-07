@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.R;
+import top.niunaijun.blackbox.utils.ComponentUtils;
 import top.niunaijun.blackbox.utils.Slog;
 import android.util.Log;
 import android.widget.ImageView;
@@ -28,15 +29,21 @@ public class LauncherActivity extends Activity {
 
     public static void launch(Intent intent, int userId) {
         try {
+            if (intent == null) {
+                Slog.w(TAG, "LauncherActivity.launch() called with null intent");
+                return;
+            }
+            ComponentUtils.ensurePackage(intent, null);
+            String packageName = ComponentUtils.getIntentPackage(intent);
             Intent splash = new Intent();
             splash.setClass(BlackBoxCore.getContext(), LauncherActivity.class);
             
             splash.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             splash.putExtra(LauncherActivity.KEY_INTENT, intent);
-            splash.putExtra(LauncherActivity.KEY_PKG, intent.getPackage());
+            splash.putExtra(LauncherActivity.KEY_PKG, packageName);
             splash.putExtra(LauncherActivity.KEY_USER_ID, userId);
             BlackBoxCore.getContext().startActivity(splash);
-            Slog.d(TAG, "LauncherActivity.launch() called for package: " + intent.getPackage());
+            Slog.d(TAG, "LauncherActivity.launch() called for package: " + packageName);
         } catch (Exception e) {
             Slog.e(TAG, "Error in LauncherActivity.launch()", e);
         }
@@ -58,10 +65,17 @@ public class LauncherActivity extends Activity {
             String packageName = intent.getStringExtra(KEY_PKG);
             int userId = intent.getIntExtra(KEY_USER_ID, 0);
 
-            if (launchIntent == null || packageName == null) {
-                Slog.w(TAG, "Missing launch intent or package name, finishing activity");
+            if (launchIntent == null) {
+                Slog.w(TAG, "Missing launch intent, finishing activity");
                 finish();
                 return;
+            }
+            ComponentUtils.ensurePackage(launchIntent, packageName);
+            if (packageName == null || packageName.isEmpty()) {
+                packageName = ComponentUtils.getIntentPackage(launchIntent);
+            }
+            if (packageName == null || packageName.isEmpty()) {
+                Slog.w(TAG, "Package name missing, launching with component-only intent");
             }
 
             Slog.d(TAG, "LauncherActivity.onCreate() for package: " + packageName + ", userId: " + userId);
@@ -132,6 +146,9 @@ public class LauncherActivity extends Activity {
 
     
     private PackageInfo getPackageInfoWithFallback(String packageName, int userId) {
+        if (packageName == null || packageName.isEmpty()) {
+            return null;
+        }
         try {
             
             return BlackBoxCore.getBPackageManager().getPackageInfo(packageName, 0, userId);
