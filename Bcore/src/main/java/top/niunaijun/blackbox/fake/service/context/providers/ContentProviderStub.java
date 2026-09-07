@@ -57,7 +57,7 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
                 Object arg = args[i];
                 if (arg instanceof String) {
                     String strArg = (String) arg;
-                    if (!isSystemProviderAuthority(strArg)) {
+                    if (!isSystemProviderAuthority(strArg) && !isGooglePackageOrAuthority(strArg)) {
                         args[i] = mAppPkg;
                     }
                 }
@@ -113,7 +113,7 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
             case "query":
                 return null; 
             case "insert":
-                return null; 
+                return android.net.Uri.EMPTY; 
             case "update":
             case "delete":
                 return 0; 
@@ -225,7 +225,22 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
                authority.contains("googlecertificates") ||
                authority.contains("com.google.android.gms") ||
                authority.contains("com.google.android.gsf") ||
+               authority.contains("com.google.settings") ||
+               authority.contains("gservices") ||
+               authority.contains("googlesettings") ||
+               authority.contains("appdoctor") ||
                authority.startsWith("android.provider.Settings");
+    }
+
+    private boolean isGooglePackageOrAuthority(String value) {
+        if (value == null) {
+            return false;
+        }
+        return value.startsWith("com.google.")
+                || value.startsWith("com.android.vending")
+                || value.contains("gservices")
+                || value.contains("googlesettings")
+                || value.contains("appdoctor");
     }
     
     
@@ -255,6 +270,9 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
         String lower = message.toLowerCase();
         return lower.contains("permission denial")
                 || lower.contains("uid mismatch")
+                || lower.contains("cannot write to google settings")
+                || lower.contains("google settings table")
+                || lower.contains("internal_broadcast")
                 || (lower.contains("calling uid") && lower.contains("doesn't match source uid"))
                 || (lower.contains("uid") && lower.contains("permission"));
     }
