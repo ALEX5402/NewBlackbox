@@ -145,7 +145,9 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                         if (perm != null && (perm.equals(android.Manifest.permission.RECORD_AUDIO)
                                 || perm.equals("android.permission.FOREGROUND_SERVICE_MICROPHONE")
                                 || perm.equals(android.Manifest.permission.MODIFY_AUDIO_SETTINGS)
-                                || perm.equals(android.Manifest.permission.CAPTURE_AUDIO_OUTPUT))) {
+                                || perm.equals(android.Manifest.permission.CAPTURE_AUDIO_OUTPUT)
+                                || isPrivilegedTelephonyPermission(perm)
+                                || isGoogleInternalPermission(perm))) {
                             packageInfo.requestedPermissionsFlags[i] |= PackageInfo.REQUESTED_PERMISSION_GRANTED;
                         }
                     }
@@ -324,6 +326,10 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             int flags = MethodParameterUtils.toInt(args[0]);
             List<ApplicationInfo> installedApplications = BlackBoxCore.getBPackageManager().getInstalledApplications(flags, BlackBoxCore.getUserId());
+            if (installedApplications != null && installedApplications.size() > 32) {
+                flags = flags & ~PackageManager.GET_META_DATA;
+                installedApplications = BlackBoxCore.getBPackageManager().getInstalledApplications(flags, BlackBoxCore.getUserId());
+            }
             return ParceledListSliceCompat.create(installedApplications);
         }
     }
@@ -335,7 +341,30 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             int flags = MethodParameterUtils.toInt(args[0]);
             List<PackageInfo> installedPackages = BlackBoxCore.getBPackageManager().getInstalledPackages(flags, BlackBoxCore.getUserId());
+            if (installedPackages != null && installedPackages.size() > 32) {
+                flags = flags & ~(PackageManager.GET_META_DATA | PackageManager.GET_SIGNATURES);
+                if (Build.VERSION.SDK_INT >= 28) {
+                    flags = flags & ~PackageManager.GET_SIGNING_CERTIFICATES;
+                }
+                installedPackages = BlackBoxCore.getBPackageManager().getInstalledPackages(flags, BlackBoxCore.getUserId());
+            }
             return ParceledListSliceCompat.create(installedPackages);
+        }
+    }
+
+    @ProxyMethod("hasSystemFeature")
+    public static class HasSystemFeature extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null && args.length > 0 && args[0] instanceof String) {
+                String feature = (String) args[0];
+                if ("com.google.android.gms".equals(feature)
+                        || "org.chromium.arc".equals(feature)
+                        || (feature != null && feature.startsWith("com.google.android.feature."))) {
+                    return true;
+                }
+            }
+            return method.invoke(who, args);
         }
     }
 
@@ -501,8 +530,8 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                 return PackageManager.PERMISSION_GRANTED;
             }
 
-            if (isGoogleInternalPermission(permission)) {
-                Slog.d(TAG, "SimpleAudioPermissionHook: Granting Google internal permission: " + permission + " to " + packageName);
+            if (isGoogleInternalPermission(permission) || isPrivilegedTelephonyPermission(permission)) {
+                Slog.d(TAG, "SimpleAudioPermissionHook: Granting Google/telephony permission: " + permission + " to " + packageName);
                 return PackageManager.PERMISSION_GRANTED;
             }
             
@@ -536,8 +565,8 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                 return PackageManager.PERMISSION_GRANTED;
             }
 
-            if (isGoogleInternalPermission(permission)) {
-                Slog.d(TAG, "CheckSelfPermission: Granting Google internal permission: " + permission + " to " + packageName);
+            if (isGoogleInternalPermission(permission) || isPrivilegedTelephonyPermission(permission)) {
+                Slog.d(TAG, "CheckSelfPermission: Granting Google/telephony permission: " + permission + " to " + packageName);
                 return PackageManager.PERMISSION_GRANTED;
             }
             
@@ -697,6 +726,18 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                 || permission.equals("android.permission.USE_CREDENTIALS")
                 || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS")
                 || permission.equals("android.permission.ACCOUNT_MANAGER");
+    }
+
+    private static boolean isPrivilegedTelephonyPermission(String permission) {
+        if (permission == null) {
+            return false;
+        }
+        return permission.equals("android.permission.READ_PRIVILEGED_PHONE_STATE")
+                || permission.equals("android.permission.MODIFY_PHONE_STATE")
+                || permission.equals("android.permission.READ_PHONE_STATE")
+                || permission.equals("android.permission.READ_PHONE_NUMBERS")
+                || permission.equals("android.permission.ACCESS_NETWORK_STATE")
+                || permission.equals("android.permission.READ_SMS");
     }
 
     private static Object hookGetPackageUid(Object who, Method method, Object[] args) throws Throwable {
