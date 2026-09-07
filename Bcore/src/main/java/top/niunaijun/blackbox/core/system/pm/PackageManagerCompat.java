@@ -182,11 +182,9 @@ public class PackageManagerCompat {
                 for (int i = 0; i < N; i++) {
                     final String perm = p.requestedPermissions.get(i);
                     pi.requestedPermissions[i] = perm;
-                    
-
-
-
-
+                    if (isVirtualGrantedPermission(perm, p.packageName)) {
+                        pi.requestedPermissionsFlags[i] |= PackageInfo.REQUESTED_PERMISSION_GRANTED;
+                    }
                 }
             }
         }
@@ -375,6 +373,30 @@ public class PackageManagerCompat {
 
 
         info.sharedLibraryFiles = sharedLibraryFileList.toArray(new String[]{});
+    }
+
+    private static boolean isVirtualGrantedPermission(String permission, String packageName) {
+        if (permission == null) {
+            return false;
+        }
+        if (permission.equals("android.permission.READ_PRIVILEGED_PHONE_STATE")
+                || permission.equals("android.permission.MODIFY_PHONE_STATE")
+                || permission.equals("android.permission.READ_PHONE_STATE")
+                || permission.equals("android.permission.READ_PHONE_NUMBERS")
+                || permission.equals("android.permission.GET_ACCOUNTS")
+                || permission.equals("android.permission.MANAGE_ACCOUNTS")
+                || permission.equals("android.permission.USE_CREDENTIALS")
+                || permission.equals("android.permission.AUTHENTICATE_ACCOUNTS")
+                || permission.equals("android.permission.ACCOUNT_MANAGER")) {
+            return true;
+        }
+        if (permission.startsWith("com.google.android.gms.permission.")
+                || permission.startsWith("com.google.android.providers.gsf.permission.")
+                || permission.startsWith("com.google.android.setupwizard.")
+                || permission.startsWith("com.android.vending.")) {
+            return true;
+        }
+        return GmsCore.isGoogleAppOrService(packageName);
     }
 
     public static Resources getResources(Context context, ApplicationInfo appInfo) {
