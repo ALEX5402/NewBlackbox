@@ -36,6 +36,7 @@ import top.niunaijun.blackbox.fake.service.IFingerprintManagerProxy;
 import top.niunaijun.blackbox.fake.service.IGraphicsStatsProxy;
 import top.niunaijun.blackbox.fake.service.IJobServiceProxy;
 import top.niunaijun.blackbox.fake.service.ILauncherAppsProxy;
+import top.niunaijun.blackbox.fake.service.ILocaleManagerProxy;
 import top.niunaijun.blackbox.fake.service.ILocationManagerProxy;
 import top.niunaijun.blackbox.fake.service.IMediaRouterServiceProxy;
 import top.niunaijun.blackbox.fake.service.IMediaSessionManagerProxy;
@@ -151,6 +152,7 @@ public class HookManager {
             addInjector(new ITelephonyRegistryProxy());
             addInjector(new IDevicePolicyManagerProxy());
             addInjector(new IAccountManagerProxy());
+            addInjector(new ILocaleManagerProxy());
             addInjector(new NetworkPermissionCompat());
             addInjector(new IConnectivityManagerProxy());
             addInjector(new IDnsResolverProxy());

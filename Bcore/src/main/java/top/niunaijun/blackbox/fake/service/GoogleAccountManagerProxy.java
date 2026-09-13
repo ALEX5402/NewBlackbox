@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import top.niunaijun.blackbox.BlackBoxCore;
+import top.niunaijun.blackbox.fake.frameworks.BAccountManager;
 import top.niunaijun.blackbox.fake.hook.ClassInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
@@ -53,24 +54,20 @@ public class GoogleAccountManagerProxy extends ClassInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
                 Slog.d(TAG, "GoogleAccountManager: Handling getAccounts call");
-                
-                
+
+                // Never fabricate accounts: an empty result is what the system
+                // returns for a device with no signed-in Google account, and it
+                // lets sign-in UIs fall through to the real add-account flow.
                 Object result = method.invoke(who, args);
-                if (result != null && result instanceof Account[]) {
+                if (result instanceof Account[]) {
                     Account[] accounts = (Account[]) result;
-                    if (accounts.length > 0) {
-                        Slog.d(TAG, "GoogleAccountManager: Found " + accounts.length + " real accounts");
-                        return result;
-                    }
+                    Slog.d(TAG, "GoogleAccountManager: Found " + accounts.length + " accounts");
+                    return accounts;
                 }
-                
-                
-                Slog.d(TAG, "GoogleAccountManager: No real accounts found, returning mock account");
-                return createMockGoogleAccounts();
-                
+                return new Account[0];
             } catch (Exception e) {
-                Slog.w(TAG, "GoogleAccountManager: GetAccounts error, returning mock accounts", e);
-                return createMockGoogleAccounts();
+                Slog.w(TAG, "GoogleAccountManager: GetAccounts error, returning empty", e);
+                return new Account[0];
             }
         }
     }
@@ -81,24 +78,34 @@ public class GoogleAccountManagerProxy extends ClassInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
                 Slog.d(TAG, "GoogleAccountManager: Handling getAccountsByType call");
-                
+
                 if (args != null && args.length > 0) {
                     String accountType = (String) args[0];
                     Slog.d(TAG, "GoogleAccountManager: Requesting accounts of type: " + accountType);
-                    
-                    
-                    if ("com.google".equals(accountType)) {
-                        Slog.d(TAG, "GoogleAccountManager: Returning mock Google accounts");
-                        return createMockGoogleAccounts();
+
+                    // Query the virtual account store first. Only when it has
+                    // nothing do we fall through to the underlying call, which
+                    // may still resolve real accounts registered in the space.
+                    try {
+                        Account[] real = BAccountManager.get().getAccountsAsUser(accountType);
+                        if (real != null && real.length > 0) {
+                            Slog.d(TAG, "GoogleAccountManager: Returning " + real.length
+                                    + " virtual accounts of type " + accountType);
+                            return real;
+                        }
+                    } catch (Throwable t) {
+                        Slog.w(TAG, "GoogleAccountManager: virtual account lookup failed", t);
                     }
                 }
-                
-                
+
+                // No virtual accounts: forward to the real service instead of
+                // fabricating accounts. Returning mocks here is what previously
+                // made Google sign-in resolve to a nonexistent user.
                 return method.invoke(who, args);
-                
+
             } catch (Exception e) {
-                Slog.w(TAG, "GoogleAccountManager: GetAccountsByType error, returning mock accounts", e);
-                return createMockGoogleAccounts();
+                Slog.w(TAG, "GoogleAccountManager: GetAccountsByType error", e);
+                return new Account[0];
             }
         }
     }
