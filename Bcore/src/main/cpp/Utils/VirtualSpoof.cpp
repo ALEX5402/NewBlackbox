@@ -14,6 +14,7 @@ struct SpoofedProp {
     const char* value;
 };
 
+// ro.hardware* select HAL and EGL drivers; faking them breaks non-Adreno devices.
 SpoofedProp spoofed_props[] = {
         {"ro.product.model", "Pixel 6"},
         {"ro.product.brand", "google"},
@@ -23,15 +24,12 @@ SpoofedProp spoofed_props[] = {
         {"ro.build.version.release", "12"},
         {"ro.build.version.security_patch", "2022-01-05"},
         {"ro.serialno", "1A2B3C4D5E6F"},
-        {"ro.hardware", "qcom"},
-        {"ro.boot.hardware", "qcom"},
         {"ro.product.board", "lahaina"},
         {"ro.product.cpu.abi", "arm64-v8a"},
         {"ro.build.type", "user"},
         {"ro.build.tags", "release-keys"},
         {"ro.kernel.qemu", "0"},
         {"ro.kernel.android.qemud", ""},
-        {"ro.hardware.egl", "adreno"},
         {"ro.boot.qemu", "0"},
     {nullptr, nullptr} 
 };

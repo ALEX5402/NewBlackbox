@@ -15,8 +15,9 @@ bool disable_hidden_api(JNIEnv *env) {
     long android_version = std::strtol(version_str, nullptr, 10);
 
     
-    if (android_version < 29) {
-        ALOGD("HiddenAPI: Android version < 29, no need to disable");
+    // Hidden API enforcement started in Android 9 (API 28).
+    if (android_version < 28) {
+        ALOGD("HiddenAPI: Android version < 28, no need to disable");
         return true;
     }
 
