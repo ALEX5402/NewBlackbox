@@ -18,6 +18,7 @@ interface IBActivityThread {
     IBinder acquireContentProviderClient(in ProviderInfo providerInfo);
 
     IBinder peekService(in Intent intent);
+    void startService(in Intent proxyIntent);
     void stopService(in Intent componentName);
 
     void finishActivity(IBinder token);

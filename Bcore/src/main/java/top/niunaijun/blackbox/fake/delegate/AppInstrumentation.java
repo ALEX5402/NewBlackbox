@@ -144,6 +144,15 @@ public final class AppInstrumentation extends BaseInstrumentationDelegate implem
         try {
             return super.newActivity(cl, className, intent);
         } catch (ClassNotFoundException e) {
+            if (intent != null && intent.getComponent() != null) {
+                try {
+                    ActivityInfo ai = BlackBoxCore.getBPackageManager().getActivityInfo(intent.getComponent(), 0, BActivityThread.getUserId());
+                    if (ai != null && ai.targetActivity != null && !ai.targetActivity.equals(className)) {
+                        return super.newActivity(cl, ai.targetActivity, intent);
+                    }
+                } catch (Throwable ignored) {
+                }
+            }
             return mBaseInstrumentation.newActivity(cl, className, intent);
         }
     }

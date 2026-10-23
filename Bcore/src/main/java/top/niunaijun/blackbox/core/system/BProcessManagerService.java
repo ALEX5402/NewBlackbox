@@ -62,11 +62,14 @@ public class BProcessManagerService implements ISystemService {
                 app = bProcess.get(processName);
                 if (app != null) {
                     if (app.initLock != null) {
-                        app.initLock.block();
+                        app.initLock.block(3000);
                     }
-                    if (app.bActivityThread != null) {
+                    if (app.bActivityThread != null && app.bActivityThread.asBinder().isBinderAlive() && app.bActivityThread.asBinder().pingBinder()) {
                         return app;
                     }
+                    bProcess.remove(processName);
+                    mPidsSelfLocked.remove(app);
+                    app = null;
                 }
                 bpid = getUsingBPidL();
                 Slog.d(TAG, "init bUid = " + buid + ", bPid = " + bpid);
@@ -147,19 +150,25 @@ public class BProcessManagerService implements ISystemService {
     }
 
     private boolean initAppProcessL(ProcessRecord record) {
-        Log.d(TAG, "initProcess: " + record.processName);
-        AppConfig appConfig = record.getClientConfig();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(AppConfig.KEY, appConfig);
-        Bundle init = ProviderCall.callSafely(record.getProviderAuthority(), "_Black_|_init_process_", null, bundle);
-        IBinder appThread = BundleCompat.getBinder(init, "_Black_|_client_");
-        if (appThread == null || !appThread.isBinderAlive()) {
-            return false;
-        }
-        attachClientL(record, appThread);
+        try {
+            Log.d(TAG, "initProcess: " + record.processName);
+            AppConfig appConfig = record.getClientConfig();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(AppConfig.KEY, appConfig);
+            Bundle init = ProviderCall.callSafely(record.getProviderAuthority(), "_Black_|_init_process_", null, bundle);
+            IBinder appThread = BundleCompat.getBinder(init, "_Black_|_client_");
+            if (appThread == null || !appThread.isBinderAlive()) {
+                return false;
+            }
+            attachClientL(record, appThread);
 
-        createProc(record);
-        return true;
+            createProc(record);
+            return true;
+        } finally {
+            if (record.initLock != null) {
+                record.initLock.open();
+            }
+        }
     }
 
     private void attachClientL(final ProcessRecord app, final IBinder appThread) {
@@ -283,6 +292,12 @@ public class BProcessManagerService implements ISystemService {
                     return processRecord;
             }
             return null;
+        }
+    }
+
+    public List<ProcessRecord> getProcessListLocked() {
+        synchronized (mPidsSelfLocked) {
+            return new ArrayList<>(mPidsSelfLocked);
         }
     }
 

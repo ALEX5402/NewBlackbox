@@ -879,10 +879,8 @@ public class BlackBoxCore extends ClientConfiguration {
                     
                     if (!isValidProcessState()) {
                         Slog.w(TAG, "Server process state is invalid, delaying service start");
-                        
                         scheduleDelayedServerServiceStart();
-                        return;
-                    }
+                    } else {
                     
                     Intent intent = new Intent();
                     intent.setClass(getContext(), DaemonService.class);
@@ -947,6 +945,7 @@ public class BlackBoxCore extends ClientConfiguration {
                         
                         tryAlternativeServerStartupMethods();
                     }
+                    }
                     
                 } catch (Exception e) {
                     Slog.e(TAG, "Unexpected error starting DaemonService in server process: " + e.getMessage(), e);
@@ -986,6 +985,18 @@ public class BlackBoxCore extends ClientConfiguration {
                 ContentProviderDelegate.init();
             }
             if (!isServerProcess()) {
+                try {
+                    Intent daemonIntent = new Intent(getContext(), DaemonService.class);
+                    getContext().bindService(daemonIntent, new android.content.ServiceConnection() {
+                        @Override
+                        public void onServiceConnected(android.content.ComponentName name, IBinder service) {
+                        }
+                        @Override
+                        public void onServiceDisconnected(android.content.ComponentName name) {
+                        }
+                    }, Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT);
+                } catch (Throwable ignored) {
+                }
                 
                 try {
                     ServiceManager.initBlackManager();
@@ -1598,6 +1609,14 @@ public class BlackBoxCore extends ClientConfiguration {
             return BActivityThread.getCallingBUid();
         } catch (Exception e) {
             Slog.w(TAG, "BActivityThread.getCallingBUid() failed, returning -1", e);
+            return -1;
+        }
+    }
+
+    public static int getUidByPid(int pid) {
+        try {
+            return getBActivityManager().getUidByPid(pid);
+        } catch (Throwable e) {
             return -1;
         }
     }

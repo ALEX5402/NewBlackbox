@@ -41,6 +41,7 @@ import top.niunaijun.blackbox.fake.service.IMediaRouterServiceProxy;
 import top.niunaijun.blackbox.fake.service.IMediaSessionManagerProxy;
 import top.niunaijun.blackbox.fake.service.IAudioServiceProxy;
 import top.niunaijun.blackbox.fake.service.ISensorPrivacyManagerProxy;
+import top.niunaijun.blackbox.fake.service.ILocaleManagerProxy;
 import top.niunaijun.blackbox.fake.service.ContentResolverProxy;
 import top.niunaijun.blackbox.fake.service.IMiuiSecurityManagerProxy;
 import top.niunaijun.blackbox.fake.service.SystemLibraryProxy;
@@ -65,6 +66,7 @@ import top.niunaijun.blackbox.fake.service.INetworkManagementServiceProxy;
 import top.niunaijun.blackbox.fake.service.INotificationManagerProxy;
 import top.niunaijun.blackbox.fake.service.IPackageManagerProxy;
 import top.niunaijun.blackbox.fake.service.IPermissionManagerProxy;
+import top.niunaijun.blackbox.fake.service.IPermissionCheckerProxy;
 import top.niunaijun.blackbox.fake.service.IPersistentDataBlockServiceProxy;
 import top.niunaijun.blackbox.fake.service.IPhoneSubInfoProxy;
 import top.niunaijun.blackbox.fake.service.IPowerManagerProxy;
@@ -123,6 +125,7 @@ public class HookManager {
             addInjector(new IMediaSessionManagerProxy());
             addInjector(new IAudioServiceProxy());
             addInjector(new ISensorPrivacyManagerProxy());
+            addInjector(new ILocaleManagerProxy());
             addInjector(new ContentResolverProxy());
             addInjector(new SystemLibraryProxy());
             addInjector(new ReLinkerProxy());
@@ -188,6 +191,7 @@ public class HookManager {
             
             if (BuildCompat.isR()) {
                 addInjector(new IPermissionManagerProxy());
+                addInjector(new IPermissionCheckerProxy());
             }
             
             if (BuildCompat.isQ()) {

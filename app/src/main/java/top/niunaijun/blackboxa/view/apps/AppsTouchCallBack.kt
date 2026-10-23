@@ -11,6 +11,10 @@ class AppsTouchCallBack(private val onMoveBlock: (from: Int, to: Int) -> Unit) :
         private const val TAG = "AppsTouchCallBack"
     }
 
+    override fun isLongPressDragEnabled(): Boolean {
+        return false
+    }
+
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder

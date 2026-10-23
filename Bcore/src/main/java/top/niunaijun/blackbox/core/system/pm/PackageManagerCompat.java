@@ -221,6 +221,9 @@ public class PackageManagerCompat {
         }
         
         ActivityInfo ai = new ActivityInfo(a.info);
+        if (ai.targetActivity != null) {
+            ai.name = ai.targetActivity;
+        }
         ai.metaData = a.metaData;
         ai.processName = BPackageManagerService.fixProcessName(ai.packageName, ai.processName);
         ai.applicationInfo = generateApplicationInfo(a.owner, flags, state, userId);

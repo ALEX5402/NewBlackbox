@@ -17,7 +17,7 @@ class BlackBoxLoader {
 
     private var mHideRoot by AppSharedPreferenceDelegate(App.getContext(), false)
 
-    private var mDaemonEnable by AppSharedPreferenceDelegate(App.getContext(), false)
+    private var mDaemonEnable by AppSharedPreferenceDelegate(App.getContext(), true)
     private var mShowShortcutPermissionDialog by AppSharedPreferenceDelegate(App.getContext(), true)
 
     
@@ -171,6 +171,28 @@ class BlackBoxLoader {
                                                 "afterApplicationOnCreate: pkg $packageName, processName $processName"
                                         )
                                         RockerManager.init(application, userId)
+
+                                        if ("com.google.android.gms" == packageName) {
+                                            try {
+                                                val mcsIntent = android.content.Intent()
+                                                mcsIntent.component = android.content.ComponentName("com.google.android.gms", "org.microg.gms.gcm.McsService")
+                                                mcsIntent.action = "org.microg.gms.gcm.ACTION_CONNECT"
+                                                application?.startService(mcsIntent)
+                                                Log.d(TAG, "Triggered McsService start in microG")
+                                            } catch (t: Throwable) {
+                                                Log.w(TAG, "Failed to start McsService: ${t.message}")
+                                            }
+                                        } else if (BlackBoxCore.get().isInstalled("com.google.android.gms", userId)) {
+                                            try {
+                                                val mcsIntent = android.content.Intent()
+                                                mcsIntent.component = android.content.ComponentName("com.google.android.gms", "org.microg.gms.gcm.McsService")
+                                                mcsIntent.action = "org.microg.gms.gcm.ACTION_CONNECT"
+                                                BlackBoxCore.getBActivityManager().startService(mcsIntent, null, false, userId)
+                                                Log.d(TAG, "Ensured McsService running for $packageName")
+                                            } catch (t: Throwable) {
+                                                Log.w(TAG, "Failed to ensure McsService: ${t.message}")
+                                            }
+                                        }
                                     } catch (e: Exception) {
                                         Log.e(
                                                 TAG,
@@ -245,12 +267,7 @@ class BlackBoxLoader {
                                 }
 
                                 override fun isEnableDaemonService(): Boolean {
-                                    return try {
-                                        mDaemonEnable
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "Error checking daemonEnable: ${e.message}")
-                                        false
-                                    }
+                                    return true
                                 }
 
                                 override fun isUseVpnNetwork(): Boolean {

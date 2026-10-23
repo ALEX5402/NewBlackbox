@@ -35,12 +35,31 @@ public class IUserManagerProxy extends BinderInvocationStub {
         return false;
     }
 
+    @ProxyMethod("getApplicationRestrictionsForUser")
+    public static class GetApplicationRestrictionsForUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null && args.length > 0 && args[0] instanceof String) {
+                args[0] = BlackBoxCore.getHostPkg();
+            }
+            try {
+                return method.invoke(who, args);
+            } catch (Throwable ignored) {
+                return new android.os.Bundle();
+            }
+        }
+    }
+
     @ProxyMethod("getApplicationRestrictions")
     public static class GetApplicationRestrictions extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             args[0] = BlackBoxCore.getHostPkg();
-            return method.invoke(who, args);
+            try {
+                return method.invoke(who, args);
+            } catch (Throwable ignored) {
+                return new android.os.Bundle();
+            }
         }
     }
 
@@ -58,6 +77,55 @@ public class IUserManagerProxy extends BinderInvocationStub {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             return new ArrayList<>();
+        }
+    }
+
+    @ProxyMethod("isMainUser")
+    public static class IsMainUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return true;
+        }
+    }
+
+    @ProxyMethod("isUserRunning")
+    public static class IsUserRunning extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return true;
+        }
+    }
+
+    @ProxyMethod("isUserUnlocked")
+    public static class IsUserUnlocked extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return true;
+        }
+    }
+
+    @ProxyMethod("isUserUnlockingOrUnlocked")
+    public static class IsUserUnlockingOrUnlocked extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return true;
+        }
+    }
+
+    @ProxyMethod("isUserVisible")
+    public static class IsUserVisible extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return true;
+        }
+    }
+
+    @ProxyMethod("getUserInfo")
+    public static class GetUserInfo extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            int userId = args != null && args.length > 0 && args[0] instanceof Integer ? (int) args[0] : 0;
+            return BRUserInfo.get()._new(userId, "BlackBox", BRUserInfo.get().FLAG_PRIMARY());
         }
     }
 }

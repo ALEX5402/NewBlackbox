@@ -448,4 +448,13 @@ public class BActivityManager extends BlackManager<IBActivityManagerService> {
         }
         return -1;
     }
+
+    public int getUidByPid(int pid) {
+        try {
+            return getService().getUidByPid(pid);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }

@@ -1,5 +1,6 @@
 package top.niunaijun.blackbox.utils.compat;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -27,5 +28,20 @@ public class ParceledListSliceCompat {
 		}
 		BRParceledListSlice.get(slice).setLastSlice(true);
 		return slice;
+	}
+
+	public static Object create(List<?> list, Method method) {
+		if (method != null && method.getReturnType() != null) {
+			if ("android.content.pm.PackageInfoList".equals(method.getReturnType().getName())) {
+				try {
+					Class<?> pkgInfoListCls = Class.forName("android.content.pm.PackageInfoList");
+					Constructor<?> constructor = pkgInfoListCls.getConstructor(List.class);
+					return constructor.newInstance(list);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}
+		return create(list);
 	}
 }

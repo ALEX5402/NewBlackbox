@@ -44,6 +44,28 @@ public class AttributionSourceUtils {
             
             Class<?> attributionSourceClass = attributionSource.getClass();
             
+            // Android 12+ stores state inside mAttributionSourceState
+            try {
+                java.lang.reflect.Field stateField = attributionSourceClass.getDeclaredField("mAttributionSourceState");
+                stateField.setAccessible(true);
+                Object state = stateField.get(attributionSource);
+                if (state != null) {
+                    try {
+                        java.lang.reflect.Field uidField = state.getClass().getDeclaredField("uid");
+                        uidField.setAccessible(true);
+                        uidField.setInt(state, BlackBoxCore.getHostUid());
+                    } catch (NoSuchFieldException ignored) {
+                    }
+                    try {
+                        java.lang.reflect.Field packageField = state.getClass().getDeclaredField("packageName");
+                        packageField.setAccessible(true);
+                        packageField.set(state, BlackBoxCore.getHostPkg());
+                    } catch (NoSuchFieldException ignored) {
+                    }
+                    Slog.d(TAG, "Fixed AttributionSourceState uid & package name");
+                }
+            } catch (Throwable ignored) {
+            }
             
             String[] uidFieldNames = {"mUid", "uid", "mCallingUid", "callingUid", "mSourceUid", "sourceUid"};
             

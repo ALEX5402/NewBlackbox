@@ -157,21 +157,29 @@ public class AndroidIdProxy extends ClassInvocationStub {
     }
 
     
+    private static String sMockAndroidId = null;
     private static String generateMockAndroidId() {
-        
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            sb.append(Integer.toHexString((int) (Math.random() * 16)));
+        if (sMockAndroidId != null) return sMockAndroidId;
+        try {
+            android.content.Context ctx = top.niunaijun.blackbox.BlackBoxCore.getContext();
+            if (ctx != null) {
+                String realId = android.provider.Settings.Secure.getString(ctx.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+                if (realId != null && !realId.isEmpty()) {
+                    sMockAndroidId = realId;
+                    return sMockAndroidId;
+                }
+            }
+        } catch (Throwable ignored) {
         }
-        String mockId = sb.toString().toUpperCase();
-        Slog.d(TAG, "AndroidId: Generated mock Android ID: " + mockId);
-        return mockId;
+        sMockAndroidId = "eaba332128121734";
+        return sMockAndroidId;
     }
 
     private static Long generateMockAndroidIdLong() {
-        
-        long mockId = (long) (Math.random() * Long.MAX_VALUE);
-        Slog.d(TAG, "AndroidId: Generated mock Android ID long: " + mockId);
-        return mockId;
+        try {
+            return Long.parseUnsignedLong(generateMockAndroidId(), 16);
+        } catch (Throwable t) {
+            return 0x1234567890abcdefL;
+        }
     }
 }
