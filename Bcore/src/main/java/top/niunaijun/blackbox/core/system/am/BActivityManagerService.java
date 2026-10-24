@@ -163,17 +163,30 @@ public class BActivityManagerService extends IBActivityManagerService.Stub imple
                 BlackBoxCore.getContext().getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = manager.getRunningAppProcesses();
         Map<Integer, ActivityManager.RunningAppProcessInfo> runningProcessMap = new HashMap<>();
-        for (ActivityManager.RunningAppProcessInfo runningProcess : runningAppProcesses) {
-            runningProcessMap.put(runningProcess.pid, runningProcess);
+        if (runningAppProcesses != null) {
+            for (ActivityManager.RunningAppProcessInfo runningProcess : runningAppProcesses) {
+                runningProcessMap.put(runningProcess.pid, runningProcess);
+            }
         }
-        List<ProcessRecord> packageProcessAsUser = BProcessManagerService.get().getPackageProcessAsUser(callerPackage, userId);
+        List<ProcessRecord> processList;
+        if (callerPackage == null || "com.google.android.gms".equals(callerPackage)) {
+            processList = BProcessManagerService.get().getProcessListLocked();
+        } else {
+            processList = BProcessManagerService.get().getPackageProcessAsUser(callerPackage, userId);
+        }
 
         RunningAppProcessInfo appProcessInfo = new RunningAppProcessInfo();
-        for (ProcessRecord processRecord : packageProcessAsUser) {
+        for (ProcessRecord processRecord : processList) {
             ActivityManager.RunningAppProcessInfo runningAppProcessInfo = runningProcessMap.get(processRecord.pid);
             if (runningAppProcessInfo != null) {
-                runningAppProcessInfo.processName = processRecord.processName;
-                appProcessInfo.mAppProcessInfoList.add(runningAppProcessInfo);
+                ActivityManager.RunningAppProcessInfo copy = new ActivityManager.RunningAppProcessInfo();
+                copy.pid = runningAppProcessInfo.pid;
+                copy.uid = processRecord.buid;
+                copy.processName = processRecord.processName;
+                copy.pkgList = new String[]{processRecord.getPackageName()};
+                copy.importance = runningAppProcessInfo.importance;
+                copy.importanceReasonCode = runningAppProcessInfo.importanceReasonCode;
+                appProcessInfo.mAppProcessInfoList.add(copy);
             }
         }
         return appProcessInfo;
@@ -259,6 +272,15 @@ public class BActivityManagerService extends IBActivityManagerService.Stub imple
             if (record != null) {
                 return record.uid;
             }
+        }
+        return -1;
+    }
+
+    @Override
+    public int getUidByPid(int pid) throws RemoteException {
+        ProcessRecord record = BProcessManagerService.get().findProcessByPid(pid);
+        if (record != null) {
+            return record.buid;
         }
         return -1;
     }

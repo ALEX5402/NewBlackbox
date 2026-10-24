@@ -17,7 +17,7 @@ class BlackBoxLoader {
 
     private var mHideRoot by AppSharedPreferenceDelegate(App.getContext(), false)
 
-    private var mDaemonEnable by AppSharedPreferenceDelegate(App.getContext(), false)
+    private var mDaemonEnable by AppSharedPreferenceDelegate(App.getContext(), true)
     private var mShowShortcutPermissionDialog by AppSharedPreferenceDelegate(App.getContext(), true)
 
     
@@ -171,6 +171,49 @@ class BlackBoxLoader {
                                                 "afterApplicationOnCreate: pkg $packageName, processName $processName"
                                         )
                                         RockerManager.init(application, userId)
+
+                                        if ("com.google.android.gms" == packageName) {
+                                            try {
+                                                val contentResolver = application?.contentResolver
+                                                if (contentResolver != null) {
+                                                    val checkinUri = android.net.Uri.parse("content://com.google.android.gms.microg.settings/check-in")
+                                                    val checkinValues = android.content.ContentValues().apply {
+                                                        put("checkin_enable_service", true)
+                                                    }
+                                                    contentResolver.update(checkinUri, checkinValues, null, null)
+
+                                                    val gcmUri = android.net.Uri.parse("content://com.google.android.gms.microg.settings/gcm")
+                                                    val gcmValues = android.content.ContentValues().apply {
+                                                        put("gcm_enable_mcs_service", true)
+                                                        put("gcm_confirm_new_apps", false)
+                                                    }
+                                                    contentResolver.update(gcmUri, gcmValues, null, null)
+                                                    Log.d(TAG, "Auto-configured microG checkin and GCM settings to ON")
+                                                }
+                                            } catch (t: Throwable) {
+                                                Log.w(TAG, "Failed to auto-configure microG settings: ${t.message}")
+                                            }
+
+                                            try {
+                                                val mcsIntent = android.content.Intent()
+                                                mcsIntent.component = android.content.ComponentName("com.google.android.gms", "org.microg.gms.gcm.McsService")
+                                                mcsIntent.action = "org.microg.gms.gcm.ACTION_CONNECT"
+                                                application?.startService(mcsIntent)
+                                                Log.d(TAG, "Triggered McsService start in microG")
+                                            } catch (t: Throwable) {
+                                                Log.w(TAG, "Failed to start McsService: ${t.message}")
+                                            }
+                                        } else if (BlackBoxCore.get().isInstalled("com.google.android.gms", userId)) {
+                                            try {
+                                                val mcsIntent = android.content.Intent()
+                                                mcsIntent.component = android.content.ComponentName("com.google.android.gms", "org.microg.gms.gcm.McsService")
+                                                mcsIntent.action = "org.microg.gms.gcm.ACTION_CONNECT"
+                                                BlackBoxCore.getBActivityManager().startService(mcsIntent, null, false, userId)
+                                                Log.d(TAG, "Ensured McsService running for $packageName")
+                                            } catch (t: Throwable) {
+                                                Log.w(TAG, "Failed to ensure McsService: ${t.message}")
+                                            }
+                                        }
                                     } catch (e: Exception) {
                                         Log.e(
                                                 TAG,
@@ -245,12 +288,7 @@ class BlackBoxLoader {
                                 }
 
                                 override fun isEnableDaemonService(): Boolean {
-                                    return try {
-                                        mDaemonEnable
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "Error checking daemonEnable: ${e.message}")
-                                        false
-                                    }
+                                    return true
                                 }
 
                                 override fun isUseVpnNetwork(): Boolean {

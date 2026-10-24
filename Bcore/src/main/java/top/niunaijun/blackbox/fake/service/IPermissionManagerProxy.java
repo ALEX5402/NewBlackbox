@@ -53,6 +53,8 @@ public class IPermissionManagerProxy extends BinderInvocationStub {
             addMethodHook(new ValueMethodProxy("setInstantAppCookie", false));
             addMethodHook(new ValueMethodProxy("isInstantApp", false));
         }
+        addMethodHook(new ValueMethodProxy("checkPermission", PackageManager.PERMISSION_GRANTED));
+        addMethodHook(new ValueMethodProxy("checkUidPermission", PackageManager.PERMISSION_GRANTED));
     }
 
     @Override

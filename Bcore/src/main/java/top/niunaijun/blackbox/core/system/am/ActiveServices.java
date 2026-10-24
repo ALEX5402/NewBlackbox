@@ -52,13 +52,19 @@ public class ActiveServices {
 
         runningServiceRecord.getAndIncrementStartId();
         final Intent stubServiceIntent = createStubServiceIntent(intent, serviceInfo, processRecord, runningServiceRecord);
+        try {
+            if (processRecord.bActivityThread != null) {
+                processRecord.bActivityThread.startService(stubServiceIntent);
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "Direct startService to process failed: " + t.getMessage());
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     BlackBoxCore.getContext().startService(stubServiceIntent);
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                } catch (Throwable ignored) {
                 }
             }
         }).start();
@@ -95,7 +101,7 @@ public class ActiveServices {
     public Intent bindService(Intent intent, final IBinder binder, String resolvedType, int userId) {
         ResolveInfo resolveInfo = resolveService(intent, resolvedType, userId);
         if (resolveInfo == null)
-            return intent;
+            return null;
         ServiceInfo serviceInfo = resolveInfo.serviceInfo;
         ProcessRecord processRecord = BProcessManagerService.get().startProcessLocked(
                 serviceInfo.packageName,

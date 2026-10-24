@@ -1,11 +1,13 @@
 package top.niunaijun.blackbox.fake.delegate;
 
+import android.app.IBinderSession;
 import android.app.IServiceConnection;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,10 +56,31 @@ public class ServiceConnectionDelegate extends IServiceConnection.Stub {
     }
 
     public void connected(ComponentName name, IBinder service, boolean dead) throws RemoteException {
+        ComponentName target = mComponentName != null ? mComponentName : name;
         if (BuildCompat.isOreo()) {
-            BRIServiceConnectionO.get(mConn).connected(mComponentName, service, dead);
-        } else {
-            mConn.connected(name, service);
+            try {
+                BRIServiceConnectionO.get(mConn).connected(target, service, dead);
+                return;
+            } catch (Throwable ignored) {
+            }
         }
+        try {
+            mConn.connected(target, service);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    // Android 16 & 17+ (SDK 36, 37) compatibility method
+    public void connected(ComponentName name, IBinder service, IBinderSession session, boolean dead) throws RemoteException {
+        ComponentName target = mComponentName != null ? mComponentName : name;
+        if (mConn != null) {
+            try {
+                Method method = mConn.getClass().getMethod("connected", ComponentName.class, IBinder.class, IBinderSession.class, boolean.class);
+                method.invoke(mConn, target, service, session, dead);
+                return;
+            } catch (Throwable ignored) {
+            }
+        }
+        connected(target, service, dead);
     }
 }

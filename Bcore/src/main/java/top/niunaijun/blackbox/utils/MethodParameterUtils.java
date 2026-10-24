@@ -150,4 +150,11 @@ public class MethodParameterUtils {
         }
         return (int)obj;
     }
+
+    public static long toLong(Object obj){
+        if(obj instanceof Integer){
+            return ((Integer) obj).longValue();
+        }
+        return (long)obj;
+    }
 }

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:id="@+id/app_clear" android:title="@string/app_clear"/>
-
-    <item android:id="@+id/app_stop" android:title="@string/app_stop"/>
-
-    <item android:id="@+id/app_remove" android:title="@string/app_remove"/>
-    <item android:id="@+id/app_shortcut" android:title="@string/app_shortcut"/>
+    <item android:id="@+id/app_open" android:title="Buka Aplikasi" />
+    <item android:id="@+id/app_stop" android:title="Paksa Berhenti (Force Stop)" />
+    <item android:id="@+id/app_clear" android:title="Hapus Data (Clear Data)" />
+    <item android:id="@+id/app_clear_cache" android:title="Hapus Cache Saja" />
+    <item android:id="@+id/app_backup" android:title="Cadangkan Data (Backup to Storage)" />
+    <item android:id="@+id/app_restore" android:title="Pulihkan Data (Restore from Backup)" />
+    <item android:id="@+id/app_shortcut" android:title="Buat Pintasan Desktop" />
+    <item android:id="@+id/app_copy_pkg" android:title="Salin Nama Package" />
+    <item android:id="@+id/app_info" android:title="Detail Aplikasi" />
+    <item android:id="@+id/app_remove" android:title="Hapus Aplikasi (Uninstall)" />
 </menu>

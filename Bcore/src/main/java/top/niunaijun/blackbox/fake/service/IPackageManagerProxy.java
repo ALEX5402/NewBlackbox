@@ -135,6 +135,14 @@ public class IPackageManagerProxy extends BinderInvocationStub {
             
             
             if ("com.android.vending".equals(packageName)) {
+                PackageInfo realPi = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, flags, BlackBoxCore.getUserId());
+                if (realPi != null) {
+                    return realPi;
+                }
+                try {
+                    return BlackBoxCore.getContext().getPackageManager().getPackageInfo(packageName, flags);
+                } catch (Throwable ignored) {
+                }
                 return createFakeGooglePlayServicesPackageInfo();
             }
             
@@ -270,7 +278,7 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             int flags = MethodParameterUtils.toInt(args[0]);
             List<PackageInfo> installedPackages = BlackBoxCore.getBPackageManager().getInstalledPackages(flags, BlackBoxCore.getUserId());
-            return ParceledListSliceCompat.create(installedPackages);
+            return ParceledListSliceCompat.create(installedPackages, method);
         }
     }
 
@@ -359,7 +367,23 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                 uid = (int) args[0];
             }
             String[] packagesForUid = BlackBoxCore.getBPackageManager().getPackagesForUid(uid);
+            if ("com.google.android.gms".equals(BActivityThread.getAppPackageName())) {
+                List<PackageInfo> installedPackages = BlackBoxCore.getBPackageManager().getInstalledPackages(0, BActivityThread.getUserId());
+                if (installedPackages != null && !installedPackages.isEmpty()) {
+                    java.util.Set<String> allPkgs = new java.util.LinkedHashSet<>();
+                    if (packagesForUid != null) {
+                        allPkgs.addAll(Arrays.asList(packagesForUid));
+                    }
+                    for (PackageInfo pi : installedPackages) {
+                        allPkgs.add(pi.packageName);
+                    }
+                    packagesForUid = allPkgs.toArray(new String[0]);
+                }
+            }
             Slog.d(TAG, args[0] + " , " + BActivityThread.getAppProcessName() + " GetPackagesForUid: " + Arrays.toString(packagesForUid));
+            if (packagesForUid == null || packagesForUid.length == 0) {
+                return new String[]{BActivityThread.getAppPackageName()};
+            }
             return packagesForUid;
         }
     }
@@ -432,9 +456,18 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                 Slog.d(TAG, "SimpleAudioPermissionHook: Granting notification/Xiaomi permission: " + permission + " to " + packageName);
                 return PackageManager.PERMISSION_GRANTED;
             }
-            
-            
+            if (permission != null && (permission.startsWith("com.google.android.") || permission.startsWith("android.permission."))) {
+                return PackageManager.PERMISSION_GRANTED;
+            }
             return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("checkUidPermission")
+    public static class CheckUidPermissionHook extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            return PackageManager.PERMISSION_GRANTED;
         }
     }
 

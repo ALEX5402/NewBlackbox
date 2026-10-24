@@ -35,7 +35,7 @@ android {
         ndkBuild {
             path 'src/main/cpp/Android.mk'
         }
-        ndkVersion = "29.0.13846066"
+        ndkVersion = "29.0.14206865"
     }
 
     compileOptions {

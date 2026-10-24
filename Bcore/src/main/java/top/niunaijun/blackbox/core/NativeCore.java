@@ -8,6 +8,8 @@ import androidx.annotation.Keep;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dalvik.system.DexFile;
 import top.niunaijun.blackbox.BlackBoxCore;
@@ -20,6 +22,23 @@ import top.niunaijun.blackbox.utils.Slog;
 
 public class NativeCore {
     public static final String TAG = "NativeCore";
+    private static final Map<Integer, Integer> sPidToUid = new ConcurrentHashMap<>();
+
+    public static int getBUidByPid(int pid) {
+        if (pid == Process.myPid()) {
+            return BlackBoxCore.getBUid();
+        }
+        Integer cached = sPidToUid.get(pid);
+        if (cached != null) {
+            return cached;
+        }
+        int buid = BlackBoxCore.getUidByPid(pid);
+        if (buid > 0) {
+            sPidToUid.put(pid, buid);
+            return buid;
+        }
+        return -1;
+    }
 
     static {
 
@@ -50,19 +69,45 @@ public class NativeCore {
                 return origCallingUid;
 
             if (origCallingUid == BlackBoxCore.getHostUid()) {
-                
-                String appPackageName = BlackBoxCore.getAppPackageName();
-                if (appPackageName != null && appPackageName.equals("com.google.android.gms")){
-                    
+                try {
+                    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+                    for (StackTraceElement element : stackTrace) {
+                        String className = element.getClassName();
+                        String methodName = element.getMethodName();
+                        if (className.contains("AttributionSource") && methodName.contains("enforceCallingUid")) {
+                            return BlackBoxCore.getHostUid();
+                        }
+                        if ((className.contains("Settings") || className.contains("FeatureFlag")) &&
+                            (methodName.contains("getString") || methodName.contains("getInt") || 
+                             methodName.contains("getLong") || methodName.contains("getFloat"))) {
+                            return Process.SYSTEM_UID; 
+                        }
+                    }
+                } catch (Exception ignored) {
                 }
-                
-                
-                
-                if (appPackageName != null && appPackageName.equals("com.google.android.webview")){
+
+                int callingPid = android.os.Binder.getCallingPid();
+                if (callingPid != Process.myPid()) {
+                    int callerBUid = getBUidByPid(callingPid);
+                    Log.d(TAG, "getCallingUid IPC: orig=" + origCallingUid + " callingPid=" + callingPid + " myPid=" + Process.myPid() + " callerBUid=" + callerBUid);
+                    if (callingPid == 0) {
+                        Log.d(TAG, "callingPid==0 caller stack:", new Throwable());
+                    }
+                    if (callerBUid > 0) {
+                        return callerBUid;
+                    }
+                }
+
+                String appPackageName = BlackBoxCore.getAppPackageName();
+                if (appPackageName != null && (appPackageName.equals("com.google.android.webview") || appPackageName.contains("webview") || appPackageName.contains("chrome"))){
                     return Process.myUid();
                 }
-                
-                
+
+                int buid = BlackBoxCore.getBUid();
+                if (buid > 0) {
+                    return buid;
+                }
+
                 try {
                     int callingBUid = BlackBoxCore.getCallingBUid();
                     if (callingBUid > 0 && callingBUid < Process.LAST_APPLICATION_UID) {
@@ -71,29 +116,7 @@ public class NativeCore {
                 } catch (Exception e) {
                     Log.w(TAG, "Error getting calling BUid: " + e.getMessage());
                 }
-                
-                
-                try {
-                    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-                    for (StackTraceElement element : stackTrace) {
-                        String className = element.getClassName();
-                        String methodName = element.getMethodName();
-                        
-                        
-                        if ((className.contains("Settings") || className.contains("FeatureFlag")) &&
-                            (methodName.contains("getString") || methodName.contains("getInt") || 
-                             methodName.contains("getLong") || methodName.contains("getFloat"))) {
-                            
-                            Log.d(TAG, "System settings access detected, using system UID to prevent mismatch");
-                            
-                            return Process.SYSTEM_UID; 
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.w(TAG, "Error analyzing stack trace for UID resolution: " + e.getMessage());
-                }
-                
-                
+
                 return BlackBoxCore.getHostUid();
             }
             return origCallingUid;

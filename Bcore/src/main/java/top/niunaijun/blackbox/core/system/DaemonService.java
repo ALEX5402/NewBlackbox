@@ -25,7 +25,7 @@ public class DaemonService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return new android.os.Binder();
     }
 
     @Override

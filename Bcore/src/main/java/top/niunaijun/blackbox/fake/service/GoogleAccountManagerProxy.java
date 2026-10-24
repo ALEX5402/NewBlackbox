@@ -291,24 +291,7 @@ public class GoogleAccountManagerProxy extends ClassInvocationStub {
 
     
     private static Account[] createMockGoogleAccounts() {
-        try {
-            List<Account> accounts = new ArrayList<>();
-            
-            
-            Account primaryAccount = new Account("mock.user@gmail.com", "com.google");
-            accounts.add(primaryAccount);
-            
-            
-            Account secondaryAccount = new Account("virtual.user@gmail.com", "com.google");
-            accounts.add(secondaryAccount);
-            
-            Slog.d(TAG, "GoogleAccountManager: Created " + accounts.size() + " mock Google accounts");
-            return accounts.toArray(new Account[0]);
-            
-        } catch (Exception e) {
-            Slog.e(TAG, "GoogleAccountManager: Failed to create mock accounts", e);
-            return new Account[0];
-        }
+        return new Account[0];
     }
 
     

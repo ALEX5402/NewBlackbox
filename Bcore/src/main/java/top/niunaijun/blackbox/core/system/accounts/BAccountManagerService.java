@@ -686,7 +686,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
     @Override
     public void addAccountAsUser(IAccountManagerResponse response, String accountType, String authTokenType, String[] requiredFeatures, boolean expectActivityLaunch, Bundle options, int userId) throws RemoteException {
-        
+        addAccount(response, accountType, authTokenType, requiredFeatures, expectActivityLaunch, options, userId);
     }
 
     @Override
@@ -1542,11 +1542,9 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         }
 
         void bind() {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "initiating bind to authenticator type " + mAccountType);
-            }
+            Slog.d(TAG, "initiating bind to authenticator type " + mAccountType);
             if (!bindToAuthenticator(mAccountType)) {
-                Log.d(TAG, "bind attempt failed for " + toDebugString());
+                Slog.w(TAG, "bind attempt failed for " + toDebugString());
                 onError(AccountManager.ERROR_CODE_REMOTE_EXCEPTION, "bind failure");
             }
         }
@@ -1564,6 +1562,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Slog.d(TAG, "Session.onServiceConnected: " + name + " service=" + service);
             mAuthenticator = IAccountAuthenticator.Stub.asInterface(service);
             try {
                 run();
@@ -1609,6 +1608,7 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
         @Override
         public void onResult(Bundle result) {
+            Slog.d(TAG, "Session.onResult: " + result);
             mNumResults++;
             Intent intent = null;
             if (result != null) {
@@ -1641,9 +1641,11 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
             }
             if (result != null
                     && (intent = result.getParcelable(AccountManager.KEY_INTENT)) != null) {
+                Slog.d(TAG, "Session.onResult KEY_INTENT: " + intent);
                 if (!checkKeyIntent(
                         Binder.getCallingUid(),
                         intent)) {
+                    Slog.e(TAG, "checkKeyIntent failed for: " + intent);
                     onError(AccountManager.ERROR_CODE_INVALID_RESPONSE,
                             "invalid intent in bundle returned");
                     return;
@@ -1733,11 +1735,13 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
         private boolean bindToAuthenticator(String authenticatorType) {
             AuthenticatorInfo authenticatorInfo = mAuthenticatorCache.authenticators.get(authenticatorType);
             if (authenticatorInfo == null) {
-                if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                    Log.v(TAG, "there is no authenticator for " + authenticatorType
-                            + ", bailing out");
+                Slog.w(TAG, "there is no authenticator for " + authenticatorType + ", reloading cache...");
+                loadAuthenticatorCache(null);
+                authenticatorInfo = mAuthenticatorCache.authenticators.get(authenticatorType);
+                if (authenticatorInfo == null) {
+                    Slog.e(TAG, "still no authenticator for " + authenticatorType + ", bailing out");
+                    return false;
                 }
-                return false;
             }
 
 
@@ -1761,12 +1765,15 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
 
 
+        try {
             if (!mContext.bindService(intent, this, flags)) {
-                if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                    Log.v(TAG, "bindService to " + componentName + " failed");
-                }
+                Slog.w(TAG, "bindService to " + componentName + " returned false");
                 return false;
             }
+        } catch (Throwable e) {
+            Slog.e(TAG, "bindService to " + componentName + " threw exception: " + e.getMessage());
+            return false;
+        }
 
             return true;
         }

@@ -148,23 +148,23 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 if (auth.equals("settings")
                         || auth.equals("media")
                         || auth.equals("telephony")
-                        || ((String) auth).contains("com.google.android.gms")
-                        || ((String) auth).contains("com.android.vending")
-                        || ((String) auth).contains("com.google.android.gsf")
-                        || auth.equals("com.google.android.gms.chimera")
                         || auth.equals("com.huawei.android.launcher.settings")
                         || auth.equals("com.hihonor.android.launcher.settings")) {
                     content = method.invoke(who, args);
                     ContentProviderDelegate.update(content, (String) auth);
                     return content;
                 } else {
-                    
-
                     ProviderInfo providerInfo = BlackBoxCore.getBPackageManager()
                             .resolveContentProvider(
                                     (String) auth, GET_META_DATA, BActivityThread.getUserId());
                     if (providerInfo == null) {
-                        
+                        if (((String) auth).contains("com.google.android.gms")
+                                || ((String) auth).contains("com.android.vending")
+                                || ((String) auth).contains("com.google.android.gsf")) {
+                            content = method.invoke(who, args);
+                            ContentProviderDelegate.update(content, (String) auth);
+                            return content;
+                        }
                         return null;
                     }
 
@@ -355,6 +355,7 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             int userId = intent.getIntExtra("_B_|_UserId", -1);
             userId = userId == -1 ? BActivityThread.getUserId() : userId;
             ResolveInfo resolveInfo = BlackBoxCore.getBPackageManager().resolveService(intent, 0, resolvedType, userId);
+            Slog.d(TAG, "BindServiceCommon: intent=" + intent + " userId=" + userId + " resolveInfo=" + resolveInfo);
             if (resolveInfo != null || AppSystemEnv.isOpenPackage(intent.getComponent())) {
                 Intent proxyIntent = BlackBoxCore.getBActivityManager().bindService(intent,
                         connection == null ? null : connection.asBinder(),
@@ -373,27 +374,46 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                     }
                 }
 
-                
                 if (proxyIntent != null && proxyIntent.getComponent() != null && 
                     proxyIntent.getComponent().getPackageName().equals(BlackBoxCore.getHostPkg())){
                     int flagsIndex = getFlagsIndex(args);
                     if (flagsIndex >= 0) {
-                        int flags = MethodParameterUtils.toInt(args[flagsIndex]);
+                        long flags = MethodParameterUtils.toLong(args[flagsIndex]);
                         flags &= ~Context.BIND_EXTERNAL_SERVICE;
-                        args[flagsIndex] = flags;
+                        if (args[flagsIndex] instanceof Long) {
+                            args[flagsIndex] = flags;
+                        } else {
+                            args[flagsIndex] = (int) flags;
+                        }
                     }
                 }
-                args[callingPackageIndex] = BlackBoxCore.getHostPkg();
+                if (callingPackageIndex >= 0 && callingPackageIndex < args.length && args[callingPackageIndex] instanceof String) {
+                    args[callingPackageIndex] = BlackBoxCore.getHostPkg();
+                } else {
+                    for (int i = 5; i < args.length; i++) {
+                        if (args[i] instanceof String && !args[i].equals(resolvedType)) {
+                            args[i] = BlackBoxCore.getHostPkg();
+                        }
+                    }
+                }
 
                 if (proxyIntent != null) {
                     args[2] = proxyIntent;
                     return method.invoke(who, args);
                 }
             }
+            if (intent.getComponent() != null && !intent.getComponent().getPackageName().equals(BlackBoxCore.getHostPkg())) {
+                String targetPkg = intent.getComponent().getPackageName();
+                if ("com.google.android.webview".equals(targetPkg) || "com.android.webview".equals(targetPkg) || targetPkg.contains("webview") || targetPkg.contains("chrome") || targetPkg.contains("trichrome")) {
+                    return method.invoke(who, args);
+                }
+                Slog.w(TAG, "BindServiceCommon: Blocking direct host bind for virtual component " + intent.getComponent());
+                return 0;
+            }
             return method.invoke(who, args);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Slog.e(TAG, "BindServiceCommon: Unexpected error", e);
-            return method.invoke(who, args);
+            return 0;
         }
     }
 
@@ -589,6 +609,10 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                     args[i] = null;
                 }
             }
+            int lastIndex = args.length - 1;
+            if (lastIndex >= 0 && args[lastIndex] instanceof Integer && (Integer) args[lastIndex] < 0) {
+                args[lastIndex] = 0;
+            }
             return method.invoke(who, args);
         }
 
@@ -773,6 +797,10 @@ public class IActivityManagerProxy extends ClassInvocationStub {
         }
     }
 
+    @ProxyMethod("checkPermissionForDevice")
+    public static class checkPermissionForDevice extends checkPermission {
+    }
+
     @ProxyMethod("checkPermission")
     public static class checkPermission extends MethodHook {
         @Override
@@ -780,7 +808,9 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             MethodParameterUtils.replaceLastUid(args);
             String permission = (String) args[0];
             if (permission.equals(Manifest.permission.ACCOUNT_MANAGER)
-                    || permission.equals(Manifest.permission.SEND_SMS)) {
+                    || permission.equals(Manifest.permission.SEND_SMS)
+                    || permission.startsWith("com.google.android.")
+                    || permission.startsWith("android.permission.")) {
                 return PackageManager.PERMISSION_GRANTED;
             }
             

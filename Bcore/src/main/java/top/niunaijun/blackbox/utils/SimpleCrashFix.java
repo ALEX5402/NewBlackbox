@@ -148,6 +148,9 @@ public class SimpleCrashFix {
     
     
     private static boolean isGooglePlayServicesCrash(Throwable throwable) {
+        if (Thread.currentThread() == android.os.Looper.getMainLooper().getThread()) {
+            return false;
+        }
         if (throwable == null) {
             return false;
         }
