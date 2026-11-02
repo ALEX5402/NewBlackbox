@@ -50,7 +50,7 @@ class FollowMyLocationOverlay : AppCompatActivity() {
         val location: BLocation? = intent.getParcelableExtra("location")
 
         startPoint = if (location == null) {
-            GeoPoint(30.2736, 120.1563)
+            GeoPoint(51.5074, -0.1278)
         } else {
             GeoPoint(location.latitude, location.longitude)
         }

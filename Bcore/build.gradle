@@ -57,15 +57,14 @@ android {
             useLegacyPackaging true
         }
     }
-    lintOptions {
-
-        checkReleaseBuilds false
+    lint {
         abortOnError false
-        warningsAsErrors false
-        disable "UnusedResources", 'RestrictedApi'
-        textOutput "stdout"
-        textReport false
         checkOnly 'NewApi', 'InlinedApi'
+        checkReleaseBuilds false
+        disable 'UnusedResources', 'RestrictedApi'
+        textOutput file('stdout')
+        textReport false
+        warningsAsErrors false
     }
 }
 
