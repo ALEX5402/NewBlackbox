@@ -21,8 +21,10 @@ class BlackBoxLoader {
     private var mShowShortcutPermissionDialog by AppSharedPreferenceDelegate(App.getContext(), true)
 
     
-    private var mUseVpnNetwork by AppSharedPreferenceDelegate(App.getContext(), false)
 
+    private var mDnsMode by AppSharedPreferenceDelegate(App.getContext(), "system")
+    private var mCustomDns by AppSharedPreferenceDelegate(App.getContext(), "")
+    private var mThemeMode by AppSharedPreferenceDelegate(App.getContext(), "system")
     private var mDisableFlagSecure by AppSharedPreferenceDelegate(App.getContext(), false)
 
     fun hideRoot(): Boolean {
@@ -39,6 +41,54 @@ class BlackBoxLoader {
             this.mHideRoot = hideRoot
         } catch (e: Exception) {
             Log.e(TAG, "Error setting hideRoot: ${e.message}")
+        }
+    }
+
+    fun dnsMode(): String {
+        return try {
+            mDnsMode ?: "system"
+        } catch (e: Exception) {
+            "system"
+        }
+    }
+
+    fun invalidDnsMode(mode: String) {
+        try {
+            this.mDnsMode = mode
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting dnsMode: ${e.message}")
+        }
+    }
+
+    fun customDns(): String {
+        return try {
+            mCustomDns ?: ""
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    fun invalidCustomDns(dns: String) {
+        try {
+            this.mCustomDns = dns
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting customDns: ${e.message}")
+        }
+    }
+
+    fun getThemeMode(): String {
+        return try {
+            mThemeMode ?: "system"
+        } catch (e: Exception) {
+            "system"
+        }
+    }
+
+    fun setThemeMode(mode: String) {
+        try {
+            this.mThemeMode = mode
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting themeMode: ${e.message}")
         }
     }
 
@@ -93,22 +143,7 @@ class BlackBoxLoader {
         }
     }
 
-    fun useVpnNetwork(): Boolean {
-        return try {
-            mUseVpnNetwork
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting useVpnNetwork: ${e.message}")
-            false
-        }
-    }
 
-    fun invalidUseVpnNetwork(enable: Boolean) {
-        try {
-            this.mUseVpnNetwork = enable
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting useVpnNetwork: ${e.message}")
-        }
-    }
 
     fun getBlackBoxCore(): BlackBoxCore {
         return try {
@@ -253,13 +288,14 @@ class BlackBoxLoader {
                                     }
                                 }
 
-                                override fun isUseVpnNetwork(): Boolean {
-                                    return try {
-                                        mUseVpnNetwork
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "Error checking useVpnNetwork: ${e.message}")
-                                        false
-                                    }
+
+
+                                override fun getDnsMode(): String {
+                                    return dnsMode()
+                                }
+
+                                override fun getCustomDns(): String {
+                                    return customDns()
                                 }
 
                                 override fun isDisableFlagSecure(): Boolean {

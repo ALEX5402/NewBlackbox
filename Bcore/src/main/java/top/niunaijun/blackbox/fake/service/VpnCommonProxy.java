@@ -9,7 +9,6 @@ import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.BActivityThread;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
-import top.niunaijun.blackbox.proxy.ProxyVpnService;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
 
@@ -40,7 +39,7 @@ public class VpnCommonProxy {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             VpnConfigContext vpnConfigContext = BRVpnConfig.get(args[0]);
-            vpnConfigContext._set_user(ProxyVpnService.class.getName());
+            vpnConfigContext._set_user(BlackBoxCore.getHostPkg());
 
             handlePackage(vpnConfigContext.allowedApplications());
             handlePackage(vpnConfigContext.disallowedApplications());
