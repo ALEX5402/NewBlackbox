@@ -957,7 +957,6 @@ public class BlackBoxCore extends ClientConfiguration {
         }
         
         
-        initVpnService();
         
         HookManager.get().init();
     }
@@ -1265,7 +1264,82 @@ public class BlackBoxCore extends ClientConfiguration {
         return mClientConfiguration.isDisableFlagSecure();
     }
 
+    @Override
+    public String getDnsMode() {
+        return mClientConfiguration != null ? mClientConfiguration.getDnsMode() : "system";
+    }
 
+    @Override
+    public String getCustomDns() {
+        return mClientConfiguration != null ? mClientConfiguration.getCustomDns() : "";
+    }
+
+    public List<java.net.InetAddress> getEffectiveDnsServers() {
+        List<java.net.InetAddress> servers = new ArrayList<>();
+        String mode = getDnsMode();
+        if (mode == null) mode = "system";
+        try {
+            switch (mode.toLowerCase()) {
+                case "cloudflare":
+                    servers.add(java.net.InetAddress.getByName("1.1.1.1"));
+                    servers.add(java.net.InetAddress.getByName("1.0.0.1"));
+                    break;
+                case "google":
+                    servers.add(java.net.InetAddress.getByName("8.8.8.8"));
+                    servers.add(java.net.InetAddress.getByName("8.8.4.4"));
+                    break;
+                case "adguard":
+                    servers.add(java.net.InetAddress.getByName("94.140.14.14"));
+                    servers.add(java.net.InetAddress.getByName("94.140.15.15"));
+                    break;
+                case "custom":
+                    String custom = getCustomDns();
+                    if (custom != null && !custom.trim().isEmpty()) {
+                        String clean = custom.trim();
+                        if (clean.startsWith("https://") || clean.startsWith("http://")) {
+                            try {
+                                java.net.URI uri = new java.net.URI(clean);
+                                String host = uri.getHost();
+                                if (host != null && !host.isEmpty()) {
+                                    clean = host;
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        } else if (clean.startsWith("tls://") || clean.startsWith("quic://")) {
+                            clean = clean.substring(clean.indexOf("://") + 3);
+                        }
+                        if (clean.contains("/")) {
+                            clean = clean.substring(0, clean.indexOf("/"));
+                        }
+                        if (clean.contains(":")) {
+                            clean = clean.split(":")[0];
+                        }
+                        String[] parts = clean.split("[,; ]+");
+                        for (String part : parts) {
+                            if (!part.isEmpty()) {
+                                try {
+                                    servers.add(java.net.InetAddress.getByName(part));
+                                } catch (Exception e) {
+                                    Slog.w(TAG, "Failed to parse custom DNS host: " + part);
+                                }
+                            }
+                        }
+                    }
+                    if (servers.isEmpty()) {
+                        servers.add(java.net.InetAddress.getByName("1.1.1.1"));
+                    }
+                    break;
+                case "system":
+                default:
+                    servers.add(java.net.InetAddress.getByName("8.8.8.8"));
+                    servers.add(java.net.InetAddress.getByName("1.1.1.1"));
+                    break;
+            }
+        } catch (Exception e) {
+            Slog.e(TAG, "Error resolving effective DNS servers: " + e.getMessage());
+        }
+        return servers;
+    }
 
     @Override
     public String getHostPackageName() {
@@ -1676,45 +1750,6 @@ public class BlackBoxCore extends ClientConfiguration {
             }
         } catch (Exception e) {
             Slog.w(TAG, "Failed to set essential properties: " + e.getMessage());
-        }
-    }
-    
-    
-    private void initVpnService() {
-        try {
-            
-            if (mClientConfiguration == null || !mClientConfiguration.isUseVpnNetwork()) {
-                Slog.d(TAG, "VPN network mode disabled, using normal network");
-                return;
-            }
-            
-            
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        
-                        Intent vpnIntent = new Intent(getContext(), top.niunaijun.blackbox.proxy.ProxyVpnService.class);
-                        vpnIntent.setAction("android.net.VpnService");
-                        
-                        if (BuildCompat.isOreo()) {
-                            getContext().startForegroundService(vpnIntent);
-                        } else {
-                            getContext().startService(vpnIntent);
-                        }
-                        
-                        Slog.d(TAG, "VPN service started successfully for internet access");
-                    } catch (Exception e) {
-                        Slog.w(TAG, "Failed to start VPN service: " + e.getMessage());
-                        
-                        
-                    }
-                }
-            }, "VPNServiceInit").start();
-            
-        } catch (Exception e) {
-            Slog.w(TAG, "Failed to initialize VPN service: " + e.getMessage());
-            
         }
     }
     

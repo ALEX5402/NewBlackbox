@@ -66,5 +66,21 @@
     <string name="enable_gms_hint">Opening Google services can make youtube and other software that strongly rely on Google play services run normally.</string>
     <string name="disable_gms">Disable Service</string>
     <string name="disable_gms_hint">Clear the current Google service environment? Google service data will be cleared.</string>
+    <string name="dns_setting">Private DNS</string>
+    <string name="dns_setting_summary">Configure DNS resolver for sandboxed apps</string>
+    <string name="dns_mode">DNS Provider</string>
+    <string name="dns_custom_ip">Custom DNS Server / URL</string>
+    <string name="dns_custom_ip_summary">IP address or DNS URL (e.g. 1.1.1.1 or https://dns.google/dns-query)</string>
+    <string name="theme_setting">Theme</string>
+    <string name="theme_setting_summary">Choose app appearance and Material You dynamic colors</string>
+    <string name="snapshot_backup">Create Snapshot Backup</string>
+    <string name="snapshot_backup_summary">Backup apps, app data, logins, accounts and configurations</string>
+    <string name="snapshot_restore">Restore Snapshot</string>
+    <string name="snapshot_restore_summary">Restore apps, app data, logins and configurations from backup</string>
+    <string name="snapshot_creating">Creating backup snapshot...</string>
+    <string name="snapshot_created">Snapshot created successfully</string>
+    <string name="snapshot_restoring">Restoring snapshot...</string>
+    <string name="snapshot_restored">Snapshot restored successfully. Please restart app.</string>
+    <string name="snapshot_failed">Snapshot operation failed: %s</string>
     <string name="no_gms">Currently, there is no Google service environment on mobile phones.</string>
 </resources>

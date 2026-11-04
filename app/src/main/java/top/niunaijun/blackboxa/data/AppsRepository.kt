@@ -258,13 +258,6 @@ class AppsRepository {
                     }
 
                     
-                    if (applicationInfo == null) {
-                        Log.w(
-                                TAG,
-                                "getVmInstallList: Skipping null applicationInfo at index $index"
-                        )
-                        return@forEachIndexed
-                    }
 
                     
                     if (applicationInfo.packageName.isNullOrBlank()) {
@@ -298,7 +291,7 @@ class AppsRepository {
                 } catch (e: Exception) {
                     Log.e(
                             TAG,
-                            "getVmInstallList: Error processing app at index $index (${applicationInfo?.packageName}): ${e.message}"
+                            "getVmInstallList: Error processing app at index $index (${applicationInfo.packageName}): ${e.message}"
                     )
                     
                 }
@@ -367,7 +360,6 @@ class AppsRepository {
             ) {
                 
                 try {
-                    val blackBoxCore = BlackBoxCore.get()
                     val hostPackageName = BlackBoxCore.getHostPkg()
 
                     

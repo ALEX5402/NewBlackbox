@@ -18,6 +18,7 @@ import black.android.os.BRServiceManager;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.ScanClass;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
+import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
@@ -173,8 +174,7 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
             
             java.util.List<java.net.InetAddress> dnsServers = new java.util.ArrayList<>();
             try {
-                dnsServers.add(java.net.InetAddress.getByName("8.8.8.8"));
-                dnsServers.add(java.net.InetAddress.getByName("8.8.4.4"));
+                dnsServers.addAll(BlackBoxCore.get().getEffectiveDnsServers());
                 
                 
                 Method setDnsServersMethod = linkProperties.getClass().getMethod("setDnsServers", java.util.List.class);
@@ -491,9 +491,7 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             try {
                 
-                java.util.List<java.net.InetAddress> dnsServers = new java.util.ArrayList<>();
-                dnsServers.add(java.net.InetAddress.getByName("8.8.8.8"));
-                dnsServers.add(java.net.InetAddress.getByName("8.8.4.4"));
+                java.util.List<java.net.InetAddress> dnsServers = new java.util.ArrayList<>(BlackBoxCore.get().getEffectiveDnsServers());
                 Slog.d(TAG, "Returning system DNS servers for sandboxed app");
                 return dnsServers;
             } catch (Exception e) {

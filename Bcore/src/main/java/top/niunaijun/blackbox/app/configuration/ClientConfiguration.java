@@ -22,12 +22,16 @@ public abstract class ClientConfiguration {
     }
 
     
-    public boolean isUseVpnNetwork() {
+    public boolean isDisableFlagSecure() {
         return false;
     }
 
-    public boolean isDisableFlagSecure() {
-        return false;
+    public String getDnsMode() {
+        return "system";
+    }
+
+    public String getCustomDns() {
+        return "";
     }
 
     
