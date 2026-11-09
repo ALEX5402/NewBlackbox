@@ -138,6 +138,17 @@ public class ActivityStack {
         }
 
         
+        if (taskRecord == null) {
+            ComponentName target = ComponentUtils.toComponentName(activityInfo);
+            synchronized (mLaunchingActivities) {
+                for (ActivityRecord launching : mLaunchingActivities) {
+                    if (!launching.finished && launching.userId == userId && target.equals(launching.component)) {
+                        Slog.w(TAG, "ignoring duplicate launch of " + target);
+                        return 0;
+                    }
+                }
+            }
+        }
         if (taskRecord == null || taskRecord.needNewTask()) {
             return startActivityInNewTaskLocked(userId, intent, activityInfo, resultTo, launchModeFlags);
         }
@@ -385,7 +396,7 @@ public class ActivityStack {
         synchronized (mLaunchingActivities) {
             mLaunchingActivities.add(targetRecord);
             Message obtain = Message.obtain(mHandler, LAUNCH_TIME_OUT, targetRecord);
-            mHandler.sendMessageDelayed(obtain, 2000);
+            mHandler.sendMessageDelayed(obtain, 10000);
         }
         return targetRecord;
     }
