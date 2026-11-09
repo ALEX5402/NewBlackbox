@@ -596,6 +596,29 @@ public class IConnectivityManagerProxy extends BinderInvocationStub {
     }
 
     
+    // MULTICLONE_NETINFO_FOR_UID
+    @ProxyMethod("getNetworkInfoForUid")
+    public static class GetNetworkInfoForUid extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] instanceof Integer) {
+                        args[i] = android.os.Process.myUid();
+                        break;
+                    }
+                }
+            }
+            try {
+                Object result = method.invoke(who, args);
+                if (result != null) return result;
+            } catch (Throwable e) {
+                Slog.w(TAG, "getNetworkInfoForUid failed, using fallback: " + e);
+            }
+            return createNetworkInfo(ConnectivityManager.TYPE_WIFI, 0, "WIFI", "");
+        }
+    }
+
     @ProxyMethod("getActiveNetworkInfoForUid")
     public static class GetActiveNetworkInfoForUid extends MethodHook {
         @Override
