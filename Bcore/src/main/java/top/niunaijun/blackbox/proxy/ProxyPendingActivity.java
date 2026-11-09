@@ -18,15 +18,26 @@ public class ProxyPendingActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        finish();
         ProxyPendingRecord pendingActivityRecord = ProxyPendingRecord.create(getIntent());
         Slog.d(TAG, "ProxyPendingActivity: " + pendingActivityRecord);
-        if (pendingActivityRecord.mTarget == null)
+        if (pendingActivityRecord.mTarget == null) {
+            finish();
             return;
-        pendingActivityRecord.mTarget.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        pendingActivityRecord.mTarget.setExtrasClassLoader(BlackBoxCore.getApplication().getClassLoader());
-        startActivity(pendingActivityRecord.mTarget);
+        }
+        Intent target = pendingActivityRecord.mTarget;
+        target.setExtrasClassLoader(BlackBoxCore.getApplication().getClassLoader());
+        android.content.ComponentName caller = getCallingActivity();
+        if (caller != null) {
+            target.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+            target.putExtra(EXTRA_RESULT_CALLER, caller.flattenToString());
+        } else {
+            target.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        startActivity(target);
+        finish();
     }
+
+    public static final String EXTRA_RESULT_CALLER = "_B_|_result_caller_";
 
     public static class P0 extends ProxyPendingActivity {
 
