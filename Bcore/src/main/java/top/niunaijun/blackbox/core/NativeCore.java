@@ -63,6 +63,10 @@ public class NativeCore {
                 }
                 
                 
+                if (android.os.Binder.getCallingPid() == Process.myPid()) {
+                    int selfBUid = top.niunaijun.blackbox.app.BActivityThread.getBUid();
+                    if (selfBUid > 0) return selfBUid;
+                }
                 try {
                     int callingBUid = BlackBoxCore.getCallingBUid();
                     if (callingBUid > 0 && callingBUid < Process.LAST_APPLICATION_UID) {
