@@ -1761,7 +1761,14 @@ public class BAccountManagerService extends IBAccountManagerService.Stub impleme
 
 
 
-            if (!mContext.bindService(intent, this, flags)) {
+            boolean bound;
+            try {
+                bound = mContext.bindService(intent, this, flags);
+            } catch (SecurityException e) {
+                Slog.w(TAG, "bindService to " + componentName + " denied", e);
+                bound = false;
+            }
+            if (!bound) {
                 if (Log.isLoggable(TAG, Log.VERBOSE)) {
                     Log.v(TAG, "bindService to " + componentName + " failed");
                 }

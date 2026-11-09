@@ -44,12 +44,38 @@ public class IUserManagerProxy extends BinderInvocationStub {
         }
     }
 
+    @ProxyMethod("getApplicationRestrictionsForUser")
+    public static class GetApplicationRestrictionsForUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            args[0] = BlackBoxCore.getHostPkg();
+            try {
+                return method.invoke(who, args);
+            } catch (Throwable e) {
+                return new android.os.Bundle();
+            }
+        }
+    }
+
     @ProxyMethod("getProfileParent")
     public static class GetProfileParent extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             Object blackBox = BRUserInfo.get()._new(BActivityThread.getUserId(), "BlackBox", BRUserInfo.get().FLAG_PRIMARY());
             return blackBox;
+        }
+    }
+
+    @ProxyMethod("hasBaseUserRestriction")
+    public static class HasBaseUserRestriction extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            try {
+                Object real = method.invoke(who, args);
+                if (real instanceof Boolean) return real;
+            } catch (Throwable ignored) {
+            }
+            return false;
         }
     }
 
