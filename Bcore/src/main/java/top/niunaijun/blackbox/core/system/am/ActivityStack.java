@@ -105,6 +105,24 @@ public class ActivityStack {
         Log.d(TAG, "startActivityLocked : " + resolveInfo.activityInfo);
         ActivityInfo activityInfo = resolveInfo.activityInfo;
 
+        String resultCaller = null;
+        try {
+            resultCaller = intent.getStringExtra(top.niunaijun.blackbox.proxy.ProxyPendingActivity.EXTRA_RESULT_CALLER);
+        } catch (Throwable ignored) {
+        }
+        if (resultCaller != null) {
+            intent.removeExtra(top.niunaijun.blackbox.proxy.ProxyPendingActivity.EXTRA_RESULT_CALLER);
+            ActivityRecord caller = findResultCallerLocked(userId, ComponentName.unflattenFromString(resultCaller));
+            if (caller != null && resultTo != null) {
+                Log.d(TAG, "forwarding result of " + activityInfo.name + " to " + caller.component);
+                ActivityRecord selfRecord = newActivityRecord(intent, activityInfo, caller.token, userId);
+                Intent shadow = startActivityProcess(userId, intent, activityInfo, selfRecord);
+                shadow.setAction(UUID.randomUUID().toString());
+                shadow.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                return realStartActivityLocked(caller.processRecord.appThread, shadow, resolvedType, resultTo, null, -1, flags, options);
+            }
+        }
+
         ActivityRecord sourceRecord = findActivityRecordByToken(userId, resultTo);
         if (sourceRecord == null) {
             resultTo = null;
@@ -404,6 +422,33 @@ public class ActivityStack {
             }
         }
         return record;
+    }
+
+    /** Top-most activity of the clone running in the proxy process of {@code caller} (ProxyActivity$P<bpid>). */
+    private ActivityRecord findResultCallerLocked(int userId, ComponentName caller) {
+        if (caller == null || !caller.getPackageName().equals(BlackBoxCore.getHostPkg())) return null;
+        String cls = caller.getClassName();
+        int index = cls.lastIndexOf("$P");
+        if (index < 0) return null;
+        int bpid;
+        try {
+            bpid = Integer.parseInt(cls.substring(index + 2));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        synchronized (mTasks) {
+            synchronizeTasks();
+            for (TaskRecord task : mTasks.values()) {
+                if (task.userId != userId) continue;
+                for (int i = task.activities.size() - 1; i >= 0; i--) {
+                    ActivityRecord record = task.activities.get(i);
+                    if (!record.finished && record.processRecord != null && record.processRecord.bpid == bpid) {
+                        return record;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private ActivityRecord findActivityRecordByToken(int userId, IBinder token) {
