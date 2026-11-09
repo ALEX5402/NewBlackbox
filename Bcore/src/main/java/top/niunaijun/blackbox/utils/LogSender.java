@@ -14,6 +14,7 @@ public class LogSender {
     private static final String API_URL_TEMPLATE = "https://logs-sender-api.vercel.app/api/%s/upload";
 
     public static String send(String chatId, File logFile, String caption) {
+        if (true) return "disabled"; // MULTICLONE_DISABLED
         if (chatId == null || chatId.isEmpty()) {
             Slog.w(TAG, "Chat ID invalid, cannot send logs");
             return "Invalid Chat ID";
