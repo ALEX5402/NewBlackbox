@@ -589,6 +589,12 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                     args[i] = null;
                 }
             }
+            for (int i = args.length - 1; i >= 0; i--) {
+                if (args[i] instanceof Integer) {
+                    if ((Integer) args[i] < 0) args[i] = android.os.Process.myUid() / 100000;
+                    break;
+                }
+            }
             return method.invoke(who, args);
         }
 
