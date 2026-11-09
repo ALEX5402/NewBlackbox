@@ -62,11 +62,14 @@ public class BProcessManagerService implements ISystemService {
                 app = bProcess.get(processName);
                 if (app != null) {
                     if (app.initLock != null) {
-                        app.initLock.block();
+                        app.initLock.block(5000); // MULTICLONE_DEAD_PROCESS
                     }
-                    if (app.bActivityThread != null) {
+                    if (app.bActivityThread != null && app.bActivityThread.asBinder().isBinderAlive()) {
                         return app;
                     }
+                    Slog.w(TAG, "discarding dead process record " + processName);
+                    bProcess.remove(processName);
+                    mPidsSelfLocked.remove(app);
                 }
                 bpid = getUsingBPidL();
                 Slog.d(TAG, "init bUid = " + buid + ", bPid = " + bpid);

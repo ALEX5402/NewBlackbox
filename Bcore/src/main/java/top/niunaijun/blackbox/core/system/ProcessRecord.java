@@ -58,9 +58,12 @@ public class ProcessRecord extends Binder {
     }
 
     public void kill() {
-        if (pid > 0) {
+        // MULTICLONE_KILL_PID
+        int target = pid > 0 ? pid : top.niunaijun.blackbox.core.system.BProcessManagerService.getPid(
+                top.niunaijun.blackbox.BlackBoxCore.getContext(), ProxyManifest.getProcessName(bpid));
+        if (target > 0) {
             try {
-                Process.killProcess(pid);
+                Process.killProcess(target);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
