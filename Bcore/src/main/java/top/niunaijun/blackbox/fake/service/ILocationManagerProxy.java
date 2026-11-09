@@ -202,7 +202,12 @@ public class ILocationManagerProxy extends BinderInvocationStub {
 
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return Arrays.asList(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER);
+            try { // MULTICLONE_ALL_PROVIDERS
+                Object real = method.invoke(who, args);
+                if (real instanceof java.util.List && !((java.util.List<?>) real).isEmpty()) return real;
+            } catch (Throwable ignored) {
+            }
+            return Arrays.asList(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER, "fused");
         }
     }
 
@@ -211,8 +216,15 @@ public class ILocationManagerProxy extends BinderInvocationStub {
 
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            String provider = (String) args[0];
-            return Objects.equals(provider, LocationManager.GPS_PROVIDER);
+            String provider = (String) args[0]; // MULTICLONE_REAL_PROVIDERS
+            try {
+                Object real = method.invoke(who, args);
+                if (real instanceof Boolean) return real;
+            } catch (Throwable ignored) {
+            }
+            return Objects.equals(provider, LocationManager.GPS_PROVIDER)
+                    || Objects.equals(provider, LocationManager.NETWORK_PROVIDER)
+                    || Objects.equals(provider, "fused");
         }
     }
 
