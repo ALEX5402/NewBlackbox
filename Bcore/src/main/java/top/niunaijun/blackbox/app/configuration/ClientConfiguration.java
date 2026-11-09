@@ -30,6 +30,14 @@ public abstract class ClientConfiguration {
         return false;
     }
 
+    /**
+     * Dumps the device logcat to Download/logs from the main process. Disabled by default: the dump contains data of
+     * every app on the device and is written to a public folder.
+     */
+    public boolean isEnableLogcatDump() {
+        return false;
+    }
+
     
     public boolean requestInstallPackage(File file, int userId) {
         return false;

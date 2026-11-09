@@ -860,7 +860,9 @@ public class BlackBoxCore extends ClientConfiguration {
         String processName = getProcessName(getContext());
         if (processName.equals(BlackBoxCore.getHostPkg())) {
             mProcessType = ProcessType.Main;
-            startLogcat();
+            if (isEnableLogcatDump()) {
+                startLogcat();
+            }
         } else if (processName.endsWith(getContext().getString(R.string.black_box_service_name))) {
             mProcessType = ProcessType.Server;
         } else {
@@ -1263,6 +1265,11 @@ public class BlackBoxCore extends ClientConfiguration {
     @Override
     public boolean isDisableFlagSecure() {
         return mClientConfiguration.isDisableFlagSecure();
+    }
+
+    @Override
+    public boolean isEnableLogcatDump() {
+        return mClientConfiguration != null && mClientConfiguration.isEnableLogcatDump();
     }
 
 
