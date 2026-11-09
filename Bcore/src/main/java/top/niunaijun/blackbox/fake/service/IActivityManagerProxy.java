@@ -352,7 +352,9 @@ public class IActivityManagerProxy extends ClassInvocationStub {
 
             
 
-            if (GmsLocationRedirect.matches(intent) && !BlackBoxCore.get().isServerProcess()) {
+            if (GmsLocationRedirect.matches(intent) && !BlackBoxCore.get().isServerProcess()
+                    && BlackBoxCore.get().isUseHostGmsLocation()
+                    && !top.niunaijun.blackbox.fake.frameworks.BLocationManager.isFakeLocationEnable()) {
                 if (connection != null) args[4] = GmsLocationRedirect.wrap(connection);
                 intent.setPackage("com.google.android.gms");
                 args[callingPackageIndex] = BlackBoxCore.getHostPkg();
