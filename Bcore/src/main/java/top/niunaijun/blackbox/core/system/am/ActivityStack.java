@@ -549,5 +549,37 @@ public class ActivityStack {
         }
         mTasks.clear();
         mTasks.putAll(newTacks);
+        java.util.Iterator<Map.Entry<Integer, TaskRecord>> it = mTasks.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Integer, TaskRecord> entry = it.next();
+            TaskRecord task = entry.getValue();
+            synchronized (task.activities) {
+                java.util.Iterator<ActivityRecord> records = task.activities.iterator();
+                while (records.hasNext()) {
+                    if (!isProcessAlive(records.next().processRecord)) records.remove();
+                }
+                if (!task.activities.isEmpty()) continue;
+            }
+            it.remove();
+            removeSystemTask(entry.getKey());
+        }
+    }
+
+    private static boolean isProcessAlive(ProcessRecord p) {
+        return p != null && p.bActivityThread != null && p.bActivityThread.asBinder().isBinderAlive();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void removeSystemTask(int taskId) {
+        for (ActivityManager.AppTask task : mAms.getAppTasks()) {
+            try {
+                if (task.getTaskInfo().id == taskId) {
+                    task.finishAndRemoveTask();
+                    Slog.d(TAG, "removed dead task " + taskId);
+                    return;
+                }
+            } catch (Throwable ignored) {
+            }
+        }
     }
 }
