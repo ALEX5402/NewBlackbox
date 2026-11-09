@@ -43,6 +43,58 @@ public class IAppOpsManagerProxy extends BinderInvocationStub {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return adaptResult(method, args, invokeOps(proxy, method, args));
+    }
+
+    private static Object adaptResult(Method method, Object[] args, Object result) {
+        Class<?> type = method.getReturnType();
+        if (!(result instanceof Integer) || type == int.class || type == Integer.class || type == void.class) {
+            return result;
+        }
+        int mode = (Integer) result;
+        if (type == boolean.class) return mode == AppOpsManager.MODE_ALLOWED;
+        if ("android.app.SyncNotedAppOp".equals(type.getName())) return newSyncNotedAppOp(type, mode, firstInt(args));
+        return type.isInstance(result) ? result : null;
+    }
+
+    private static Object newSyncNotedAppOp(Class<?> type, int mode, int op) {
+        try {
+            java.lang.reflect.Constructor<?> c = type.getDeclaredConstructor(int.class, int.class, String.class, String.class);
+            c.setAccessible(true);
+            return c.newInstance(mode, op, null, null);
+        } catch (Throwable ignored) {
+        }
+        try {
+            java.lang.reflect.Constructor<?> c = type.getDeclaredConstructor(int.class, int.class, String.class);
+            c.setAccessible(true);
+            return c.newInstance(mode, op, null);
+        } catch (Throwable ignored) {
+        }
+        try {
+            Object op2 = type.getConstructor(int.class, String.class).newInstance(op, null);
+            try {
+                java.lang.reflect.Field f = type.getDeclaredField("mOpMode");
+                f.setAccessible(true);
+                f.setInt(op2, mode);
+            } catch (Throwable ignored) {
+            }
+            return op2;
+        } catch (Throwable e) {
+            Slog.w(TAG, "AppOps: cannot create SyncNotedAppOp", e);
+            return null;
+        }
+    }
+
+    private static int firstInt(Object[] args) {
+        if (args != null) {
+            for (Object a : args) {
+                if (a instanceof Integer) return (Integer) a;
+            }
+        }
+        return 0;
+    }
+
+    private Object invokeOps(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
         
         

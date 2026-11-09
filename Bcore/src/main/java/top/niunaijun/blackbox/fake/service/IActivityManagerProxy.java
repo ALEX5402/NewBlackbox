@@ -109,6 +109,15 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             
             String methodName = method.getName();
             Slog.w(TAG, "ActivityManager invoke: SecurityException in " + methodName + ", returning safe default", e);
+            Class<?> type = method.getReturnType();
+            if (type == boolean.class) return methodName.startsWith("stop") || methodName.startsWith("unbind");
+            if (type == int.class) return 0;
+            if (type == long.class) return 0L;
+            if (type == float.class) return 0f;
+            if (type == double.class) return 0d;
+            if (type == short.class) return (short) 0;
+            if (type == byte.class) return (byte) 0;
+            if (type == char.class) return (char) 0;
             
             
             if (methodName.startsWith("set") || methodName.startsWith("update")) {
@@ -873,6 +882,21 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 e.printStackTrace();
             }
             return 0;
+        }
+    }
+
+    @ProxyMethod("getUidProcessState")
+    public static class GetUidProcessState extends MethodHook {
+        private static final int PROCESS_STATE_TOP = 2; // ActivityManager.PROCESS_STATE_TOP (@hide)
+
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            try {
+                Object real = method.invoke(who, args);
+                if (real instanceof Integer) return real;
+            } catch (Throwable ignored) {
+            }
+            return PROCESS_STATE_TOP;
         }
     }
 
