@@ -46,6 +46,10 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
         if ("asBinder".equals(method.getName())) {
             return method.invoke(mBase, args);
         }
+        Object googleSettings = handleGoogleSettings(method.getName(), args);
+        if (googleSettings != null) {
+            return googleSettings;
+        }
         
         
         String methodName = method.getName();
@@ -121,6 +125,97 @@ public class ContentProviderStub extends ClassInvocationStub implements BContent
         }
     }
     
+    private static final String GOOGLE_SETTINGS_AUTHORITY = "com.google.settings";
+
+    private static Object handleGoogleSettings(String methodName, Object[] args) {
+        if (args == null) return null;
+        android.net.Uri uri = null;
+        for (Object arg : args) {
+            if (arg instanceof android.net.Uri) {
+                uri = (android.net.Uri) arg;
+                break;
+            }
+        }
+        if (uri == null || !GOOGLE_SETTINGS_AUTHORITY.equals(uri.getAuthority())
+                || !"partner".equals(uri.getPathSegments().isEmpty() ? null : uri.getPathSegments().get(0))) {
+            return null;
+        }
+        try {
+            if ("insert".equals(methodName)) {
+                for (Object arg : args) {
+                    if (arg instanceof android.content.ContentValues) {
+                        android.content.ContentValues values = (android.content.ContentValues) arg;
+                        String name = values.getAsString("name");
+                        if (name == null) return null;
+                        storeGoogleSetting(name, values.getAsString("value"));
+                        return android.net.Uri.withAppendedPath(uri, name);
+                    }
+                }
+            } else if ("query".equals(methodName)) {
+                String name = selectedGoogleSetting(args);
+                if (name == null) return null;
+                java.util.Properties settings = loadGoogleSettings();
+                if (!settings.containsKey(name)) return null;
+                String[] projection = null;
+                for (Object arg : args) {
+                    if (arg instanceof String[]) {
+                        projection = (String[]) arg;
+                        break;
+                    }
+                }
+                if (projection == null) projection = new String[]{"_id", "name", "value"};
+                Object[] row = new Object[projection.length];
+                for (int i = 0; i < projection.length; i++) {
+                    if ("name".equals(projection[i])) row[i] = name;
+                    else if ("value".equals(projection[i])) row[i] = settings.getProperty(name);
+                    else if ("_id".equals(projection[i])) row[i] = 1;
+                }
+                android.database.MatrixCursor cursor = new android.database.MatrixCursor(projection, 1);
+                cursor.addRow(row);
+                return cursor;
+            }
+        } catch (Throwable e) {
+            Slog.w(TAG, "Google settings virtualization failed", e);
+        }
+        return null;
+    }
+
+    private static String selectedGoogleSetting(Object[] args) {
+        for (Object arg : args) {
+            if (arg instanceof Bundle) {
+                String[] selectionArgs = ((Bundle) arg).getStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS);
+                if (selectionArgs != null && selectionArgs.length > 0) return selectionArgs[0];
+            }
+        }
+        return null;
+    }
+
+    private static java.io.File googleSettingsFile() {
+        return new java.io.File(BlackBoxCore.getContext().getFilesDir(), "google_settings_" + BActivityThread.getUserId() + ".properties");
+    }
+
+    private static synchronized java.util.Properties loadGoogleSettings() {
+        java.util.Properties settings = new java.util.Properties();
+        java.io.File file = googleSettingsFile();
+        if (file.exists()) {
+            try (java.io.InputStream in = new java.io.FileInputStream(file)) {
+                settings.load(in);
+            } catch (java.io.IOException e) {
+                Slog.w(TAG, "Cannot read " + file, e);
+            }
+        }
+        return settings;
+    }
+
+    private static synchronized void storeGoogleSetting(String name, String value) throws java.io.IOException {
+        java.util.Properties settings = loadGoogleSettings();
+        if (value == null) settings.remove(name);
+        else settings.setProperty(name, value);
+        try (java.io.OutputStream out = new java.io.FileOutputStream(googleSettingsFile())) {
+            settings.store(out, null);
+        }
+    }
+
     private Object getSafeDefaultValue(String methodName) {
         switch (methodName) {
             case "query":
