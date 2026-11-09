@@ -352,6 +352,13 @@ public class IActivityManagerProxy extends ClassInvocationStub {
 
             
 
+            if (GmsLocationRedirect.matches(intent) && !BlackBoxCore.get().isServerProcess()) {
+                if (connection != null) args[4] = GmsLocationRedirect.wrap(connection);
+                intent.setPackage("com.google.android.gms");
+                args[callingPackageIndex] = BlackBoxCore.getHostPkg();
+                return method.invoke(who, args);
+            }
+
             int userId = intent.getIntExtra("_B_|_UserId", -1);
             userId = userId == -1 ? BActivityThread.getUserId() : userId;
             ResolveInfo resolveInfo = BlackBoxCore.getBPackageManager().resolveService(intent, 0, resolvedType, userId);
@@ -458,6 +465,11 @@ public class IActivityManagerProxy extends ClassInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             IServiceConnection iServiceConnection = (IServiceConnection) args[0];
             if (iServiceConnection == null) {
+                return method.invoke(who, args);
+            }
+            IServiceConnection redirect = GmsLocationRedirect.getWrapper(iServiceConnection.asBinder());
+            if (redirect != null) {
+                args[0] = redirect;
                 return method.invoke(who, args);
             }
             BlackBoxCore.getBActivityManager().unbindService(iServiceConnection.asBinder(), BActivityThread.getUserId());
