@@ -57,8 +57,12 @@ public class ILocationManagerProxy extends BinderInvocationStub {
             if (method.getName().equals("getLastLocation") || 
                 method.getName().equals("getLastKnownLocation") ||
                 method.getName().equals("requestLocationUpdates")) {
-                Log.w(TAG, "Blocking location request from Google Play Services to prevent crash");
-                return null;
+                try {
+                    return super.invoke(proxy, method, args);
+                } catch (Throwable e) {
+                    Log.w(TAG, "GMS " + method.getName() + " failed", e);
+                    return method.getReturnType() == int.class ? 0 : null;
+                }
             }
         }
         
@@ -194,6 +198,19 @@ public class ILocationManagerProxy extends BinderInvocationStub {
                 return LocationManager.GPS_PROVIDER;
             }
             return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("setLocationEnabledForUser")
+    public static class SetLocationEnabledForUser extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            try {
+                return method.invoke(who, args);
+            } catch (Throwable e) {
+                Log.w(TAG, "setLocationEnabledForUser ignored: " + e.getCause());
+                return null;
+            }
         }
     }
 
