@@ -135,7 +135,14 @@ public class IPackageManagerProxy extends BinderInvocationStub {
             
             
             if ("com.android.vending".equals(packageName)) {
-                return createFakeGooglePlayServicesPackageInfo();
+                PackageInfo real = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, flags, BlackBoxCore.getUserId());
+                if (real == null) {
+                    try {
+                        real = (PackageInfo) method.invoke(who, args);
+                    } catch (Throwable ignored) {
+                    }
+                }
+                return real != null ? real : createFakeGooglePlayServicesPackageInfo();
             }
             
             PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, flags, BlackBoxCore.getUserId());
